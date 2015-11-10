@@ -1,0 +1,26 @@
+#!/bin/sh
+
+FILES="\
+cuisine.ico \
+recettes.* \
+html \
+"
+
+USER="sbaus"
+PASSWORD="1chermis"
+
+#ncftpput -R -u $USER -p $PASSWORD sbaus.free.fr bookmarks home/*
+#ncftpput -R -u $USER -p $PASSWORD ftpperso.free.fr cuisine cuisine.ico
+#ncftpput -R -u $USER -p $PASSWORD ftpperso.free.fr cuisine recettes.*
+
+ncftpput -R -u $USER -p $PASSWORD sbaus.free.fr flore fam/* 
+
+#cd fam
+#for file in `find |egrep ".*[a-z]$"`
+#do
+#echo $file
+#ncftpput -C -u $USER -p $PASSWORD sbaus.free.fr $file flore/$file
+#done
+# |xargs -n 1  ncftpput -C -u $USER -p $PASSWORD sbaus.free.fr '{}' flore/'{}'
+
+

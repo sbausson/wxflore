@@ -1,0 +1,116 @@
+L : lumière
+1 : hypersciaphiles
+2 : sciaphiles
+3 : intermédiaires
+4 : hémisciaphiles
+5 : intermédiaires
+6 : hémihéliophiles
+7 : intermédiaires
+8 : héliophiles
+9 : hyperhéliophiles
+
+T : Température
+1 : alpines à nivales, altiméditerranéennes
+2 : subalpines, oroméditerranéennes
+3 : montagnardes
+4 : collinéennes, psychroatlantiques
+5 : planitiaires à montagnardes
+"6 : planitiaires thermophiles, thermoatlantiques, thermocontinentales, 
+subméditerranéennes, supraméditerranéennes"
+7 : euryméditerranéennes, méditerranéo-atlantiques
+8 : mésoméditerranéennes
+9 : thermoméditerranéennes à subdésertiques
+
+C : Continentalité
+1 : marines à maritimes
+2 : hyperocéaniques
+3 : océaniques
+4 : subocéaniques
+5 : intermédiaires
+6 : précontinentales
+7 : subcontinentales
+8 : continentales
+9 : hypercontinentales
+
+HA : Humidité atmosphérique
+1 : aéroxérophiles
+2 : intermédiaires
+3 : aéromésoxérophiles
+4 : intermédiaires
+5 : aéromésohydriques
+6 : intermédiaires
+7 : aéromésohygrophiles
+8 : intermédiaires
+9 : aérohydrophiles
+
+HE : Humidité édaphique
+1 : hyperxérophiles (sclérophiles, ligneuses microphylles, réviviscentes)
+2 : perxérophiles (caulocrassulescentes subaphylles, coussinets)
+3 : xérophiles (velues, aiguillonnées, cuticule épaisse)
+4 : mésoxérophiles
+5 : mésohydriques
+6 : mésohygrophiles
+7 : hygrophiles (courtement inondables, en semaines)
+8 : hydrophiles (longuement inondables, en mois)
+9 : amphibies saisonnières (hélophytes exondés une partie minoritaire de l’année)
+10 : amphibies permanentes (hélophytes semiémergés à base toujours noyée)
+11 : aquatiques superficielles (0-50cm)
+12 : aquatiques profondes (1-3m)
+
+R : Réaction du sol (pH)
+1 : hyperacidophiles
+2 : acidophiles
+3 : intermédiaires
+4 : acidoclines (pH<5,5)
+5 : intermédiaires
+6 : neutroclines (pH>5,5)
+7 : neutrophiles
+8 : basophiles
+9 : hyperbasophiles
+
+"N : Nutriments du sol 
+(surtout anions azotés et phosphatés, puis également cations potassiques)"
+1 : hyperoligotrophiles
+2 : oligotrophiles
+3 : intermédiaires
+4 : mésooligotrophiles
+5 : mésotrophiles
+6 : mésoeutrophiles
+7 : intermédiaires
+8 : eutrophiles
+9 : polytrophiles
+
+"S : Salinité (surtout Chlorures, également sodium), 
+modifié d'après Scherfose 1990 et Ellenberg & al. 1992"
+0 : ne supportant pas le sel
+1 : hyperoligohalines, [0-0,1% Cl-]
+2 : peroligohalines, [0,1-0,3% Cl-]
+3 : oligohalines, [0,3-0,5% Cl-]
+4 : mesooligohalines, [0,5-0,7% Cl-]
+5 : mesohalines, [0,7-0,9% Cl-]
+6 : mesoeuhalines, [0,9-1,2% Cl-]
+7 : euhalines, [1,2-1,6% Cl-]
+8 : polyhalines, [1,6-2,3% Cl-]
+9 : hyperhalines, [>2,3% Cl-]
+
+Tx : Texture du sol
+1 : argile
+2 : intermédiaire
+3 : limon
+4 : sable fin
+5 : sable grossier
+6 : graviers
+7 : galets
+8 : blocs, fentes des parois
+9 : dalle
+
+MO : Matière organique du sol et type d'humus
+1 : lithosol, arénosol
+2 : mull carbonaté
+3 : mull actif
+4 : mull acide
+5 : moder
+6 : mor, hydromor, xéromor
+7 : ranker, tangel
+8 : anmoor, gyttja
+9 : tourbe
