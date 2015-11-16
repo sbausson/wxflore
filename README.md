@@ -6,9 +6,11 @@ wxflore-x.x/wxflore.py
 
 $HOME/.wxflore/config.py
 Exemple:
-  flore_root = "/home/git/wxflore/Flores/Main"
-  flore_img_path = "/Bota/Flores/Main/img"
+```
+flore_root = "/home/git/wxflore/Flores/Main"
+flore_img_path = "/Bota/Flores/Main/img"
+```
 
-## Contact
+## Author(s)
 Stéphane Bausson (sbausson [at] gmail.com)
 
