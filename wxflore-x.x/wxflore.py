@@ -2314,8 +2314,12 @@ if __name__ == '__main__':
         import config
         root = config.flore_root
         img_path = config.flore_img_path
+        if hasattr(config,"meta_path"):
+            options.paths.meta = config.meta_path
     except ImportError:
         default_config = 1
+        options.paths.meta = ""
+        
 
     if default_config:
         script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding))) 
@@ -2325,7 +2329,10 @@ if __name__ == '__main__':
         
     if options.paths.db == "":
         db_base_dir = os.path.join(root,"db")
-        options.paths.meta = os.path.join(root,"meta")
+
+        if options.paths.meta != "":
+            options.paths.meta = os.path.join(root,"meta")
+            
         options.paths.db = os.path.join(db_base_dir,"flore.main")
         options.paths.coste = os.path.join(db_base_dir,"flore.coste")
         options.paths.telacol = os.path.join(db_base_dir,"flore.telacol")
