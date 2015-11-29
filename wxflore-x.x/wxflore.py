@@ -2320,17 +2320,16 @@ if __name__ == '__main__':
         default_config = 1
         options.paths.meta = ""
         
-
     if default_config:
         script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding))) 
         root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
         img_path = os.path.join(root,"img")
         print(root,img_path)        
-        
+    
     if options.paths.db == "":
         db_base_dir = os.path.join(root,"db")
 
-        if options.paths.meta != "":
+        if options.paths.meta == "":
             options.paths.meta = os.path.join(root,"meta")
             
         options.paths.db = os.path.join(db_base_dir,"flore.main")
@@ -2353,11 +2352,11 @@ if __name__ == '__main__':
         if not os.path.exists(notes_path):
             os.makedirs(notes_path)
 
-
     options.suffix='.'.join([x for x in options.paths.db.split(os.sep) if x !=""])
 
     print(os.sep)
-    print(options.paths.db) 
+    print(options.paths.db)
+    print("meta= {}".format(options.paths.meta))
     print(options.suffix)
 
     app = wx.App(redirect=False)
