@@ -34,6 +34,7 @@ class OPTIONS:
     tag = ""
     total = 0
     verbose = 0
+    update_file = 0 # to update NL in tela files
     more_directories = []
     warning = 0
     paths = PATHS()
@@ -979,6 +980,19 @@ def parse_SEEALSO(filename,struct,options):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
+def update_file(filename,nl):
+
+    t = []
+    with codecs.open(filename,'r','utf-8') as f:
+        for l in f.readlines():
+            if re.match("^NL:",l):
+                l=u"NL: {}\n".format(nl)
+            t.append(l)
+
+    with codecs.open(filename,'w','utf-8') as f:
+        for l in t:
+            f.write(l)
+            
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -1086,7 +1100,11 @@ def parse_file(filename,name,options):
                                                                                                  options.bdtfx[struct["ID.tela"]]["NL"].encode("utf-8")),"red",
                         options)
                 struct["NL"] = unicode(options.bdtfx[struct["ID.tela"]]["NL"])
-
+                if options.update_file:
+                    resp = raw_input('Update "{}" ? (y/n) '.format(filename))
+                    if resp == "y":
+                        update_file(filename,struct["NL"])
+                        
             elif struct["FA"] != options.bdtfx[struct["ID.tela"]]["fam"]:
                 warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx[struct["ID.tela"]]["fam"]),
                         "cyan",

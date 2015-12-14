@@ -66,7 +66,8 @@ with open(bdtfx_in_file, "r") as csvfile:
             if author.strip() != "" and author_date.strip() != "":
                 s += " [{}, {}]".format(author,author_date)
             elif author.strip() != "":
-                s += " [{}]".format(author,author_date)
+                s += " [{}, {}]".format(author,author_date)
+                #s += " [{}]".format(author,author_date)
 
             nl = s.decode("utf-8")
             nl_t[num] = nl
