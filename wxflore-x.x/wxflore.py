@@ -2287,8 +2287,8 @@ if __name__ == '__main__':
 
     print("wxPython version: {}".format(wx.__version__))
 
-    options = fldb.OPTIONS()
-    #sys.setdefaultencoding('utf8')
+    options = fldb.init() #OPTIONS()
+
     options.noconfig = 0
     options.wxga = 0
     

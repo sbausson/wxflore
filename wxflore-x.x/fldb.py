@@ -59,7 +59,19 @@ cell_format = """<td bgcolor="%s" valign="top"><font color="%s">%s<br></td>"""
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def warning(s,color):
+def init():
+
+    options = OPTIONS()
+    options.log_filename = "wxflore.log"
+    with open(options.log_filename,"w"):
+        pass
+
+    return options
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+def warning(s,color,options):
 
     color_t = {
         "red":91,
@@ -69,9 +81,12 @@ def warning(s,color):
         "magenta":95,
         "cyan":96,
         "white":98,
-}
+    }
 
     print("\033[{}m{}\033[{}m".format(color_t[color],s,0))
+
+    with open(options.log_filename,"a") as f:
+        f.write(s+"\n")
 
 #-------------------------------------------------------------------------------
 # 
@@ -713,7 +728,7 @@ def python_table(base_flore_path,options=OPTIONS()):
     if os.path.exists(os.path.join(options.paths.img,"photos")):
         for filename in  os.listdir(os.path.join(options.paths.img,"photos")):
             if filename not in photos_path_list:
-                warning("## WARNING ## {} photo not linked to any taxon ...".format(filename),"magenta")
+                warning("## WARNING ## {} photo not linked to any taxon ...".format(filename),"magenta",options)
 
     return struct_table 
 
@@ -1068,11 +1083,14 @@ def parse_file(filename,name,options):
                                                                                                  struct["ID.tela"],
                                                                                                  filename,
                                                                                                  struct["NL"].encode("utf-8"),
-                                                                                                 options.bdtfx[struct["ID.tela"]]["NL"].encode("utf-8")),"red")
+                                                                                                 options.bdtfx[struct["ID.tela"]]["NL"].encode("utf-8")),"red",
+                        options)
                 struct["NL"] = unicode(options.bdtfx[struct["ID.tela"]]["NL"])
 
             elif struct["FA"] != options.bdtfx[struct["ID.tela"]]["fam"]:
-                warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx[struct["ID.tela"]]["fam"]),"cyan")
+                warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx[struct["ID.tela"]]["fam"]),
+                        "cyan",
+                        options)
 
             #struct["NL"] = unicode(options.bdtfx[struct["ID.tela"]]["NL"])
             #print(struct["NL"],filename) #options.bdtfx[struct["ID.tela"]])
@@ -1088,7 +1106,8 @@ def parse_file(filename,name,options):
             struct["ID.inpn"] = options.bdtfx[struct["ID.tela"]]["ID.inpn"] 
 
         else:
-            warning("{} not in bdtfx ... {}".format(struct["ID.tela"],filename),"yellow")
+            warning("{} not in bdtfx ... {}".format(struct["ID.tela"],filename),
+                    "yellow",options)
         
     
     # COSTE Description file
