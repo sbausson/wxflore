@@ -55,6 +55,7 @@ with open(bdtfx_in_file, "r") as csvfile:
             num = row[indexes.index("num_nom")]
             num_ref = row[indexes.index("num_nom_retenu")]
             sup_ref = row[indexes.index("num_tax_sup")]
+            num_basio = row[indexes.index("num_basionyme")]
             name_sci = row[indexes.index("nom_sci")]
             genre = row[indexes.index("genre")]
             rang = int(row[indexes.index("rang")])
@@ -72,6 +73,12 @@ with open(bdtfx_in_file, "r") as csvfile:
             nl = s.decode("utf-8")
             nl_t[num] = nl
 
+            if name_sci == "toto":
+                print("num_ref",num_ref)
+                print("sup_ref",sup_ref)
+                print("rang",rang)
+                print("num",num)
+                error()
 
             if num_ref != "":
                 if num_ref not in table.keys():
@@ -87,7 +94,7 @@ with open(bdtfx_in_file, "r") as csvfile:
                 elif num != num_ref:
                     table[num_ref]["syn"].append(num)
                 
-                else:
+                elif num_ref != "":
                     table[num_ref]["NL"] = nl
                     table[num_ref]["ID.inpn"] = id_inpn
                     table[num_ref]["gen"] = genre
