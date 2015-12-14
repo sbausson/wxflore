@@ -987,6 +987,7 @@ class DescriptionPanel(wx.Panel):
         menu = wx.Menu()
 
         self.popupID_COPY_NL_FA_NV_UK = wx.NewId()
+        self.popupID_COPY_NL_FA_NV_UK_diaspora = wx.NewId()
         self.popupID_COPY_NL_FA_NV = wx.NewId()
         self.popupID_COPY_NL_FA = wx.NewId()
         self.popupID_COPY_ID_TELA = wx.NewId()
@@ -1004,6 +1005,7 @@ class DescriptionPanel(wx.Panel):
         self.popupID_EXPORT = wx.NewId()
 
         menu.Append(self.popupID_COPY_NL_FA_NV_UK, "Copy NL (FA) + NV + N.UK")
+        menu.Append(self.popupID_COPY_NL_FA_NV_UK_diaspora, "Copy NL (FA) + NV + N.UK (diaspora)")
         menu.Append(self.popupID_COPY_NL_FA_NV, "Copy NL (FA) + NV")
         menu.Append(self.popupID_COPY_NL_FA, "Copy NL (FA)")
         menu.AppendSeparator()
@@ -1061,6 +1063,36 @@ class DescriptionPanel(wx.Panel):
             except:
                 pass
 
+        elif event.GetId() == self.popupID_COPY_NL_FA_NV_UK_diaspora:
+            #nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
+            nl1, nl2 = re.findall("(.*)\[(.*)\]",self.struct['NL'])[0]
+            nl1 = nl1.strip()
+            nl2 = nl2.strip()
+
+            s = u"***{}***  {}  /  **{}**".format(nl1,nl2,self.struct["FA"])
+            try:
+                s+=u"\nNom(s) français: {}".format(self.struct["NV"].replace(";",",")) #.encode("utf-8"))
+            except:
+                pass
+
+            try:
+                s+=u"\nNom(s) anglais: {}".format(self.struct["N.UK"].replace(";",","))
+            except:
+                pass
+            
+            s+='\n\n'
+            s+='#botanique '
+            s+='#botany '
+            s+='#botanik '
+            s+='#fleur '
+            s+='#bloemen '
+            s+='#plantes '
+            s+='#plants '
+            s+='#planten '
+            s+='#nature '
+            s+='#wild '
+            s+='#{} '.format(self.struct['FA'].lower())
+            
         elif event.GetId() == self.popupID_COPY_NL_FA_NV:
             nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
             s = u"{} / {}".format(nl,self.struct["FA"])
