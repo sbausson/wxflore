@@ -8,7 +8,7 @@ Prerequisites:
 
 WxFlore installation:
 
-Go into Installation Directory of your choice, then
+Go into <DIRECTORY> of your choice, then
 
 ```
 git clone https://github.com/sbausson/wxflore.git
