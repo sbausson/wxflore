@@ -3,11 +3,11 @@
 
 ## Installation
 Prerequisites:
-- latest Python 2.7.x : https://www.python.org/download/releases/2.7/
+- Latest Python 2.7.x : https://www.python.org/download/releases/2.7/
 - wxPython 3.x http://www.wxpython.org/
 
-WxFlore installation
-Go into Installation Directory of your choice, then
+WxFlore installation:
+ Go into Installation Directory of your choice, then
 ```
 git clone https://github.com/sbausson/wxflore.git
 ```
