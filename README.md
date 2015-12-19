@@ -1,6 +1,16 @@
 # wxflore
 **wxflore** Electronic flora written in Python based on wxPython library
 
+## Installation
+Prerequisites:
+- latest Python 2.7.x : https://www.python.org/download/releases/2.7/
+- wxPython 3.x http://www.wxpython.org/
+
+WxFlore:
+Go into Installation Directory of your choice, then
+git clone https://github.com/sbausson/wxflore.git
+
+
 ## Usage
 wxflore-x.x/wxflore.py
 

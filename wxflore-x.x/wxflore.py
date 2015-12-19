@@ -1091,6 +1091,7 @@ class DescriptionPanel(wx.Panel):
             s+='#planten '
             s+='#nature '
             s+='#wild '
+            s+='#{} '.format(nl1.split()[0].lower())
             s+='#{} '.format(self.struct['FA'].lower())
             
         elif event.GetId() == self.popupID_COPY_NL_FA_NV:
