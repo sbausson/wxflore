@@ -7,7 +7,9 @@ Prerequisites:
 - wxPython 3.x http://www.wxpython.org/
 
 WxFlore installation:
- Go into Installation Directory of your choice, then
+
+Go into Installation Directory of your choice, then
+
 ```
 git clone https://github.com/sbausson/wxflore.git
 ```
