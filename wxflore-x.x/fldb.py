@@ -595,18 +595,6 @@ def nyd(filename,struct_table,options):
         print('\n'.join([''.join(s.rjust(35)for s in row) for row in z])) 
         print("-"*100)
 
-#    for i in range(0,max(len(in_list),len(out_list))):
-#        if i >= len(in_list):
-#            in_name = ""
-#        else:
-#            in_name = in_list[i]
-#
-#        if i >= len(out_list):
-#            out_name = ""
-#        else:
-#            out_name = out_list[i]
-#            
-#        print("{0:30} {1:30}".format(in_name,out_name))
 
 #-------------------------------------------------------------------------------
 #
@@ -649,6 +637,13 @@ def python_table(base_flore_path,options=OPTIONS()):
         print('Loading "chorodep.py" ...')
     except:
         print('## WARNING ## : Can not load "chorodep.py !')
+
+    try:
+        import baseveg        
+        options.baseveg_table = baseveg.table
+        print('Loading "baseveg.py" ...')
+    except:
+        print('## WARNING ## : Can not load "baseveg.py !')
 
     
     # Import RED LIST 
@@ -1167,17 +1162,22 @@ def parse_file(filename,name,options):
             if struct["ID.tela"] in options.cat[cat]:
                 struct["cat"].append(cat)
 
-    # Catminat / baseflor + chorodep
+    # Catminat / baseflor
+    #---------------------
     try:
         struct["baseflor"] = options.baseflor_table[struct["ID.tela"]]
     except:
         pass
 
+    # Catminat / chorodep
+    #---------------------
     try:
         struct["chorodep"] = options.chorodep_table[struct["ID.tela"]]
     except:
         pass
-
+    
+    # Catminat / RedList
+    #---------------------
     try:
         struct["redlist"] = options.redlist_table[struct["ID.tela"]]
     except:

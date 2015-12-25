@@ -174,10 +174,73 @@ def IsNotebookPageAlreadyExist(notebook,name):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-class PanelNOTES(wx.Panel):
+class Panel_baseveg(wx.Panel):
+
+    def __init__(self, parent, struct, button, options):
+        print("Panel_baseveg")
+        self.parent = parent
+        self.struct = struct
+        self.button = button
+        self.options = options
+        
+        wx.Panel.__init__(self, parent, -1)
+        self.SetAutoLayout(1)
+
+        self.RTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.TE_MULTILINE)
+
+        font = wx.Font(8, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.NORMAL)
+        self.RTC.BeginFont(font)
+
+        self.RTC.SetBackgroundColour(self.parent.colors.normal[1])
+        self.RTC.SetForegroundColour(self.parent.colors.normal[0])
+        self.RTC.SetEditable(False)
+        #self.RTC.Bind(wx.EVT_RIGHT_DOWN, self.RightClick)
+
+        self.RTC.BeginTextColour(parent.colors.normal[0])
+
+        s=''
+        if 'ID.cat' in struct['baseflor'] and struct['baseflor']['ID.cat'] != '':
+            st = self.options.baseveg_table[struct['baseflor']['ID.cat']]
+            fmt = u' {:<40s}  :  {}\n'
+            s+=fmt.format(u'Dénomination écologique',st['ECO.name'].decode('utf-8'))
+            s+=fmt.format(u'Chorologie mondiale',st['choro.world'].decode('utf-8'))
+            s+=fmt.format(u'Répartition connue en France',st['REP.fr'].decode('utf-8'))
+            s+=fmt.format(u'Physionmie',st['C.physio'].decode('utf-8'))
+            s+=fmt.format(u'Etages altitudinaux (altitude)',st['C.alti'].decode('utf-8'))
+            s+=fmt.format(u'Latitude',st['C.lat'].decode('utf-8'))
+            s+=fmt.format(u'Océanité',st['C.ocea'].decode('utf-8'))
+            s+=fmt.format(u'Température',st['C.temp'].decode('utf-8'))
+            s+=fmt.format(u'Lumière',st['C.lum'].decode('utf-8'))
+            s+=fmt.format(u'Exposition, pente',st['C.exp'].decode('utf-8'))
+            s+=fmt.format(u'Optimum de développement',st['C.opt'].decode('utf-8'))
+            s+=fmt.format(u'Humidité atmosphérique',st['C.humi.nat'].decode('utf-8'))
+            s+=fmt.format(u"Types de sol et d'humus",st['C.humus'].decode('utf-8'))
+            s+=fmt.format(u'Humidité édaphique',st['C.humi.ned'].decode('utf-8'))
+            s+=fmt.format(u'Texture du sol',st['C.tex'].decode('utf-8'))
+            s+=fmt.format(u'Niveau trophique',st['C.niv.troph'].decode('utf-8'))
+            s+=fmt.format(u'pH du sol',st['C.pH'].decode('utf-8'))
+            s+=fmt.format(u'Salinité',st['C.sal'].decode('utf-8'))
+            s+=fmt.format(u'Dynamique',st['C.dyn'].decode('utf-8'))
+            s+=fmt.format(u'Influences anthropozoogènes',st['C.infl'].decode('utf-8'))
+
+#    ['SYNTAXON','SYNTAXON'],
+#    ['NIVEAU','level'],
+#
+            self.RTC.SetValue(s)
+
+        self.RTC.GetCaret().Hide() 
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
+        self.SetSizer(sizer)
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class Panel_NOTES(wx.Panel):
 
     def __init__(self, parent, struct, filename, button):
-        print("PanelNOTES")
+        print("Panel_NOTES")
         self.parent = parent
         self.struct = struct
         self.button = button
@@ -215,6 +278,7 @@ class PanelNOTES(wx.Panel):
 
     #-------------------------------------------------------------------------------
     def RightClickMenu(self,event):
+        
         print("RightClickMenu")
 
         if event.GetId() == self.popupID_EDIT:
@@ -227,7 +291,9 @@ class PanelNOTES(wx.Panel):
 
     #-------------------------------------------------------------------------------
     def ReadNotes(self):
-        print("ReadNotes",self.fn)   
+        
+        print("ReadNotes",self.fn)
+        
         try:
             f = codecs.open(self.fn, "r", "utf-8")
             text = ''.join(f.readlines())
@@ -503,6 +569,19 @@ class DescriptionPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def Button_OBS(self,event):
         pass
+    
+    #-------------------------------------------------------------------------------
+    def Button_BASEVEG(self,event):
+
+        print("Button_baseveg")
+        
+        name = "BaseVeg"
+        PageIndex = IsNotebookPageAlreadyExist(self.notebook,name)
+        if PageIndex:
+            self.notebook.SetSelection(PageIndex - 1)
+        else:
+            panel = Panel_baseveg(self,self.struct,self.button_baseveg, self.options)
+            self.notebook.AddPage(panel, name, True)
 
     #-------------------------------------------------------------------------------
     def Button_NOTES(self,event):
@@ -512,7 +591,7 @@ class DescriptionPanel(wx.Panel):
         if PageIndex:
             self.notebook.SetSelection(PageIndex - 1)
         else:
-            panel = PanelNOTES(self,self.struct,self.note_fn,self.button_note)
+            panel = Panel_NOTES(self,self.struct,self.note_fn,self.button_note)
             self.notebook.AddPage(panel, name, True)
 
 
@@ -549,14 +628,8 @@ class DescriptionPanel(wx.Panel):
         else:
             n2 = n_[1].replace("]","").strip()
 
-            
-        #self.headerRTC.EndAllStyles()
-
-#        try:
-#            self.headerSizer1.Clear()
-#        except:
-#            pass
-
+        id = 400
+  
         try:
             self.headerSizer.Clear(1)
             print("UpdateHeader.Clear()")
@@ -719,12 +792,37 @@ class DescriptionPanel(wx.Panel):
 
         self.tagsSizer =  wx.BoxSizer(wx.HORIZONTAL)
         self.scrolledTagPanel = wx.lib.scrolledpanel.ScrolledPanel(self,size=(-1,28))
+        self.scrolledTagPanel.SetBackgroundColour(colors.normal[1])
         self.tagFlag = 0
 
         self.protSizer =  wx.BoxSizer(wx.HORIZONTAL)
         self.scrolledProtPanel = wx.lib.scrolledpanel.ScrolledPanel(self,size=(-1,34))
+        self.scrolledProtPanel.SetBackgroundColour(colors.normal[1])
         self.protFlag = 0
 
+        # ID Catminat
+        #--------------
+        if 'ID.cat' in self.struct['baseflor'] and self.struct['baseflor']['ID.cat'] != '':
+
+            self.tagsSizer.Add((5,-1))
+            self.button_baseveg = wx.Button(self.scrolledTagPanel,
+                                            id,
+                                            u" Cat: {} ".format(self.struct['baseflor']['ID.cat']),
+                                            wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
+            #button.SetForegroundColour("#600060")
+            self.button_baseveg.SetForegroundColour("#000000")
+            #button.SetBackgroundColour("#6699ff")
+            self.button_baseveg.SetBackgroundColour("#ffffff")
+            self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
+            self.tagFlag = 1
+
+            print(dir(self.button_baseveg))
+            wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
+            id+=1
+
+
+        # Tags
+        #--------------
         if "tags" in struct.keys():
             for tag in struct["tags"]:
 
@@ -733,7 +831,8 @@ class DescriptionPanel(wx.Panel):
                 self.tagsSizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
                 self.tagsSizer.Add((5,-1))
 
-                button = wx.Button(self.scrolledTagPanel, wx.ID_ANY, u" {} ".format(tag), wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
+                button = wx.Button(self.scrolledTagPanel, wx.ID_ANY, u" {} ".format(tag),
+                                   wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
                 button.SetForegroundColour("#600060")
                 button.SetBackgroundColour("#6699ff")
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
@@ -742,27 +841,11 @@ class DescriptionPanel(wx.Panel):
         # Catergories
         #-------------
         if "cat" in struct.keys():
-#            cat_colors={u"Aquatique":["#f0f0f0","#3399ff"], 
-#                        #u'Montagne':["#ffccff","#666699"], 
-#                        u"Fougere":["#0C5A10","#A4D765"],
-#                        u"Montagne":["#701FE5","#D1ED4A"],
-#                        u"Alpine":["#D1F5FA","#9D96A1"],
-#                        u"Littoral":["#117BA7","#E9D27C"],
-#                        u"Foret":["#002900","#00cc00"], 
-#                        u"Ligneuse":[-1,-1]}
-#
-#            cat_names={"Aquatique":u"Aquatique",
-#                        #u'Montagne':["#ffccff","#666699"], 
-#                       "Fougere":u"Fougère",
-#                       "Montagne":u"Montagne",
-#                       "Alpine":u"Alpine",
-#                       "Littoral":u"Littoral",
-#                       "Foret":u"Forêt",
-#                       "Ligneuse":u"Ligneuse"}
-
-
             for cat in struct["cat"]:
-                button = wx.Button(self.scrolledTagPanel, wx.ID_ANY, u" {} ".format(self.apps.button_config["cat"]["names"][cat]), wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
+                button = wx.Button(self.scrolledTagPanel, wx.ID_ANY,
+                                   u" {} ".format(self.apps.button_config["cat"]["names"][cat]),
+                                   wx.DefaultPosition, (-1,-1),
+                                   style=wx.BU_EXACTFIT)
                 try:
                     button.SetForegroundColour(self.apps.button_config["cat"]["colors"][cat][0])
                     button.SetBackgroundColour(self.apps.button_config["cat"]["colors"][cat][1])
@@ -782,7 +865,9 @@ class DescriptionPanel(wx.Panel):
             
             rl = struct["redlist"]
             try:
-                button = wx.Button(self.scrolledProtPanel, wx.ID_ANY, u" {} ".format(self.apps.button_config["redlist"]["names"][rl]), wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
+                button = wx.Button(self.scrolledProtPanel, wx.ID_ANY,
+                                   u" {} ".format(self.apps.button_config["redlist"]["names"][rl]),
+                                   wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
                 button.SetForegroundColour(self.apps.button_config["redlist"]["colors"][rl][0])
                 button.SetBackgroundColour(self.apps.button_config["redlist"]["colors"][rl][1])
                 self.protSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
@@ -795,7 +880,8 @@ class DescriptionPanel(wx.Panel):
         #-----------------
         if struct["prot.nat"] != []:
             
-            button = wx.Button(self.scrolledProtPanel, wx.ID_ANY, u"France Métropole", wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
+            button = wx.Button(self.scrolledProtPanel, wx.ID_ANY, u"France Métropole",
+                               wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
             button.SetForegroundColour("#660033")
             button.SetBackgroundColour("#ff0066")
             self.protSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
@@ -901,7 +987,6 @@ class DescriptionPanel(wx.Panel):
         #--------------
         self.seealsoSizer =  wx.BoxSizer(wx.HORIZONTAL)
         if "seealso" in struct.keys():
-            id = 400
         
             statictext = wx.StaticText(self, -1, "Voir aussi:")
             self.seealsoSizer.Add((5,-1))

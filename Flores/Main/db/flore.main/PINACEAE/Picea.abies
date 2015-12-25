@@ -1,20 +1,22 @@
 FA: Pinaceae
 NL: Picea abies [(L.) H.Karst., 1881]
-NV: Épicéa
+NV: Épicéa; Épicéa commun; Épinette de Norvège
+N.UK: Norway spruce
+N.IT: Abete rosso; Peccio
 SY:
-    Abies alpestris [Br, ]
-    Picea excelsa subsp. alpestris [(Br, ]
+    Abies alpestris [Brügger, 1886]
+    Picea excelsa subsp. alpestris [(Brügger) Domin ex Cif. & Giacom., 1950]
     Pinus abies [L., 1753]
     Peuce abies [(L.) Rich., 1810]
     Pinus pectinata [Lam., 1779]
     Picea alpestris [Stein, 1887]
-    Picea excelsa subsp. alpestris [(Stein) Asch., ]
+    Picea excelsa subsp. alpestris [(Stein) Asch. & Graebn., 1896]
     Picea excelsa var. alpestris [(Stein) Rouy, 1913]
-    Picea excelsa f. integrisquamis [Carri, ]
-    Picea integrisquamis [(Carri, ]
+    Picea excelsa f. integrisquamis [Carrière, ]
+    Picea integrisquamis [(Carrière) Chiov., 1935]
     Abies cinerea [Borkh., 1800]
     Abies excelsa [Poir., 1805]
-    Abies medioxima [Lawson, 1866]
+    Abies medioxima [C.Lawson, 1866]
     Abies picea [Mill., 1768]
     Abies taxifolia [Desf., 1804]
     Picea excelsa [Link, 1841]
@@ -28,5 +30,4 @@ SY:
 ID.tela: 75288
 ID.inpn: 113432
 REF.wiki.fr: http://fr.wikipedia.org/wiki/Picea_abies
-ID.coste: 
-N.coste: 
+ID.coste: 3335
