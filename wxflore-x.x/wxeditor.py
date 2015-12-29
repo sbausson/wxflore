@@ -14,7 +14,7 @@ ID_EXIT=200
 #
 #-------------------------------------------------------------------------------
 class MainWindow(wx.Dialog):
-    def __init__(self,parent,title,filename):
+    def __init__(self,parent,title,filename,colors):
 
         self.filename=filename
         
@@ -23,6 +23,8 @@ class MainWindow(wx.Dialog):
         #wx.Frame.__init__(self,parent,wx.ID_ANY, title)
 
         self.TC = wx.TextCtrl(self, 1, style=wx.TE_MULTILINE, size=(700, 500))
+        self.TC.SetBackgroundColour(colors.normal[1])
+        self.TC.SetForegroundColour(colors.normal[0])
         #self.CreateStatusBar()
 
         self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)

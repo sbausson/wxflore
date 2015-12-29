@@ -619,28 +619,30 @@ def python_table(base_flore_path,options=OPTIONS()):
     path = os.path.join(options.paths.db,"python")
     try:
         import bdtfx
-        options.bdtfx = bdtfx.table
+        options.bdtfx = bdtfx
         print('Loading "bdtfx.py" ...')
     except:
         print("## WARNING ## : Can not load 'bdtfx' ...")
 
     try:
         import baseflor
-        options.baseflor_table = baseflor.table
+        #options.baseflor_table = baseflor.table
+        options.baseflor = baseflor
         print('Loading "baseflor.py" ...')
     except:
         print('## WARNING ## : Can not load "baseflor.py" !')
 
     try:
         import chorodep        
-        options.chorodep_table = chorodep.table
+        options.chorodep = chorodep
         print('Loading "chorodep.py" ...')
     except:
         print('## WARNING ## : Can not load "chorodep.py !')
 
     try:
         import baseveg        
-        options.baseveg_table = baseveg.table
+        #options.baseveg_table = baseveg.table
+        options.baseveg = baseveg
         print('Loading "baseveg.py" ...')
     except:
         print('## WARNING ## : Can not load "baseveg.py !')
@@ -1035,7 +1037,7 @@ def parse_file(filename,name,options):
             try:
                 keyword,value = line.split(":",1)
                 #value = value.decode('utf-8')
-            except IOError:
+            except: # IOError:
                 print(filename)
                 print(line)
                 ERROR()
@@ -1078,30 +1080,30 @@ def parse_file(filename,name,options):
             #parse_struct(line,struct,options)
 
     if "ID.tela" in struct.keys():
-        if struct["ID.tela"] in options.bdtfx.keys():
+        if struct["ID.tela"] in options.bdtfx.table.keys():
             #print(options.bdtfx[struct["ID.tela"]])
             #print(type(struct["NL"]),type(options.bdtfx[struct["ID.tela"]]["NL"]))
             #print(struct["NL"],options.bdtfx[struct["ID.tela"]]["NL"])
 
             struct["NL"] = struct["NL"].replace(u"×","x")
 
-            if struct["NL"] != options.bdtfx[struct["ID.tela"]]["NL"]:
+            if struct["NL"] != options.bdtfx.table[struct["ID.tela"]]["NL"]:
                 options.debug.not_updated += 1
 
                 warning("\n## WARNING ## : ({}) {} does not seem uptodate ... {}\n{}\n{}".format(options.debug.not_updated,
                                                                                                  struct["ID.tela"],
                                                                                                  filename,
                                                                                                  struct["NL"].encode("utf-8"),
-                                                                                                 options.bdtfx[struct["ID.tela"]]["NL"].encode("utf-8")),"red",
+                                                                                                 options.bdtfx.table[struct["ID.tela"]]["NL"].encode("utf-8")),"red",
                         options)
-                struct["NL"] = unicode(options.bdtfx[struct["ID.tela"]]["NL"])
+                struct["NL"] = unicode(options.bdtfx.table[struct["ID.tela"]]["NL"])
                 if options.update_file:
                     resp = raw_input('Update "{}" ? (y/n) '.format(filename))
                     if resp == "y":
                         update_file(filename,struct["NL"])
                         
-            elif struct["FA"] != options.bdtfx[struct["ID.tela"]]["fam"]:
-                warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx[struct["ID.tela"]]["fam"]),
+            elif struct["FA"] != options.bdtfx.table[struct["ID.tela"]]["fam"]:
+                warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx.table[struct["ID.tela"]]["fam"]),
                         "cyan",
                         options)
 
@@ -1115,8 +1117,8 @@ def parse_file(filename,name,options):
 #                    pass
 #
             #print(syn_t)
-            struct["SY"] = options.bdtfx[struct["ID.tela"]]["syn"] 
-            struct["ID.inpn"] = options.bdtfx[struct["ID.tela"]]["ID.inpn"] 
+            struct["SY"] = options.bdtfx.table[struct["ID.tela"]]["syn"] 
+            struct["ID.inpn"] = options.bdtfx.table[struct["ID.tela"]]["ID.inpn"] 
 
         else:
             warning("{} not in bdtfx ... {}".format(struct["ID.tela"],filename),
@@ -1165,14 +1167,14 @@ def parse_file(filename,name,options):
     # Catminat / baseflor
     #---------------------
     try:
-        struct["baseflor"] = options.baseflor_table[struct["ID.tela"]]
+        struct['baseflor'] = options.baseflor.table[struct["ID.tela"]]
     except:
-        pass
+        struct['baseflor'] = {}
 
     # Catminat / chorodep
     #---------------------
     try:
-        struct["chorodep"] = options.chorodep_table[struct["ID.tela"]]
+        struct["chorodep"] = options.chorodep.table[struct["ID.tela"]]
     except:
         pass
     
@@ -1249,14 +1251,14 @@ def parse_files(pattern_list,options):
 
     try:
         import baseflor
-        options.baseflor_table = baseflor.table
+        options.baseflor = baseflor
         print('Loading "baseflor.py" ...')
     except:
         print('Can not load "baseflor.py" !')
 
     try:
         import chorodep        
-        options.chorodep_table = chorodep.table
+        options.chorodep = chorodep
         print('Loading "chorodep.py" ...')
     except:
         print('Can not load "chorodep.py !')

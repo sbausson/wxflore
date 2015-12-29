@@ -36,7 +36,7 @@ class colors:
     selected = ["#ccff33","#707070"]
     selection = ["#ff9933","#202020"]
     #normal = ["#000000","#ffffff"]
-    normal = ["#ffffff","#202020"] 
+    normal = ["#ffffff","#101010"] 
     #nl = ["#ffffff","#202020"]
     nl = ["#ffffff","#202020"]
 
@@ -63,71 +63,111 @@ format_url_fcnb = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def build_text_to_export(struct):
+def build_text_to_export(struct,markdown=False):
 
     #-------------------------------------------------------------------------------
     def fill_string(format_string,struct,field_name,field):
 
         s_res = ""
 
-        try:            
-            if field in ["NV","N.UK","N.IT","N.DE","N.ES","N.NL","ZO","FL","HB","REF.wiki.fr"]:
-                s = struct[field].replace(";",",") #.encode("utf-8")
-                s_res+=format_string.format(field_name,s.encode("utf-8"))
+        if field not in struct and field not in ['FCBN','COSTE']:
+            print("====",field)
+            return s_res
 
-            elif field in ["SY","DS"]:
-                s_res+="{}:\n".format(field_name)
-                for item in struct[field]:
-                    s_res+=format_string.format(item.encode("utf-8"))
-
-            elif field in ["ID.tela","ID.inpn"]:
-                s = struct[field]
-                s_res+=format_string.format(field_name,s,s)
-
-            elif field in ["FCBN"]:
-                print "FCND"
-                s = struct["ID.inpn"]
-                s_res+=format_string.format(field_name,s)
-                
+        if field == 'NL':
+            nl1, nl2 = re.findall("(.*)\[(.*)\]",struct['NL'])[0]
+            nl1 = nl1.strip()
+            nl2 = nl2.strip()
+            if markdown:
+                s_res = u"***{}***  {}  /  **{}**\n\n".format(nl1,nl2,struct["FA"])
             else:
-                s = struct[field] #.encode("utf-8")
-                s_res+=format_string.format(field_name,s.encode("utf-8"))
+                s_res = u"{}  {}  /  {}".format(nl1,nl2,struct["FA"])
+
+        elif field in ["NV","N.UK","N.IT","N.DE","N.ES","N.NL","ZO","FL","HB","REF.wiki.fr"]:
+            s = struct[field].replace(";",",") #.encode("utf-8")
+            s_res+=format_string.format(field_name,s) #.encode("utf-8"))
+
+        elif field in ["SY","DS"]:
+            s_res+="\n**{}:**\n".format(field_name)
+            for item in struct[field]:
+                s_res+=format_string.format(item) #.encode("utf-8"))
+            s_res+='\n'
             
-        except:
-            s_res=""
-#            print field
-#            print format_string.format(field_name,s.encode("utf-8"))
+        elif field in ["ID.tela","ID.inpn"]:
+            s = struct[field]
+            s_res+=format_string.format(field_name,s,s)
+
+        elif field in ["FCBN"]:
+            print "FCBN"
+            s = struct["ID.inpn"]
+            s_res+=format_string.format(field_name,s)
+
+        elif field == 'COSTE':
+            s=''
+            if "ID.coste" in struct.keys():
+                if struct["ID.coste"] != "":
+                    s +=u"N°{}".format(struct["ID.coste"])
+            if "N.coste" in struct.keys():
+                s +=u"  -  {}".format(struct["N.coste"])
+            s_res+=format_string.format(field_name,s)
+            
+        else:
+            s = struct[field] #.encode("utf-8")
+            s_res+=format_string.format(field_name,s) #.encode("utf-8"))
             
         return s_res
         
     #-------------------------------------------------------------------------------
     s = ""
-    format_string = "{:25} : {}\n"
-    format_list = " "*8 + "- {}\n"
-    format_tela = "{:25} : N°{}  http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n"
-    format_inpn = "{:25} : N°{}  http://inpn.mnhn.fr/espece/cd_nom/{}\n"
-    format_fcnb = "{:25} : http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
+    if markdown:
+        format_string = u'**{}**  :  {}\n'
+        format_tela = u'**{}**  :  N°{}  http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n'
+        format_inpn = u'**{}**  :  N°{}  http://inpn.mnhn.fr/espece/cd_nom/{}\n'
+        format_fcbn = u'**{}**  :  http://siflore.fcbn.fr/?cd_ref={}&r=metro\n'
+    else:
+        format_string = u'{:25} : {}\n'
+        format_tela = u'{:25} : N°{}  http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n'
+        format_inpn = u'{:25} : N°{}  http://inpn.mnhn.fr/espece/cd_nom/{}\n'
+        format_fcbn = u'{:25} : http://siflore.fcbn.fr/?cd_ref={}&r=metro\n'
+        
+    format_list = u'    - {}\n'
 
-    s+=fill_string(format_string,struct,"Nom latin","NL")
-    s+=fill_string(format_string,struct,"Famille","FA")
-    s+=fill_string(format_string,struct,"Nom(s) vernaculaire((s)","NV")
-    s+=fill_string(format_string,struct,"Nom Anglais","N.UK")
-    s+=fill_string(format_string,struct,"Nom Néerlandais","N.NL")
-    s+=fill_string(format_string,struct,"Nom Italien","N.IT")
-    s+=fill_string(format_string,struct,"Nom Espagnol","N.ES")
-    s+=fill_string(format_string,struct,"Nom Allemand","N.DE")
-    s+=fill_string(format_list,struct,"Synonymes","SY")
-    s+=fill_string(format_list,struct,"Description","DS")
-    s+=fill_string(format_string,struct,"Habitat","HB")
-    s+=fill_string(format_string,struct,"Zone Géographique","ZO")
-    s+=fill_string(format_string,struct,"Floraison","FL")
-    s+=fill_string(format_string,struct,"Usage","US")
-    #s+=fill_string(format_string,struct,"Ref. Coste","coste")
-    s+=fill_string(format_tela,struct,"Ref. Tela","ID.tela")
-    s+=fill_string(format_inpn,struct,"Ref. INPN","ID.inpn")
-    s+=fill_string(format_fcnb,struct,"Répartition FCNB","FCBN")
-    s+=fill_string(format_string,struct,"Wiki.Fr","REF.wiki.fr")
+    s+=fill_string(format_string,struct,u'Nom latin',"NL")
+    #s+=fill_string(format_string,struct,"Famille","FA")
+    s+=fill_string(format_string,struct,u'Nom(s) français(s)',"NV")
+    s+=fill_string(format_string,struct,u'English',"N.UK")
+    s+=fill_string(format_string,struct,u'Nederlands',"N.NL")
+    s+=fill_string(format_string,struct,u'Italiano',"N.IT")
+    s+=fill_string(format_string,struct,u'Español',"N.ES")
+    s+=fill_string(format_string,struct,u'Deutsch',"N.DE")
+    if not markdown:
+        s+=fill_string(format_list,struct,"Synonymes","SY")
+    s+=fill_string(format_list,struct,u'Description',"DS")
+    s+=fill_string(format_string,struct,u'Habitat',"HB")
+    s+=fill_string(format_string,struct,u'Zone Géographique',"ZO")
+    s+=fill_string(format_string,struct,u'Floraison',"FL")
+    s+=fill_string(format_string,struct,u'Ref. Coste',"COSTE")
+    s+=fill_string(format_string,struct,u'Usage',"US")
+    s+=fill_string(format_tela,struct,u'Ref. Tela',"ID.tela")
+    s+=fill_string(format_inpn,struct,u'Ref. INPN',"ID.inpn")
+    s+=fill_string(format_fcbn,struct,u'Répartition FCBN',"FCBN")
+    s+=fill_string(format_string,struct,u'Wiki.Fr',"REF.wiki.fr")
 
+    s+='\n\n'
+    s+='#botanique '
+    s+='#botany '
+    s+='#botanik '
+    s+='#fleur '
+    s+='#bloemen '
+    s+='#plantes '
+    s+='#plants '
+    s+='#planten '
+    s+='#nature '
+    s+='#wild '
+    s+='#{} '.format(struct['NL'].split()[0].lower())
+    s+='#{} '.format(struct['FA'].lower())
+    s+='\n'
+    
     return s    
 
 #-------------------------------------------------------------------------------
@@ -174,6 +214,48 @@ def IsNotebookPageAlreadyExist(notebook,name):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
+def build_baseveg_string(struct,options,markdown=False):
+    
+    s=''
+    if 'ID.cat' in struct['baseflor'] and struct['baseflor']['ID.cat'] != '':
+        st = options.baseveg.table[struct['baseflor']['ID.cat']]
+        if markdown:
+            fmt = u' - **{}**  :  {}\n'
+        else:
+            fmt = u' {:35s}  :  {}\n'
+
+        if markdown:
+            s+=u'**Baseveg:**\n'
+            s+=u'*Index phytosociologique synonymique de la végétation de la France Version du 22/12/2015\n'
+            s+=u'P. Julve, 1998 ff. Programme Catminat. http://perso.wanadoo.fr/philippe.julve/catminat.htm*\n\n'
+            
+        s+=fmt.format(u'Syntaxon',st['SYNTAXON'].decode('utf-8'))
+        s+=fmt.format(u'Dénomination écologique',st['ECO.name'].decode('utf-8'))
+        s+=fmt.format(u'Chorologie mondiale',st['choro.world'].decode('utf-8'))
+        s+=fmt.format(u'Répartition connue en France',st['REP.fr'].decode('utf-8'))
+        s+=fmt.format(u'Physionmie',st['C.physio'].decode('utf-8'))
+        s+=fmt.format(u'Etages altitudinaux (altitude)',st['C.alti'].decode('utf-8'))
+        s+=fmt.format(u'Latitude',st['C.lat'].decode('utf-8'))
+        s+=fmt.format(u'Océanité',st['C.ocea'].decode('utf-8'))
+        s+=fmt.format(u'Température',st['C.temp'].decode('utf-8'))
+        s+=fmt.format(u'Lumière',st['C.lum'].decode('utf-8'))
+        s+=fmt.format(u'Exposition, pente',st['C.exp'].decode('utf-8'))
+        s+=fmt.format(u'Optimum de développement',st['C.opt'].decode('utf-8'))
+        s+=fmt.format(u'Humidité atmosphérique',st['C.humi.nat'].decode('utf-8'))
+        s+=fmt.format(u"Types de sol et d'humus",st['C.humus'].decode('utf-8'))
+        s+=fmt.format(u'Humidité édaphique',st['C.humi.ned'].decode('utf-8'))
+        s+=fmt.format(u'Texture du sol',st['C.tex'].decode('utf-8'))
+        s+=fmt.format(u'Niveau trophique',st['C.niv.troph'].decode('utf-8'))
+        s+=fmt.format(u'pH du sol',st['C.pH'].decode('utf-8'))
+        s+=fmt.format(u'Salinité',st['C.sal'].decode('utf-8'))
+        s+=fmt.format(u'Dynamique',st['C.dyn'].decode('utf-8'))
+        s+=fmt.format(u'Influences anthropozoogènes',st['C.infl'].decode('utf-8'))
+
+    return s
+    
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
 class Panel_baseveg(wx.Panel):
 
     def __init__(self, parent, struct, button, options):
@@ -188,7 +270,9 @@ class Panel_baseveg(wx.Panel):
 
         self.RTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.TE_MULTILINE)
 
-        font = wx.Font(8, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.NORMAL)
+        #font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL) #MODERN
+        font = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Monospace')
+
         self.RTC.BeginFont(font)
 
         self.RTC.SetBackgroundColour(self.parent.colors.normal[1])
@@ -198,35 +282,10 @@ class Panel_baseveg(wx.Panel):
 
         self.RTC.BeginTextColour(parent.colors.normal[0])
 
-        s=''
-        if 'ID.cat' in struct['baseflor'] and struct['baseflor']['ID.cat'] != '':
-            st = self.options.baseveg_table[struct['baseflor']['ID.cat']]
-            fmt = u' {:<40s}  :  {}\n'
-            s+=fmt.format(u'Dénomination écologique',st['ECO.name'].decode('utf-8'))
-            s+=fmt.format(u'Chorologie mondiale',st['choro.world'].decode('utf-8'))
-            s+=fmt.format(u'Répartition connue en France',st['REP.fr'].decode('utf-8'))
-            s+=fmt.format(u'Physionmie',st['C.physio'].decode('utf-8'))
-            s+=fmt.format(u'Etages altitudinaux (altitude)',st['C.alti'].decode('utf-8'))
-            s+=fmt.format(u'Latitude',st['C.lat'].decode('utf-8'))
-            s+=fmt.format(u'Océanité',st['C.ocea'].decode('utf-8'))
-            s+=fmt.format(u'Température',st['C.temp'].decode('utf-8'))
-            s+=fmt.format(u'Lumière',st['C.lum'].decode('utf-8'))
-            s+=fmt.format(u'Exposition, pente',st['C.exp'].decode('utf-8'))
-            s+=fmt.format(u'Optimum de développement',st['C.opt'].decode('utf-8'))
-            s+=fmt.format(u'Humidité atmosphérique',st['C.humi.nat'].decode('utf-8'))
-            s+=fmt.format(u"Types de sol et d'humus",st['C.humus'].decode('utf-8'))
-            s+=fmt.format(u'Humidité édaphique',st['C.humi.ned'].decode('utf-8'))
-            s+=fmt.format(u'Texture du sol',st['C.tex'].decode('utf-8'))
-            s+=fmt.format(u'Niveau trophique',st['C.niv.troph'].decode('utf-8'))
-            s+=fmt.format(u'pH du sol',st['C.pH'].decode('utf-8'))
-            s+=fmt.format(u'Salinité',st['C.sal'].decode('utf-8'))
-            s+=fmt.format(u'Dynamique',st['C.dyn'].decode('utf-8'))
-            s+=fmt.format(u'Influences anthropozoogènes',st['C.infl'].decode('utf-8'))
-
-#    ['SYNTAXON','SYNTAXON'],
-#    ['NIVEAU','level'],
-#
+        s = build_baseveg_string(struct,self.options)
+        if s!= '':
             self.RTC.SetValue(s)
+        
 
         self.RTC.GetCaret().Hide() 
 
@@ -282,7 +341,10 @@ class Panel_NOTES(wx.Panel):
         print("RightClickMenu")
 
         if event.GetId() == self.popupID_EDIT:
-            ed = wxeditor.MainWindow(self,u"Note : {}".format(self.struct["nl"]),self.fn)
+            ed = wxeditor.MainWindow(self,
+                                     u"Note : {}".format(self.struct["nl"]),
+                                     self.fn,
+                                     self.parent.colors)
             ed.ShowModal()
             self.ReadNotes()
             nevent = NoteUpdateEvent()
@@ -454,12 +516,12 @@ class ThumbPanel(wx.lib.scrolledpanel.ScrolledPanel):
     #-------------------------------------------------------------------------------
     def __init__(self,parent,options):
 
-        #wx.Panel.__init__(self,parent,size=(-1,-1))
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self,parent,size=(-1,200)) #,style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER|wx.HSCROLL)
-
-        self.SetBackgroundColour("#202020")
         self.options = options
         self.parent = parent
+
+        #wx.Panel.__init__(self,parent,size=(-1,-1))
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self,parent,size=(-1,200)) #,style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER|wx.HSCROLL)
+        self.SetBackgroundColour(colors.normal[1])
         
 #        self.Autosizer = wx.FlexGridSizer(cols=2)
 #        self.Autosizer.SetFlexibleDirection(wx.VERTICAL)
@@ -837,6 +899,8 @@ class DescriptionPanel(wx.Panel):
                 button.SetBackgroundColour("#6699ff")
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                 self.tagFlag = 1
+                
+        self.protSizer.Add((5,-1))
 
         # Catergories
         #-------------
@@ -861,7 +925,6 @@ class DescriptionPanel(wx.Panel):
         # Red List Status
         #-----------------
         if "redlist" in struct.keys():
-                
             
             rl = struct["redlist"]
             try:
@@ -1072,7 +1135,9 @@ class DescriptionPanel(wx.Panel):
         menu = wx.Menu()
 
         self.popupID_COPY_NL_FA_NV_UK = wx.NewId()
-        self.popupID_COPY_NL_FA_NV_UK_diaspora = wx.NewId()
+        self.popupID_COPY_DIASPORA_names = wx.NewId()
+        self.popupID_COPY_DIASPORA_desc = wx.NewId()
+        self.popupID_COPY_DIASPORA_baseveg = wx.NewId()
         self.popupID_COPY_NL_FA_NV = wx.NewId()
         self.popupID_COPY_NL_FA = wx.NewId()
         self.popupID_COPY_ID_TELA = wx.NewId()
@@ -1090,9 +1155,12 @@ class DescriptionPanel(wx.Panel):
         self.popupID_EXPORT = wx.NewId()
 
         menu.Append(self.popupID_COPY_NL_FA_NV_UK, "Copy NL (FA) + NV + N.UK")
-        menu.Append(self.popupID_COPY_NL_FA_NV_UK_diaspora, "Copy NL (FA) + NV + N.UK (diaspora)")
         menu.Append(self.popupID_COPY_NL_FA_NV, "Copy NL (FA) + NV")
         menu.Append(self.popupID_COPY_NL_FA, "Copy NL (FA)")
+        menu.AppendSeparator()
+        menu.Append(self.popupID_COPY_DIASPORA_names, 'Diaspora* : copy NL + (FA) + Names')
+        menu.Append(self.popupID_COPY_DIASPORA_desc, 'Diaspora* : copy Description')        
+        menu.Append(self.popupID_COPY_DIASPORA_baseveg, 'Diaspora* : copy BaseVeg')        
         menu.AppendSeparator()
         menu.Append(self.popupID_COPY_ID_TELA, "Copy ID TELA")
         menu.Append(self.popupID_COPY_ID_INPN, "Copy ID INPN")
@@ -1126,13 +1194,20 @@ class DescriptionPanel(wx.Panel):
             TextFrame(text,self)
 
         elif event.GetId() == self.popupID_EDIT_MAIN:
-            ed = wxeditor.MainWindow(self,u"Main description : {}".format(self.struct["nl"]),self.struct["FN"])
+            ed = wxeditor.MainWindow(self,
+                                     u"Main description : {}".format(self.struct["nl"]),
+                                     self.struct["FN"],
+                                     colors)
             ed.ShowModal()
+            
             struct = fldb.parse_file(self.struct["FN"],self.struct["N."],options)
             self.apps.Update(struct)
 
         elif event.GetId() == self.popupID_EDIT_COSTE:
-            ed = wxeditor.MainWindow(self,u"COSTE description : {}".format(self.struct["nl"]),self.struct["FN.coste"])
+            ed = wxeditor.MainWindow(self,
+                                     u"COSTE description : {}".format(self.struct["nl"]),
+                                     self.struct["FN.coste"],
+                                     colors)
             ed.ShowModal()
 
         elif event.GetId() == self.popupID_COPY_NL_FA_NV_UK:
@@ -1148,7 +1223,7 @@ class DescriptionPanel(wx.Panel):
             except:
                 pass
 
-        elif event.GetId() == self.popupID_COPY_NL_FA_NV_UK_diaspora:
+        elif event.GetId() == self.popupID_COPY_DIASPORA_names:
             #nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
             nl1, nl2 = re.findall("(.*)\[(.*)\]",self.struct['NL'])[0]
             nl1 = nl1.strip()
@@ -1161,10 +1236,30 @@ class DescriptionPanel(wx.Panel):
                 pass
 
             try:
-                s+=u"\nNom(s) anglais: {}".format(self.struct["N.UK"].replace(";",","))
+                s+=u"\nEnglish: {}".format(self.struct["N.UK"].replace(";",","))
             except:
                 pass
-            
+
+            try:
+                s+=u"\nNederlands: {}".format(self.struct["N.NL"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\nDeutsch: {}".format(self.struct["N.DE"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\nItaliano: {}".format(self.struct["N.IT"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\nEspañol: {}".format(self.struct["N.ES"].replace(";",","))
+            except:
+                pass
+
             s+='\n\n'
             s+='#botanique '
             s+='#botany '
@@ -1179,6 +1274,14 @@ class DescriptionPanel(wx.Panel):
             s+='#{} '.format(nl1.split()[0].lower())
             s+='#{} '.format(self.struct['FA'].lower())
             
+        elif event.GetId() == self.popupID_COPY_DIASPORA_desc:
+            s = build_text_to_export(self.struct,True)
+            print(s)
+
+        elif event.GetId() == self.popupID_COPY_DIASPORA_baseveg:
+            s = build_baseveg_string(self.struct,self.options,True)
+            print(s)
+
         elif event.GetId() == self.popupID_COPY_NL_FA_NV:
             nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
             s = u"{} / {}".format(nl,self.struct["FA"])
@@ -1732,6 +1835,34 @@ class MainPanel(wx.Panel):
             self.panel3.grid.SetFocus()
 
         self.Layout()
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class MyDialog ( wx.Dialog ):
+
+    def __init__( self, parent, msg ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString,
+                             pos = wx.DefaultPosition,
+                             #size = wx.Size(-1,-1),
+                             style = wx.DEFAULT_DIALOG_STYLE )
+
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        self.panel = wx.Panel( self, wx.ID_ANY,
+                               wx.DefaultPosition,
+                               wx.DefaultSize)
+
+        self.m_staticText = wx.StaticText( self.panel, wx.ID_ANY, u"test",
+                                           wx.DefaultPosition,
+                                           wx.DefaultSize,
+                                           0 )
+        mainSizer.Add( self.panel, 0, wx.ALL|wx.EXPAND, 5 )
+
+        self.m_sdbSizerOK = wx.Button( self, wx.ID_OK, size=(-1,50) )
+        mainSizer.Add( self.m_sdbSizerOK, 1, wx.ALL|wx.CENTER, 5 )
+        self.SetSizer( mainSizer )
+        self.m_staticText.SetLabel(msg)
+        self.Fit()
         
 
 #-------------------------------------------------------------------------------
@@ -1999,6 +2130,9 @@ class MainApp(wx.Frame):
         self.filter_cb = wx.ComboBox(self.statusbar,  wx.CB_DROPDOWN, style=wx.TE_PROCESS_ENTER, pos=(25,25), size=(400,-1)) #|wx.TE_PROCESS_ENTER
         self.filter_cb.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL))
         self.filter_cb.SetBackgroundColour("#99ff66") ##ccff99")
+        #self.filter_cb.SetBackgroundColour("#008888") ##ccff99")
+        self.filter_cb.SetForegroundColour("#050505") ##ccff99")
+        
         self.filter_cb.Clear()
 #        statusbar_sozer.Add(self.filter_cb, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
         self.statusbar.AddControl(self.filter_cb)
@@ -2100,6 +2234,7 @@ class MainApp(wx.Frame):
 
         self.notebook = aui.AuiNotebook(self) #,aui.AUI_NB_CLOSE_ON_ALL_TABS)
         self.notebook.SetArtProvider(aui.ChromeTabArt())
+        #self.notebook.SetArtProvider(aui.AuiDefaultTabArt())
 
         self.mainPanel = MainPanel(self)
         self.notebook.AddPage(self.mainPanel, "Main", True)
@@ -2209,18 +2344,42 @@ class MainApp(wx.Frame):
 
     #-------------------------------------------------------------------------------
     def onHelpCredits(self, event):
-        msg = """
-Base de données des Trachéophytes de France métropolitaine (bdtfx) (Version 3.00 - 26 janvier 2015)
-http://referentiels.tela-botanica.org/referentiel/index.php?module=Informations&ref=bdtfx
+        msg = ''
 
-Julve, Ph., 1998 ff. baseflor. 
-Index botanique, écologique et chorologique de la Flore de France.
-Version [date de la version utilisée].
-Programme Catminat. <http://perso.wanadoo.fr/philippe.julve/catminat.htm>"""
-        print msg
+    
+        msg += """
+- BDTFX : Base de données des Trachéophytes de France métropolitaine.
+  Version: {}
+  http://referentiels.tela-botanica.org/referentiel/index.php?module=Informations&ref=bdtfx
+""".format(options.bdtfx.version)
+        
+        if options.baseflor.version != '':
+            msg+="""
+- Baseflor: Index botanique, écologique et chorologique de la Flore de France.
+  Catminat, Julve, Ph., 1998 : http://perso.wanadoo.fr/philippe.julve/catminat.htm
+  Version: {}
+""".format(options.baseflor.version)
+        
+        if options.baseveg.version != '':
+            msg+="""
+- Baseveg : Index phytosociologique synonymique de la végétation de la France.
+  Catminat, Julve, Ph., 1998 : http://perso.wanadoo.fr/philippe.julve/catminat.htm
+  Version: {}
+""".format(options.baseveg.version)
+
+        if options.chorodep.version != '':
+            msg+="""
+- Chorodep : Listes départementales des plantes de France.
+  Catminat, Julve, Ph., 1998 : http://perso.wanadoo.fr/philippe.julve/catminat.htm
+  Version: {}
+""".format(options.chorodep.version)
+
+        print(msg)
         msg = msg.decode('utf8','ignore')         
-        wx.MessageBox(msg, "Credits",wx.OK | wx.ICON_INFORMATION)
-
+        #wx.MessageBox(msg, "Credits",wx.OK | wx.ICON_INFORMATION)
+        dlg = MyDialog(self,msg)
+        dlg.ShowModal()
+        
     #-------------------------------------------------------------------------------
     def select_button(self,index):
 
