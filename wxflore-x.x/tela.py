@@ -328,7 +328,8 @@ for id in tela_ids:
 
     read_url(s,id,"synthese")
     read_url(s,id,"description")
-    read_url(s,id,"nomenclature")
+    # syn removed
+    #read_url(s,id,"nomenclature")
 
     name = s.nl.replace("× ","").strip()
     name = name.split("[")[0].strip()
@@ -343,9 +344,10 @@ for id in tela_ids:
     f.write("FA: {}\n".format(s.fa))
     f.write("NL: {}\n".format(s.nl))
     f.write("NV: {}\n".format(s.nv))
-    f.write("SY:\n")
-    for syn in s.syn:
-        f.write("    {}\n".format(syn))
+# syn removed
+#    f.write("SY:\n")
+#    for syn in s.syn:
+#        f.write("    {}\n".format(syn))
     f.write("ID.tela: {}\n".format(s.id_tela))
 
     try:

@@ -95,7 +95,7 @@ def build_python_module():
                 #CN = row[indexes.index("N°_Taxinomique_BDNFF")]
                 #print(row)
 
-                if niv in['ASS','CLA','ALL','ORD']:
+                if niv in['ASS','ASSGR','CLA','ALL','SUBALL','ORD']:
 
                     s=''
                     s+='"{}":'.format(id_cat)

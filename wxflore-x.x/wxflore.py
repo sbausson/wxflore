@@ -226,7 +226,7 @@ def build_baseveg_string(struct,options,markdown=False):
 
         if markdown:
             s+=u'**Baseveg:**\n'
-            s+=u'*Index phytosociologique synonymique de la végétation de la France Version du 22/12/2015\n'
+            s+=u'*Index phytosociologique synonymique de la végétation de la France Version [{}]\n'.format(options.baseveg.version)
             s+=u'P. Julve, 1998 ff. Programme Catminat. http://perso.wanadoo.fr/philippe.julve/catminat.htm*\n\n'
             
         s+=fmt.format(u'Syntaxon',st['SYNTAXON'].decode('utf-8'))
@@ -680,7 +680,7 @@ class DescriptionPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def UpdateHeader(self,struct):
 
-        print("wxflore.py / Description.UpdateHeader()")
+        print("-----> wxflore.py / Description.UpdateHeader()")
         self.struct = struct
 
         n_ = struct["NL"].split("[")
@@ -694,7 +694,7 @@ class DescriptionPanel(wx.Panel):
   
         try:
             self.headerSizer.Clear(1)
-            print("UpdateHeader.Clear()")
+            print("headerSizer.Clear()")
         except:
             self.headerSizer = wx.BoxSizer(wx.HORIZONTAL)
             self.headerSizer.SetMinSize((-1,self.apps.size["THUMB.YMAX"]))
@@ -810,7 +810,7 @@ class DescriptionPanel(wx.Panel):
             self.headerRTC.WriteText(u", Conti: {}".format(struct["baseflor"]["GRAD.C"]))
         except:
             pass
-        
+
         self.headerRTC.Newline()
         try:
             self.headerRTC.WriteText(u"pH: {}".format(struct["baseflor"]["GRAD.pH"]))
@@ -864,10 +864,11 @@ class DescriptionPanel(wx.Panel):
 
         # ID Catminat
         #--------------
-        if 'ID.cat' in self.struct['baseflor'] and self.struct['baseflor']['ID.cat'] != '':
+        if 0 and 'ID.cat' in self.struct['baseflor'] and self.struct['baseflor']['ID.cat'] != '':
 
             self.tagsSizer.Add((5,-1))
-            self.button_baseveg = wx.Button(self.scrolledTagPanel,
+            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
+            self.button_baseveg = wx.Button(self.toolbar,
                                             id,
                                             u" Cat: {} ".format(self.struct['baseflor']['ID.cat']),
                                             wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
@@ -875,8 +876,9 @@ class DescriptionPanel(wx.Panel):
             self.button_baseveg.SetForegroundColour("#000000")
             #button.SetBackgroundColour("#6699ff")
             self.button_baseveg.SetBackgroundColour("#ffffff")
-            self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
-            self.tagFlag = 1
+            #self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
+            self.toolbar.AddControl(self.button_baseveg)
+            #self.tagFlag = 1
 
             print(dir(self.button_baseveg))
             wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
@@ -899,6 +901,8 @@ class DescriptionPanel(wx.Panel):
                 button.SetBackgroundColour("#6699ff")
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                 self.tagFlag = 1
+                print(" ======== if tagflag / Tags .{}.".format(tag))
+
                 
         self.protSizer.Add((5,-1))
 
@@ -918,6 +922,7 @@ class DescriptionPanel(wx.Panel):
 
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                 self.tagFlag = 1
+                print(" ======== if tagflag / Category")
 
                 self.apps.button_list["cat"].append(cat)
 
@@ -949,7 +954,6 @@ class DescriptionPanel(wx.Panel):
             button.SetBackgroundColour("#ff0066")
             self.protSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
             self.protFlag = 1
-
 
         # Regional Protections
         #----------------------
@@ -997,7 +1001,9 @@ class DescriptionPanel(wx.Panel):
                     self.protSizer.Add((5,-1))
 
                 try:
-                    button = wx.Button(self.scrolledProtPanel, wx.ID_ANY, u" {} ".format(region.table[prot][0]),style=wx.BU_EXACTFIT) #.decode("utf8")))
+                    button = wx.Button(self.scrolledProtPanel,
+                                       wx.ID_ANY,
+                                       u" {} ".format(region.table[prot][0]),style=wx.BU_EXACTFIT) #.decode("utf8")))
                 
                     if prot_colors[prot][0] != -1:
                         button.SetForegroundColour(prot_colors[prot][0])
@@ -1045,7 +1051,6 @@ class DescriptionPanel(wx.Panel):
                 except IOError:
                     print("## WARNING ## : Protection Status error")
             
-
         # See Also ...
         #--------------
         self.seealsoSizer =  wx.BoxSizer(wx.HORIZONTAL)
@@ -1078,7 +1083,10 @@ class DescriptionPanel(wx.Panel):
 
                     id+=1
                     self.seealsoSizer.Add(button,0,wx.ALL)
-                    self.tagFlag = 1
+                    #self.tagFlag = 1
+                    print(" ======== if tagflag / ID.tela .{}.".format(seealso))
+
+                    
 
         # COSTE Illustration
         #--------------------
@@ -1122,6 +1130,7 @@ class DescriptionPanel(wx.Panel):
 
         #print(u"[ {} ]".format(struct["REF"]))
         print(u"[ {} ]".format(struct["FN"]))
+        print("## END ## DescriptionPanel.UpdateHeader()")
         
     #-------------------------------------------------------------------------------
     def onPhotoClick(self,coste_ill,evt):
@@ -1348,7 +1357,8 @@ class DescriptionPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def UpdateDesc(self,struct):
 
-        print("wxflore.py / Description.UpdateDesc()")
+        if options.debug:
+            print("=====> wxflore.py / Description.UpdateDesc()")
         
         #self.descRTC.Clear()
         big_font = 11
@@ -1357,7 +1367,9 @@ class DescriptionPanel(wx.Panel):
         self.descSizer.Clear(1)
         #self.descSizer = wx.BoxSizer(wx.VERTICAL)
 
+        print("DescriptionPanl.UpdateDesc() -> call to UpdateHeader()")
         self.UpdateHeader(struct)
+        print("DescriptionPanl.UpdateDesc() -> return from UpdateHeader()")
 
         self.descRTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER);
         self.descRTC.SetBackgroundColour(colors.normal[1])
@@ -1394,7 +1406,7 @@ class DescriptionPanel(wx.Panel):
         
         self.descRTC.EndLeftIndent()                
         self.descRTC.EndFontSize()
-        
+
         if "HB" in struct.keys():
             self.descRTC.Newline()            
             self.descRTC.BeginFontSize(big_font)    
@@ -1535,29 +1547,27 @@ class DescriptionPanel(wx.Panel):
                 
             wx.EVT_BUTTON( self, id, self.Button_NOTES)
             id+=1
+            
+        # ID Catminat
+        #--------------
+        if 'ID.cat' in self.struct['baseflor'] and self.struct['baseflor']['ID.cat'] != '':
 
+            self.tagsSizer.Add((5,-1))
+            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
+            self.button_baseveg = wx.Button(self.toolbar,
+                                            id,
+                                            u" Cat: {} ".format(self.struct['baseflor']['ID.cat']),
+                                            wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
+            #button.SetForegroundColour("#600060")
+            self.button_baseveg.SetForegroundColour("#000000")
+            #button.SetBackgroundColour("#6699ff")
+            self.button_baseveg.SetBackgroundColour("#ffffff")
+            #self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
+            self.toolbar.AddControl(self.button_baseveg)
+            #self.tagFlag = 1
 
-#        # Catergories
-#        #-------------
-#        if "cat" in struct.keys():
-#            cat_colors={u'Aquatique':["#f0f0f0","#3399ff"], 
-#                        u'Montagne':["#ffccff","#666699"], 
-#                        u'Littoral':["#660066","#b89470"], 
-#                        u'Forêt':["#002900","#00cc00"], 
-#                        u'Ligneuse':[-1,-1]}
-#
-#
-#            for cat in struct["cat"]:
-#
-#                button = wx.Button(self.toolbar, wx.ID_ANY, u" {} ".format(cat), wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
-#                try:
-#                    button.SetForegroundColour(cat_colors[cat][0])
-#                    button.SetBackgroundColour(cat_colors[cat][1])
-#                except:
-#                    pass
-#
-#                self.toolbar.AddControl(button)
-
+            wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
+            id+=1
 
 
         self.toolbar.Realize()
@@ -1580,6 +1590,9 @@ class DescriptionPanel(wx.Panel):
         
         self.SetSizer(self.descSizer)
         self.Layout()
+
+        if options.debug:
+            print("## END ## DescriptionPanel.UpdateDesc()")
 
 #-------------------------------------------------------------------------------
 #
@@ -1655,6 +1668,9 @@ class FilteredPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def UpdateDesc(self):
 
+        if options.debug:
+            print("FilteredPanel.UpdateDesc()")
+                  
         struct = self.content[self.grid.data_t[self.index]] 
 
         self.descPanel.UpdateDesc(struct)
@@ -1672,11 +1688,19 @@ class FilteredPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def Update(self,index):
 
-        print("wxflore.py FilteredPanel.Update()",index)
+        if options.debug:
+            print("wxflore.py FilteredPanel.Update() / index={}".format(index))
 
         self.index = index
+
+        if options.debug:
+            print("FilteredPanel.Update() call to self.UpdateDesc()")
+
         self.UpdateDesc()
 
+        if options.debug:
+            print("FilteredPanel.Update() return from self.UpdateDesc()")
+            
         self.Layout()
         
 #-------------------------------------------------------------------------------
@@ -1686,6 +1710,11 @@ class MainPanel(wx.Panel):
 
     def __init__(self, apps):
 
+        self.options = apps.options
+
+        if self.options.debug:
+            print("MainPanel.__init__()")
+                  
         wx.Panel.__init__(self, apps, -1) # size=(1700, 1000))
         #self.mainPanel = wx.Panel(self, -1)        
         #self.mainPanel.SetBackgroundColour(wx.RED)
@@ -1696,7 +1725,6 @@ class MainPanel(wx.Panel):
 
         self.tree = apps.tree
         self.content = apps.content
-        self.options = apps.options
         self.colors = apps.colors
 #        self.apps = apps
         
@@ -1734,12 +1762,16 @@ class MainPanel(wx.Panel):
 
         mainPanelSizer = wx.BoxSizer(wx.VERTICAL)
         mainPanelSizer.Add(self.grids_splitter, 1, wx.EXPAND)
-        self.thumbPanel = ThumbPanel(self,self.options)        
+        self.thumbPanel = ThumbPanel(self,self.options)
+
+        print("MainPanel.__init__() call to self.UpdateDesc()")
         self.UpdateDesc()
+        print("MainPanel.__init__() return from self.UpdateDesc()")
 
         #mainPanelSizer.Add(self.thumbPanel, 1, wx.ALL|wx.EXPAND)
         mainPanelSizer.Add(self.thumbPanel, 0, wx.EXPAND) #|wx.EXPAND)
         self.SetSizer(mainPanelSizer)
+        print("## END ## MainPanel.__init__()")
 
     #-------------------------------------------------------------------------------
     def UpdateFam(self,update):
@@ -1790,10 +1822,11 @@ class MainPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def UpdateDesc(self):
 
+        
         try:            
             struct = self.content[self.spe_data[self.pos.spe]]
             #print(struct)
-            self.descPanel.UpdateHeader(struct)
+            # test self.descPanel.UpdateHeader(struct)
             self.descPanel.UpdateDesc(struct)
             self.descPanel.Layout()
             self.thumbPanel.Update(struct)
@@ -2330,9 +2363,21 @@ class MainApp(wx.Frame):
     #-------------------------------------------------------------------------------
     def onHelpAbout(self, event):
         try:
-            import version            
-            msg = 'wxFlore - Version %s\nStéphane Bausson' %  version.version
-            msg += "\nwxPython version %s" % wx.__version__
+            import version
+            msg=''
+            msg+='wxFlore - Version {}'.format(version.version)
+            msg+='\n\nStéphane Bausson (sbausson@gmail.com)'
+            msg+='\n\nwxPython version {}'.format(wx.__version__)
+            msg+='\n'
+            
+            if self.options.bdtfx.version != '':
+                msg+='\nbdtfx [{}]'.format(options.bdtfx.version)
+            if self.options.baseflor.version != '':
+                msg+='\nbaseflor [{}]'.format(options.baseflor.version)
+            if self.options.baseveg.version != '':
+                msg+='\nbaseveg [{}]'.format(options.baseveg.version)
+            if self.options.chorodep.version != '':
+                msg+='\nchorodep [{}]'.format(options.chorodep.version)
 
             print msg
             msg = msg.decode('utf8','ignore') 
@@ -2568,6 +2613,7 @@ if __name__ == '__main__':
 
     options.noconfig = 0
     options.wxga = 0
+    options.debug = 1
     
     if os.getenv("HOME") == None:
         options.home  = os.getenv("HOMEPATH").decode(sys.stdout.encoding)
