@@ -2510,9 +2510,8 @@ class MainApp(wx.Frame):
     #-------------------------------------------------------------------------------
     def select_button(self,index):
 
-
-        self.s_buttons[i].SetForegroundColour("#202020")
         for i in range(0,self.n_s_buttons):
+            self.s_buttons[i].SetForegroundColour("#202020")
             if index == i:
                 self.s_buttons[i].SetBackgroundColour("#ccff66")
             else:
