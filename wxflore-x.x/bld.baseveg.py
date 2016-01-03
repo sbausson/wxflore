@@ -20,14 +20,14 @@ def bld_filename(nl):
     except:
         print(nl)
         error()
-        
+
     name = name.strip().replace(" x ",".").replace(" ",".")
     if len(name.split(".")) == 1:
         name = ""
         print("## WARNING ## Ignoring : {}".format(nl))
 
     return name
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -78,10 +78,10 @@ def build_python_module():
 
     f.write('# -*- coding: utf-8 -*-\n')
     f.write('\n#keys# = Code Catminat\n\n')
-    
+
     f.write("version='{}'\n\n".format(version))
     f.write("table={\n")
-    with open(baseflor_filename, "r") as csvfile: 
+    with open(baseflor_filename, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         i=0
 
@@ -95,7 +95,14 @@ def build_python_module():
                 #CN = row[indexes.index("N°_Taxinomique_BDNFF")]
                 #print(row)
 
-                if niv in['ASS','ASSGR','CLA','ALL','SUBALL','ORD']:
+                if niv in ['ALL',
+                           'ASS',
+                           'ASSGR',
+                           'CLA',
+                           'ORD',
+                           'SUBALL',
+                           'SUBCLA',
+                ]:
 
                     s=''
                     s+='"{}":'.format(id_cat)
@@ -104,11 +111,11 @@ def build_python_module():
                     for item in conv_table:
                         s+='"{}": "{}",'.format(item[1],row[indexes.index(item[0])].replace('\n',' '))
                     f.write(s)
-                        
+
                     s_=[]
                     for i in range(0,len(indexes)):
                         dep_match=re.match(".*\((.*)\)",indexes[i])
-                        if dep_match:       
+                        if dep_match:
                             ndep = dep_match.group(1)
                             x = row[i].strip()
                             if x in ["1"]: #,"1?"]:
@@ -121,11 +128,11 @@ def build_python_module():
                     f.write('"1": {}'.format(sorted(s_)))
                     f.write('},\n')
             i+=1
-    
+
 
     f.write("}\n")
     f.close()
-                        
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------

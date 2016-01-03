@@ -36,7 +36,7 @@ class colors:
     selected = ["#ccff33","#707070"]
     selection = ["#ff9933","#202020"]
     #normal = ["#000000","#ffffff"]
-    normal = ["#ffffff","#101010"] 
+    normal = ["#ffffff","#101010"]
     #nl = ["#ffffff","#202020"]
     nl = ["#ffffff","#202020"]
 
@@ -59,7 +59,7 @@ format_url_tela = "http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n"
 format_url_inpn = "http://inpn.mnhn.fr/espece/cd_nom/{}\n"
 format_url_fcnb = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
 
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ def build_text_to_export(struct,markdown=False):
             for item in struct[field]:
                 s_res+=format_string.format(item) #.encode("utf-8"))
             s_res+='\n'
-            
+
         elif field in ["ID.tela","ID.inpn"]:
             s = struct[field]
             s_res+=format_string.format(field_name,s,s)
@@ -110,13 +110,13 @@ def build_text_to_export(struct,markdown=False):
             if "N.coste" in struct.keys():
                 s +=u"  -  {}".format(struct["N.coste"])
             s_res+=format_string.format(field_name,s)
-            
+
         else:
             s = struct[field] #.encode("utf-8")
             s_res+=format_string.format(field_name,s) #.encode("utf-8"))
-            
+
         return s_res
-        
+
     #-------------------------------------------------------------------------------
     s = ""
     if markdown:
@@ -129,7 +129,7 @@ def build_text_to_export(struct,markdown=False):
         format_tela = u'{:25} : N°{}  http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n'
         format_inpn = u'{:25} : N°{}  http://inpn.mnhn.fr/espece/cd_nom/{}\n'
         format_fcbn = u'{:25} : http://siflore.fcbn.fr/?cd_ref={}&r=metro\n'
-        
+
     format_list = u'    - {}\n'
 
     s+=fill_string(format_string,struct,u'Nom latin',"NL")
@@ -153,7 +153,7 @@ def build_text_to_export(struct,markdown=False):
     s+=fill_string(format_fcbn,struct,u'Répartition FCBN',"FCBN")
     s+=fill_string(format_string,struct,u'Wiki.Fr',"REF.wiki.fr")
 
-    s+='\n\n'
+    s+='\n'
     s+='#botanique '
     s+='#botany '
     s+='#botanik '
@@ -167,8 +167,8 @@ def build_text_to_export(struct,markdown=False):
     s+='#{} '.format(struct['NL'].split()[0].lower())
     s+='#{} '.format(struct['FA'].lower())
     s+='\n'
-    
-    return s    
+
+    return s
 
 #-------------------------------------------------------------------------------
 #
@@ -185,7 +185,7 @@ class TextFrame(wx.Frame):
         txt.SetBackgroundColour(panel.colors.normal[1])
         #txt.SetForegroundColour(panel.colors.normal[0])
         txt.SetForegroundColour("#99ccff")
-            
+
         font = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Liberation Mono')
 
         txt.SetFont(font)
@@ -215,7 +215,7 @@ def IsNotebookPageAlreadyExist(notebook,name):
 #
 #-------------------------------------------------------------------------------
 def build_baseveg_string(struct,options,markdown=False):
-    
+
     s=''
     if 'ID.cat' in struct['baseflor'] and struct['baseflor']['ID.cat'] != '':
         st = options.baseveg.table[struct['baseflor']['ID.cat']]
@@ -228,7 +228,7 @@ def build_baseveg_string(struct,options,markdown=False):
             s+=u'**Baseveg:**\n'
             s+=u'*Index phytosociologique synonymique de la végétation de la France Version [{}]\n'.format(options.baseveg.version)
             s+=u'P. Julve, 1998 ff. Programme Catminat. http://perso.wanadoo.fr/philippe.julve/catminat.htm*\n\n'
-            
+
         s+=fmt.format(u'Syntaxon',st['SYNTAXON'].decode('utf-8'))
         s+=fmt.format(u'Dénomination écologique',st['ECO.name'].decode('utf-8'))
         s+=fmt.format(u'Chorologie mondiale',st['choro.world'].decode('utf-8'))
@@ -252,7 +252,7 @@ def build_baseveg_string(struct,options,markdown=False):
         s+=fmt.format(u'Influences anthropozoogènes',st['C.infl'].decode('utf-8'))
 
     return s
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ class Panel_baseveg(wx.Panel):
         self.struct = struct
         self.button = button
         self.options = options
-        
+
         wx.Panel.__init__(self, parent, -1)
         self.SetAutoLayout(1)
 
@@ -285,9 +285,9 @@ class Panel_baseveg(wx.Panel):
         s = build_baseveg_string(struct,self.options)
         if s!= '':
             self.RTC.SetValue(s)
-        
 
-        self.RTC.GetCaret().Hide() 
+
+        self.RTC.GetCaret().Hide()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
@@ -319,7 +319,7 @@ class Panel_NOTES(wx.Panel):
 
         self.ReadNotes()
 
-        self.RTC.GetCaret().Hide() 
+        self.RTC.GetCaret().Hide()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
@@ -327,17 +327,17 @@ class Panel_NOTES(wx.Panel):
 
     #-------------------------------------------------------------------------------
     def RightClick(self,event):
-        
+
         menu = wx.Menu()
         self.popupID_EDIT = wx.NewId()
         menu.Append(self.popupID_EDIT, "Edit this Note")
-        self.Bind(wx.EVT_MENU, self.RightClickMenu) 
+        self.Bind(wx.EVT_MENU, self.RightClickMenu)
         self.PopupMenu(menu)
         menu.Destroy()
 
     #-------------------------------------------------------------------------------
     def RightClickMenu(self,event):
-        
+
         print("RightClickMenu")
 
         if event.GetId() == self.popupID_EDIT:
@@ -353,9 +353,9 @@ class Panel_NOTES(wx.Panel):
 
     #-------------------------------------------------------------------------------
     def ReadNotes(self):
-        
+
         print("ReadNotes",self.fn)
-        
+
         try:
             f = codecs.open(self.fn, "r", "utf-8")
             text = ''.join(f.readlines())
@@ -394,7 +394,7 @@ class PanelSYN(wx.Panel):
 
         print(s)
         self.RTC.WriteText(s)
-        self.RTC.GetCaret().Hide() 
+        self.RTC.GetCaret().Hide()
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
@@ -406,7 +406,7 @@ class PanelSYN(wx.Panel):
 class AdvancedSearchPanel(wx.Panel):
 
     def __init__(self, apps):
-        
+
         id = 100
         print("AdvancedSearchPanel")
 
@@ -417,10 +417,10 @@ class AdvancedSearchPanel(wx.Panel):
         topicSizer = wx.BoxSizer(wx.HORIZONTAL)
         toolbarSizer = wx.BoxSizer(wx.HORIZONTAL)
         catSizer = wx.BoxSizer(wx.VERTICAL)
-        
-        for cat in self.apps.button_config["cat"]["colors"].keys(): 
+
+        for cat in self.apps.button_config["cat"]["colors"].keys():
             button = wx.Button(self, id, u"{}".format(cat), wx.DefaultPosition, (-1,-1)) #, style=wx.BU_EXACTFIT)
-            
+
             if self.apps.button_config["cat"]["colors"][cat][0] != -1:
                 button.SetForegroundColour(self.apps.button_config["cat"]["colors"][cat][0])
 
@@ -452,7 +452,7 @@ class AdvancedSearchPanel(wx.Panel):
         for i in range(1,95):
             button = wx.Button(self, label='{}'.format(i),size=(40,-1))
             button.SetForegroundColour("#101010")
-            button.SetBackgroundColour("#D0D0D0") 
+            button.SetBackgroundColour("#D0D0D0")
             grid.append((button, 0, wx.ALIGN_LEFT))
             #wx.EVT_BUTTON( self, id, functools.partial(self.onDept,i))
             self.Bind(wx.EVT_BUTTON,functools.partial(self.onDept,i),button)
@@ -465,19 +465,19 @@ class AdvancedSearchPanel(wx.Panel):
         topicSizer.Add(deptSizer,0,wx.ALIGN_LEFT)
         topicSizer.Add(catSizer)
         mainSizer.Add(topicSizer)
-        
+
         # Toolbar
-        button = wx.Button(self, label='SEARCH')    
+        button = wx.Button(self, label='SEARCH')
         self.Bind(wx.EVT_BUTTON,self.onAdvancedSearch,button)
 #        button.SetForegroundColour("#4610A3")
 #        button.SetForegroundColour("#4610A3")
 
-        button.SetBackgroundColour("#2594FD") ##33F62D") 
-        button.SetForegroundColour("#ffffff") 
+        button.SetBackgroundColour("#2594FD") ##33F62D")
+        button.SetForegroundColour("#ffffff")
         toolbarSizer.Add(button,0,wx.ALIGN_LEFT)
-        
+
         mainSizer.Add(toolbarSizer)
-        
+
         self.SetSizer(mainSizer)
         self.Layout()
 
@@ -491,13 +491,13 @@ class AdvancedSearchPanel(wx.Panel):
         if self.selectDept[num] == 0:
             self.selectDept[num] = 1
             self.dept_button_t[num].SetForegroundColour("#101010")
-            #self.dept_button_t[num].SetBackgroundColour("#FFFFFF") 
-            self.dept_button_t[num].SetBackgroundColour("#F4FE8B") #"#F4FFD6")        
+            #self.dept_button_t[num].SetBackgroundColour("#FFFFFF")
+            self.dept_button_t[num].SetBackgroundColour("#F4FE8B") #"#F4FFD6")
 
         else:
             self.selectDept[num] = 0
             self.dept_button_t[num].SetForegroundColour("#101010")
-            self.dept_button_t[num].SetBackgroundColour("#D0D0D0") 
+            self.dept_button_t[num].SetBackgroundColour("#D0D0D0")
 
         print self.selectDept
 
@@ -522,7 +522,7 @@ class ThumbPanel(wx.lib.scrolledpanel.ScrolledPanel):
         #wx.Panel.__init__(self,parent,size=(-1,-1))
         wx.lib.scrolledpanel.ScrolledPanel.__init__(self,parent,size=(-1,200)) #,style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER|wx.HSCROLL)
         self.SetBackgroundColour(colors.normal[1])
-        
+
 #        self.Autosizer = wx.FlexGridSizer(cols=2)
 #        self.Autosizer.SetFlexibleDirection(wx.VERTICAL)
 
@@ -555,12 +555,12 @@ class ThumbPanel(wx.lib.scrolledpanel.ScrolledPanel):
         print thumb_dir
         print photo_dir
 
-        self.thumbSizer.DeleteWindows()        
+        self.thumbSizer.DeleteWindows()
         #self.thumbSizer = wx.BoxSizer(wx.HORIZONTAL)
 
         if os.path.exists(thumb_dir):
             print(name_reduced)
-            
+
             n=0
             self.pictPaths = []
             locale = wx.Locale(wx.LANGUAGE_DEFAULT)
@@ -570,9 +570,9 @@ class ThumbPanel(wx.lib.scrolledpanel.ScrolledPanel):
                 photo_path = os.path.join(photo_dir,img_name)
 
                 self.pictPaths.append(photo_path)
-                
+
                 image = wx.Image(thumb_path, wx.BITMAP_TYPE_ANY)
-                imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))  
+                imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
                 imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,n))
                 #self.thumbSizer.Add(imageBitmap, 0, wx.ALIGN_LEFT|wx.ALL, 8)
                 self.thumbSizer.Add(imageBitmap, 0, wx.ALL|wx.EXPAND, 8)
@@ -604,11 +604,11 @@ class ThumbPanel(wx.lib.scrolledpanel.ScrolledPanel):
 #-------------------------------------------------------------------------------
 class DescriptionPanel(wx.Panel):
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__(self,parent,apps,options,colors):
 
         self.options = options
-        self.colors = colors 
+        self.colors = colors
         self.parent = parent
         self.apps = apps
 
@@ -627,23 +627,60 @@ class DescriptionPanel(wx.Panel):
         else:
             panel = PanelSYN(self,self.struct)
             self.notebook.AddPage(panel, name, True)
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
     def Button_OBS(self,event):
         pass
-    
+
     #-------------------------------------------------------------------------------
     def Button_BASEVEG(self,event):
 
+        def filter_basveg_by_cat_id(cat_id):
+
+            #table = self.apps.table
+            content = self.apps.content
+            filtered_struct_list = []
+
+            for spe in content.keys():
+                struct = content[spe]
+                if 'ID.cat' in struct['baseflor'] and struct['baseflor']['ID.cat'] == cat_id:
+                    filtered_struct_list.append(struct)
+
+            sorted_list = sorted(filtered_struct_list, key=lambda k: (k['FA'], k['NL']))
+            if len(filtered_struct_list) == 0:
+                pass
+            else:
+                name = cat_id
+                new_panel = FilteredPanel(self.apps,sorted_list)
+                self.apps.notebook.AddPage( new_panel, name, True )
+                PageIndex = self.apps.notebook.GetSelection()
+                self.apps.notebook.SetPageTextColour(PageIndex,'#669900')
+
+
+        #-------------------------------------------------------------------------------
         print("Button_baseveg")
-        
-        name = "BaseVeg"
+
+        #name = "BaseVeg"
+        name = self.struct['baseflor']['ID.cat']
         PageIndex = IsNotebookPageAlreadyExist(self.notebook,name)
+        #print(self.notebook.GetSelection)
+
         if PageIndex:
             self.notebook.SetSelection(PageIndex - 1)
+            #self.catminat_button=1
+            filter_basveg_by_cat_id(self.struct['baseflor']['ID.cat'])
+
         else:
+            #self.catminat_button=0
             panel = Panel_baseveg(self,self.struct,self.button_baseveg, self.options)
             self.notebook.AddPage(panel, name, True)
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
+
+        #print("++++++++",self.catminat_button)
+        print(len(self.apps.table.keys()))
 
     #-------------------------------------------------------------------------------
     def Button_NOTES(self,event):
@@ -655,6 +692,8 @@ class DescriptionPanel(wx.Panel):
         else:
             panel = Panel_NOTES(self,self.struct,self.note_fn,self.button_note)
             self.notebook.AddPage(panel, name, True)
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
 
 
     #-------------------------------------------------------------------------------
@@ -662,15 +701,15 @@ class DescriptionPanel(wx.Panel):
         print("OnNoteUpdate")
         if os.path.exists(self.note_fn):
             self.button_note.SetForegroundColour("#101010")
-            self.button_note.SetBackgroundColour("#33CCCC") 
+            self.button_note.SetBackgroundColour("#33CCCC")
         else:
             self.button_note.SetForegroundColour("#101010")
-            self.button_note.SetBackgroundColour("#D0D0D0") 
+            self.button_note.SetBackgroundColour("#D0D0D0")
 
     #-------------------------------------------------------------------------------
     def onNotebookClose(self,event):
         print("toto")
-        
+
 #    def ReadTagsFile(self,name,struct):
 #
 #        print "TOTOTOTOTO"
@@ -691,14 +730,14 @@ class DescriptionPanel(wx.Panel):
             n2 = n_[1].replace("]","").strip()
 
         id = 400
-  
+
         try:
             self.headerSizer.Clear(1)
             print("headerSizer.Clear()")
         except:
             self.headerSizer = wx.BoxSizer(wx.HORIZONTAL)
             self.headerSizer.SetMinSize((-1,self.apps.size["THUMB.YMAX"]))
-        
+
         self.headerRTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER);
         self.headerRTC.SetBackgroundColour(colors.normal[1])
         self.headerRTC.SetForegroundColour(colors.normal[0])
@@ -709,61 +748,71 @@ class DescriptionPanel(wx.Panel):
         self.headerRTC.SelectNone()
         self.headerRTC.ChangeValue("")
         self.headerRTC.SelectNone()
-        
-        self.headerRTC.BeginFontSize(self.apps.size["FONT.BIG"])    
-        self.headerRTC.BeginAlignment(wx.TEXT_ALIGNMENT_RIGHT)
-        self.headerRTC.BeginTextColour(self.colors.fa[0])
-        self.headerRTC.BeginRightIndent(20)
 
-        self.headerRTC.WriteText("{}".format(struct["FA"]))
-        self.headerRTC.Newline()
+#        self.headerRTC.BeginFontSize(self.apps.size["FONT.BIG"])
+#        self.headerRTC.BeginAlignment(wx.TEXT_ALIGNMENT_RIGHT)
+#        self.headerRTC.BeginTextColour(self.colors.fa[0])
+#        self.headerRTC.BeginRightIndent(20)
+#
+#        self.headerRTC.WriteText("{}".format(struct["FA"]))
+#        self.headerRTC.Newline()
+#
+#        self.headerRTC.EndRightIndent()
+#        self.headerRTC.EndTextColour()
+#        self.headerRTC.EndAlignment()
+#        self.headerRTC.EndFontSize()
 
-        self.headerRTC.EndRightIndent()
-        self.headerRTC.EndTextColour()
-        self.headerRTC.EndAlignment()
-        self.headerRTC.EndFontSize()
-
-        #self.headerRTC.EndRightIndent()        
 
         self.headerRTC.BeginTextColour(self.colors.nl[0])
         self.headerRTC.BeginFontSize(self.apps.size["FONT.BIG"])
         self.headerRTC.BeginAlignment(wx.TEXT_ALIGNMENT_LEFT)
-        self.headerRTC.BeginLeftIndent(10)
+        #self.headerRTC.BeginLeftIndent(10)
         self.headerRTC.BeginBold()
         self.headerRTC.BeginItalic()
-        
+
         self.headerRTC.WriteText(u"{}".format(n1))
 
         self.headerRTC.EndItalic()
         self.headerRTC.EndBold()
-        self.headerRTC.EndFontSize()        
+        #self.headerRTC.EndFontSize()
 
-        self.headerRTC.BeginFontSize(12)
-        
+        #self.headerRTC.BeginFontSize(12)
+
         self.headerRTC.WriteText(u" {}".format(n2))
+
+        #self.headerRTC.BeginFontSize(self.apps.size["FONT.BIG"])
+        self.headerRTC.BeginTextColour("#808080")
+        self.headerRTC.WriteText("     /     ")
+        self.headerRTC.BeginTextColour(self.colors.fa[0])
+        self.headerRTC.WriteText("{}".format(struct["FA"]))
+        self.headerRTC.EndTextColour()
         self.headerRTC.Newline()
+
+        self.headerRTC.EndFontSize()
+        self.headerRTC.BeginFontSize(12)
         self.headerRTC.EndFontSize()
         self.headerRTC.EndAlignment()
         self.headerRTC.EndTextColour()
 
 
         self.headerRTC.BeginAlignment(wx.TEXT_ALIGNMENT_LEFT)
+        ##self.headerRTC.BeginLeftIndent(10)
 
-        self.headerRTC.BeginFontSize(self.apps.size["FONT.BIG"])  
+        self.headerRTC.BeginFontSize(self.apps.size["FONT.BIG"])
         self.headerRTC.BeginTextColour(self.colors.nv[0])
         self.headerRTC.WriteText(u"{}\n".format(struct["NV"].replace(";",", ")))
         self.headerRTC.EndTextColour()
         self.headerRTC.EndFontSize()
 
         if "N.UK" in struct.keys() and struct["N.UK"] != "":
-            self.headerRTC.BeginFontSize(12)  
+            self.headerRTC.BeginFontSize(12)
             self.headerRTC.BeginTextColour("#cc6600")
             self.headerRTC.WriteText(struct["N.UK"].replace(";",", "))
             self.headerRTC.EndTextColour()
             self.headerRTC.EndFontSize()
-        
+
         self.headerRTC.EndAlignment()
-        self.headerRTC.EndLeftIndent()        
+        ###self.headerRTC.EndLeftIndent()
 
         self.headerRTC.Newline()
         self.headerRTC.Newline()
@@ -784,26 +833,27 @@ class DescriptionPanel(wx.Panel):
                 self.headerRTC.BeginTextColour(self.colors.flower[col][0])
                 self.headerRTC.WriteText(u"{}".format(col.upper()))
                 self.headerRTC.EndTextColour()
-                
+
             self.headerRTC.WriteText(u" / {}".format(struct["baseflor"]["FL.flo"]))
             self.headerRTC.WriteText(u" / {}".format(struct["baseflor"]["FL.inf"]))
             self.headerRTC.WriteText(u" / {}\n".format(struct["baseflor"]["FL.fru"]))
-            
+
             self.headerRTC.WriteText(u"Sexualité: {}".format(struct["baseflor"]["FL.se"]))
             self.headerRTC.WriteText(u" / Ordre Maturation: {}".format(struct["baseflor"]["FL.mat"]))
             self.headerRTC.WriteText(u" / Dissemination: {}\n".format(struct["baseflor"]["FL.dis"]))
 
-            
+
         except:
             pass
 
         try:
             self.headerRTC.Newline()
-            self.headerRTC.WriteText(u"Ecologie: {} / {}\n".format(struct["baseflor"]["ECO.ch"],struct["baseflor"]["ECO.opt"]))
+            self.headerRTC.WriteText(u"Ecologie: {} / {}\n".format(struct["baseflor"]["ECO.ch"],
+                                                                   struct["baseflor"]["ECO.opt"]))
         except:
             pass
-        
-        try:            
+
+        try:
             self.headerRTC.WriteText(u"Lumière: {}".format(struct["baseflor"]["GRAD.L"]))
             self.headerRTC.WriteText(u", Humidité air: {}".format(struct["baseflor"]["GRAD.Ha"]))
             self.headerRTC.WriteText(u", Temp: {}".format(struct["baseflor"]["GRAD.T"]))
@@ -822,7 +872,7 @@ class DescriptionPanel(wx.Panel):
         except:
             pass
 
-        try:                
+        try:
             tl = struct["baseflor"]["TL"].strip().capitalize()
             if tl != "":
                 self.headerRTC.Newline()
@@ -835,13 +885,12 @@ class DescriptionPanel(wx.Panel):
             #print("struct[chorodep]",struct["chorodep"])
             pres = ", ".join(struct["chorodep"]["1"])
             rar = struct["chorodep"]["rar"]
-            self.headerRTC.Newline()            
+            self.headerRTC.Newline()
             self.headerRTC.WriteText(u"Pres ({}) : {}".format(rar,pres.replace(";",", ")))
         except:
             pass
-        
 
-#        self.headerRTC.Newline()            
+#        self.headerRTC.Newline()
 #        for label in ["LABEL1","LABEL2","LABEL3","LABEL4"]:
 #            self.headerRTC.BeginTextColour("#6699ff")
 #            #self.headerRTC.SetForegroundColour("#808000")#            self.headerRTC.WriteText("{}".format(label))
@@ -890,9 +939,12 @@ class DescriptionPanel(wx.Panel):
         if "tags" in struct.keys():
             for tag in struct["tags"]:
 
-                statictext = wx.StaticText(self, -1, "Tags:")
-                self.tagsSizer.Add((5,-1))
-                self.tagsSizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
+                # statictext = wx.StaticText(self.scrolledTagPanel, -1, "Tags:")
+                # #font = statictext.GetFont()
+                # #font.SetWeight(wx.BOLD)
+                # #statictext.SetFont(font)
+                # self.tagsSizer.Add((5,-1))
+                # self.tagsSizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
                 self.tagsSizer.Add((5,-1))
 
                 button = wx.Button(self.scrolledTagPanel, wx.ID_ANY, u" {} ".format(tag),
@@ -901,9 +953,8 @@ class DescriptionPanel(wx.Panel):
                 button.SetBackgroundColour("#6699ff")
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                 self.tagFlag = 1
-                print(" ======== if tagflag / Tags .{}.".format(tag))
 
-                
+
         self.protSizer.Add((5,-1))
 
         # Catergories
@@ -920,6 +971,8 @@ class DescriptionPanel(wx.Panel):
                 except:
                     pass
 
+
+                self.tagsSizer.Add((5,-1))
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                 self.tagFlag = 1
                 print(" ======== if tagflag / Category")
@@ -930,7 +983,7 @@ class DescriptionPanel(wx.Panel):
         # Red List Status
         #-----------------
         if "redlist" in struct.keys():
-            
+
             rl = struct["redlist"]
             try:
                 button = wx.Button(self.scrolledProtPanel, wx.ID_ANY,
@@ -947,7 +1000,7 @@ class DescriptionPanel(wx.Panel):
         # Red List Status
         #-----------------
         if struct["prot.nat"] != []:
-            
+
             button = wx.Button(self.scrolledProtPanel, wx.ID_ANY, u"France Métropole",
                                wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
             button.SetForegroundColour("#660033")
@@ -957,27 +1010,27 @@ class DescriptionPanel(wx.Panel):
 
         # Regional Protections
         #----------------------
-        prot_colors={u'Languedoc-Roussillon':[-1,-1], 
-                     u'Basse-Normandie':[-1,-1], 
-                     u'Lorraine':[-1,-1], 
-                     u'Poitou-Charentes':[-1,-1], 
-                     u'Nord-Pas-de-Calais':[-1,-1],  
-                     u'Pays-de-la-Loire':[-1,-1], 
-                     u'Centre':[-1,-1], 
-                     u'Bretagne':[-1,-1], 
-                     u'Bourgogne':[-1,-1], 
-                     u'Aquitaine':[-1,-1], 
-                     u'Auvergne':[-1,-1], 
-                     u'Alsace':[-1,-1], 
-                     u'IDF':[-1,-1],  
-                     u'Corse':[-1,-1], 
-                     u'Franche-Comte':[-1,-1],  
-                     u'Limousin':[-1,-1], 
-                     u'Rhone-Alpes':[-1,-1], 
-                     u'PACA':[-1,-1],  
-                     u'Haute-Normandie':[-1,-1], 
-                     u'Picardie':[-1,-1], 
-                     u'Champagne-Ardenne':[-1,-1],  
+        prot_colors={u'Languedoc-Roussillon':[-1,-1],
+                     u'Basse-Normandie':[-1,-1],
+                     u'Lorraine':[-1,-1],
+                     u'Poitou-Charentes':[-1,-1],
+                     u'Nord-Pas-de-Calais':[-1,-1],
+                     u'Pays-de-la-Loire':[-1,-1],
+                     u'Centre':[-1,-1],
+                     u'Bretagne':[-1,-1],
+                     u'Bourgogne':[-1,-1],
+                     u'Aquitaine':[-1,-1],
+                     u'Auvergne':[-1,-1],
+                     u'Alsace':[-1,-1],
+                     u'IDF':[-1,-1],
+                     u'Corse':[-1,-1],
+                     u'Franche-Comte':[-1,-1],
+                     u'Limousin':[-1,-1],
+                     u'Rhone-Alpes':[-1,-1],
+                     u'PACA':[-1,-1],
+                     u'Haute-Normandie':[-1,-1],
+                     u'Picardie':[-1,-1],
+                     u'Champagne-Ardenne':[-1,-1],
                      u'Midi-Pyrenees':["#99ff33",-1]}
 
         prot_prio = [u'Midi-Pyrenees',u'Aquitaine']
@@ -1004,7 +1057,7 @@ class DescriptionPanel(wx.Panel):
                     button = wx.Button(self.scrolledProtPanel,
                                        wx.ID_ANY,
                                        u" {} ".format(region.table[prot][0]),style=wx.BU_EXACTFIT) #.decode("utf8")))
-                
+
                     if prot_colors[prot][0] != -1:
                         button.SetForegroundColour(prot_colors[prot][0])
                     else:
@@ -1042,20 +1095,20 @@ class DescriptionPanel(wx.Panel):
 
                 try:
                     button = wx.Button(self.scrolledProtPanel, wx.ID_ANY, u" {} ".format(prot),style=wx.BU_EXACTFIT) #.decode("utf8")))
-                
-                    button.SetForegroundColour("#FF9966")                
+
+                    button.SetForegroundColour("#FF9966")
                     button.SetBackgroundColour("#202020")
 
                     self.protSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                     self.protFlag = 1
                 except IOError:
                     print("## WARNING ## : Protection Status error")
-            
+
         # See Also ...
         #--------------
         self.seealsoSizer =  wx.BoxSizer(wx.HORIZONTAL)
         if "seealso" in struct.keys():
-        
+
             statictext = wx.StaticText(self, -1, "Voir aussi:")
             self.seealsoSizer.Add((5,-1))
             self.seealsoSizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
@@ -1073,12 +1126,12 @@ class DescriptionPanel(wx.Panel):
                                 struct_t.append(self.apps.content[nl])
                                 break
                 if seealso != struct["ID.tela"]:
-                    button = wx.Button(self, id, " {} ".format(name), wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )                
+                    button = wx.Button(self, id, " {} ".format(name), wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
                     button.SetForegroundColour("#FfFfFf")
                     button.SetBackgroundColour("#85adad") #"#00CC99")
                     button.struct_list = struct_t
                     button.name = "See also: {}".format(short_name)
-                
+
                     wx.EVT_BUTTON( self, id, self.apps.onOpenNewTab)
 
                     id+=1
@@ -1086,7 +1139,7 @@ class DescriptionPanel(wx.Panel):
                     #self.tagFlag = 1
                     print(" ======== if tagflag / ID.tela .{}.".format(seealso))
 
-                    
+
 
         # COSTE Illustration
         #--------------------
@@ -1099,15 +1152,36 @@ class DescriptionPanel(wx.Panel):
             #image = image.Scale(200,250, wx.IMAGE_QUALITY_HIGH)
             image = image.Scale(self.apps.size["THUMB.XMAX"],
                                 self.apps.size["THUMB.YMAX"], wx.IMAGE_QUALITY_HIGH)
-            imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))       
+            imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
             imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
             self.headerSizer.Add(imageBitmap,0,wx.ALL)
+
+        elif 1:
+            name_reduced = bota.ReduceName(struct["NL"])
+            thumb_dir = os.path.join(self.options.paths.img,"photos",name_reduced)
+            thumb_file = os.path.join(thumb_dir,name_reduced+'.00.jpg')
+            if os.path.exists(thumb_file):
+                locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+                image = wx.Image(thumb_file, wx.BITMAP_TYPE_JPEG)
+
+                # scale the image, preserving the aspect ratio
+                W = image.GetWidth()
+                H = image.GetHeight()
+
+                h = self.apps.size["THUMB.YMAX"]
+                w = W*h/H
+
+                image = image.Scale(w, h, wx.IMAGE_QUALITY_HIGH)
+
+                imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
+                imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
+                self.headerSizer.Add(imageBitmap,0,wx.ALL)
         else:
             self.headerSizer.Add((240,-1))
 
 
         #self.headerSizer.Layout()
-        self.headerSizer1.Add(self.headerRTC,1,wx.ALIGN_LEFT|wx.EXPAND)
+        self.headerSizer1.Add(self.headerRTC,1,wx.ALIGN_LEFT|wx.EXPAND,4)
 
         if hasattr(self,"seealsoSizer"):
             self.headerSizer1.Add(self.seealsoSizer,0,wx.ALIGN_LEFT)
@@ -1131,7 +1205,7 @@ class DescriptionPanel(wx.Panel):
         #print(u"[ {} ]".format(struct["REF"]))
         print(u"[ {} ]".format(struct["FN"]))
         print("## END ## DescriptionPanel.UpdateHeader()")
-        
+
     #-------------------------------------------------------------------------------
     def onPhotoClick(self,coste_ill,evt):
         print "onPhotoClick",coste_ill
@@ -1140,7 +1214,7 @@ class DescriptionPanel(wx.Panel):
 
     #-------------------------------------------------------------------------------
     def RightClick(self,event):
-        
+
         menu = wx.Menu()
 
         self.popupID_COPY_NL_FA_NV_UK = wx.NewId()
@@ -1168,8 +1242,8 @@ class DescriptionPanel(wx.Panel):
         menu.Append(self.popupID_COPY_NL_FA, "Copy NL (FA)")
         menu.AppendSeparator()
         menu.Append(self.popupID_COPY_DIASPORA_names, 'Diaspora* : copy NL + (FA) + Names')
-        menu.Append(self.popupID_COPY_DIASPORA_desc, 'Diaspora* : copy Description')        
-        menu.Append(self.popupID_COPY_DIASPORA_baseveg, 'Diaspora* : copy BaseVeg')        
+        menu.Append(self.popupID_COPY_DIASPORA_desc, 'Diaspora* : copy Description')
+        menu.Append(self.popupID_COPY_DIASPORA_baseveg, 'Diaspora* : copy BaseVeg')
         menu.AppendSeparator()
         menu.Append(self.popupID_COPY_ID_TELA, "Copy ID TELA")
         menu.Append(self.popupID_COPY_ID_INPN, "Copy ID INPN")
@@ -1189,7 +1263,7 @@ class DescriptionPanel(wx.Panel):
         menu.AppendSeparator()
         menu.Append(self.popupID_EXPORT, "Export to TXT")
 
-        self.Bind(wx.EVT_MENU, self.RightClickMenu) 
+        self.Bind(wx.EVT_MENU, self.RightClickMenu)
 
         self.PopupMenu(menu)
         menu.Destroy()
@@ -1208,7 +1282,7 @@ class DescriptionPanel(wx.Panel):
                                      self.struct["FN"],
                                      colors)
             ed.ShowModal()
-            
+
             struct = fldb.parse_file(self.struct["FN"],self.struct["N."],options)
             self.apps.Update(struct)
 
@@ -1282,7 +1356,7 @@ class DescriptionPanel(wx.Panel):
             s+='#wild '
             s+='#{} '.format(nl1.split()[0].lower())
             s+='#{} '.format(self.struct['FA'].lower())
-            
+
         elif event.GetId() == self.popupID_COPY_DIASPORA_desc:
             s = build_text_to_export(self.struct,True)
             print(s)
@@ -1322,7 +1396,7 @@ class DescriptionPanel(wx.Panel):
 
             s+=rl
             s+="\n"
-            
+
             s_ = []
             for prot in self.struct["prot.reg"]:
                 s_.append(prot)
@@ -1333,7 +1407,7 @@ class DescriptionPanel(wx.Panel):
             for prot in self.struct["prot.dep"]:
                 s_.append(prot)
             if s_ != []:
-                s+="Protection Départementale : {}\n".format(", ".join(s_))                
+                s+="Protection Départementale : {}\n".format(", ".join(s_))
 
             print(s)
 
@@ -1353,13 +1427,13 @@ class DescriptionPanel(wx.Panel):
             wx.TheClipboard.Open()
             wx.TheClipboard.SetData(clipdata)
             wx.TheClipboard.Close()
-            
+
     #-------------------------------------------------------------------------------
     def UpdateDesc(self,struct):
 
         if options.debug:
             print("=====> wxflore.py / Description.UpdateDesc()")
-        
+
         #self.descRTC.Clear()
         big_font = 11
         small_font = 10
@@ -1382,14 +1456,14 @@ class DescriptionPanel(wx.Panel):
         font = wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL)
         self.descRTC.BeginFont(font)
 
-        self.descRTC.BeginFontSize(big_font) 
+        self.descRTC.BeginFontSize(big_font)
         self.descRTC.BeginBold()
         self.descRTC.WriteText("Description:")
         self.descRTC.Newline()
         self.descRTC.EndFontSize()
         self.descRTC.EndBold()
 
-        self.descRTC.BeginFontSize(small_font)    
+        self.descRTC.BeginFontSize(small_font)
         self.descRTC.BeginLeftIndent(50)
 
         if struct["DS"] != []:
@@ -1397,57 +1471,57 @@ class DescriptionPanel(wx.Panel):
                 self.descRTC.WriteText(u"- {}\n".format(l))
 
         elif "telacol.DS" in struct.keys() and struct["telacol.DS"] != []:
-        
+
             for l in struct["telacol.DS"]:
                 if re.match(r"Identification|Générale|NB |\-\s*$",l,re.UNICODE):
                     self.descRTC.WriteText(u"{}\n".format(l))
                 else:
-                    self.descRTC.WriteText(u"- {}\n".format(l)) 
-        
-        self.descRTC.EndLeftIndent()                
+                    self.descRTC.WriteText(u"- {}\n".format(l))
+
+        #self.descRTC.EndLeftIndent()
         self.descRTC.EndFontSize()
 
         if "HB" in struct.keys():
-            self.descRTC.Newline()            
-            self.descRTC.BeginFontSize(big_font)    
+            self.descRTC.Newline()
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Ecologie:\n")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
 
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.BeginLeftIndent(50)
             self.descRTC.WriteText(u"- {}\n".format(struct["HB"]))
             self.descRTC.EndFontSize()
-            self.descRTC.EndLeftIndent()                
+            self.descRTC.EndLeftIndent()
 
 
         if "ZO" in struct.keys():
             self.descRTC.WriteText("\n")
-            
-            self.descRTC.BeginFontSize(big_font)    
+
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Zone Géographique:\n")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
 
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.BeginLeftIndent(50)
             self.descRTC.WriteText(u"- {}\n".format(struct["ZO"]))
             self.descRTC.EndFontSize()
-            self.descRTC.EndLeftIndent()                
-        
+            self.descRTC.EndLeftIndent()
+
 
         if "FL" in struct.keys():
             self.descRTC.WriteText("\n")
-            
-            self.descRTC.BeginFontSize(big_font)    
+
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText(u"Floraison:")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
 
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.WriteText("    ")
             self.descRTC.WriteText(u"{}\n".format(struct["FL"]))
             self.descRTC.EndFontSize()
@@ -1459,54 +1533,54 @@ class DescriptionPanel(wx.Panel):
                 ref_coste +=u"N°{}".format(struct["ID.coste"])
         if "N.coste" in struct.keys():
             ref_coste +=u"  -  {}".format(struct["N.coste"])
-        
+
         if ref_coste != "":
             self.descRTC.WriteText("\n")
-            
-            self.descRTC.BeginFontSize(big_font)    
+
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Ref. Coste:")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
 
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.WriteText("    ")
             self.descRTC.WriteText(u"{}\n".format(ref_coste))
             self.descRTC.EndFontSize()
 
         if "REF.wiki.fr" in struct.keys():
             self.descRTC.WriteText("\n")
-            
-            self.descRTC.BeginFontSize(big_font)    
+
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Wikipedia:")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.WriteText("    ")
             self.descRTC.WriteText("{}\n".format(struct["REF.wiki.fr"]))
             self.descRTC.EndFontSize()
 
         if "ID.inpn" in struct.keys():
-            self.descRTC.BeginFontSize(big_font)    
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("INPN:")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
 
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.WriteText("    ")
             self.descRTC.WriteText("http://inpn.mnhn.fr/espece/cd_nom/{}\n".format(struct["ID.inpn"]))
             self.descRTC.EndFontSize()
 
         if "ID.tela" in struct.keys():
-            self.descRTC.BeginFontSize(big_font)    
+            self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Tela:")
             self.descRTC.EndBold()
             self.descRTC.EndFontSize()
 
-            self.descRTC.BeginFontSize(small_font)    
+            self.descRTC.BeginFontSize(small_font)
             self.descRTC.WriteText("    ")
             self.descRTC.WriteText("http://www.tela-botanica.org/bdtfx-nn-{}-synthese".format(struct["ID.tela"]))
 
@@ -1534,7 +1608,7 @@ class DescriptionPanel(wx.Panel):
 
         self.button_note = wx.Button(self.toolbar, id, "Notes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
         self.button_note.SetForegroundColour("#101010")
-        self.button_note.SetBackgroundColour("#D0D0D0") 
+        self.button_note.SetBackgroundColour("#D0D0D0")
         self.toolbar.AddControl(self.button_note)
 
         self.note_fn = ""
@@ -1543,11 +1617,11 @@ class DescriptionPanel(wx.Panel):
             print(self.note_fn)
             if os.path.exists(self.note_fn):
                 self.button_note.SetForegroundColour("#101010")
-                self.button_note.SetBackgroundColour("#33CCCC") 
-                
+                self.button_note.SetBackgroundColour("#33CCCC")
+
             wx.EVT_BUTTON( self, id, self.Button_NOTES)
             id+=1
-            
+
         # ID Catminat
         #--------------
         if 'ID.cat' in self.struct['baseflor'] and self.struct['baseflor']['ID.cat'] != '':
@@ -1579,15 +1653,17 @@ class DescriptionPanel(wx.Panel):
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.onNotebookClose)
 
         self.notebook.AddPage(self.descRTC, "Description (COSTE)", True)
+        PageIndex = self.notebook.GetSelection()
+        self.notebook.SetPageTextColour(PageIndex,'#669900')
 
         #self.scrolled_header = wx.lib.scrolledpanel.ScrolledPanel(self,size=(-1,-1))
         #self.scrolled_header.SetupScrolling(True,True)
         #self.scrolled_header.SetSizer(self.headerSizer)
 
-        self.descSizer.Add(self.headerSizer,0,wx.ALIGN_LEFT|wx.EXPAND)      
-        self.descSizer.Add(self.toolbar,0,wx.ALIGN_LEFT) #|wx.EXPAND)  
+        self.descSizer.Add(self.headerSizer,0,wx.ALIGN_LEFT|wx.EXPAND)
+        self.descSizer.Add(self.toolbar,0,wx.ALIGN_LEFT) #|wx.EXPAND)
         self.descSizer.Add(self.notebook,1,wx.ALIGN_LEFT|wx.EXPAND)
-        
+
         self.SetSizer(self.descSizer)
         self.Layout()
 
@@ -1602,7 +1678,7 @@ class FilteredPanel(wx.Panel):
     def __init__(self, apps, filtered_struct_list, attrib_list = []):
 
         wx.Panel.__init__(self, apps, -1) # size=(1700, 1000))
-        #self.mainPanel = wx.Panel(self, -1)        
+        #self.mainPanel = wx.Panel(self, -1)
         #self.mainPanel.SetBackgroundColour(wx.RED)
 
         self.div_data = apps.div_data
@@ -1616,8 +1692,8 @@ class FilteredPanel(wx.Panel):
 
         self.grids_splitter = MultiSplitterWindow(self, style=wx.SP_LIVE_UPDATE)
 
-        self.index = 0        
-        
+        self.index = 0
+
         self.grid = wxgrid.filteredGrid(self.grids_splitter, self, filtered_struct_list, self.index, attrib_list)
         #self.grid.SetSelection(self.index)
 
@@ -1625,7 +1701,7 @@ class FilteredPanel(wx.Panel):
 #        self.grid.Bind(wx.EVT_KILL_FOCUS, self.onKillFocus)
 
         self.descPanel = DescriptionPanel(self.grids_splitter, self.apps, self.options, colors)
-        
+
         self.grids_splitter.AppendWindow(self.grid,500)
         self.grids_splitter.AppendWindow(self.descPanel,500)
 
@@ -1641,7 +1717,7 @@ class FilteredPanel(wx.Panel):
 #        mainPanelSizer.Add(self.buttonSizer, 0, wx.EXPAND) #|wx.EXPAND)
 
         mainPanelSizer.Add(self.grids_splitter, 1, wx.EXPAND)
-        self.thumbPanel = ThumbPanel(self,self.options)        
+        self.thumbPanel = ThumbPanel(self,self.options)
         self.UpdateDesc()
 
         mainPanelSizer.Add(self.thumbPanel, 0, wx.EXPAND) #|wx.EXPAND)
@@ -1655,9 +1731,9 @@ class FilteredPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     #-------------------------------------------------------------------------------
     def onFocus(self, event):
-        #self.grid.SetFocus()        
+        #self.grid.SetFocus()
         print "FilteredPanel received focus!"
- 
+
     #-------------------------------------------------------------------------------
     #-------------------------------------------------------------------------------
     def onKillFocus(self, event):
@@ -1670,8 +1746,8 @@ class FilteredPanel(wx.Panel):
 
         if options.debug:
             print("FilteredPanel.UpdateDesc()")
-                  
-        struct = self.content[self.grid.data_t[self.index]] 
+
+        struct = self.content[self.grid.data_t[self.index]]
 
         self.descPanel.UpdateDesc(struct)
         self.thumbPanel.Update(struct)
@@ -1700,9 +1776,9 @@ class FilteredPanel(wx.Panel):
 
         if options.debug:
             print("FilteredPanel.Update() return from self.UpdateDesc()")
-            
+
         self.Layout()
-        
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -1714,9 +1790,9 @@ class MainPanel(wx.Panel):
 
         if self.options.debug:
             print("MainPanel.__init__()")
-                  
+
         wx.Panel.__init__(self, apps, -1) # size=(1700, 1000))
-        #self.mainPanel = wx.Panel(self, -1)        
+        #self.mainPanel = wx.Panel(self, -1)
         #self.mainPanel.SetBackgroundColour(wx.RED)
 
         self.apps = apps
@@ -1727,7 +1803,7 @@ class MainPanel(wx.Panel):
         self.content = apps.content
         self.colors = apps.colors
 #        self.apps = apps
-        
+
         # Content
         #---------
         class pos:
@@ -1752,7 +1828,7 @@ class MainPanel(wx.Panel):
         self.descPanel = DescriptionPanel(self.grids_splitter, self.apps, self.options, self.colors)
 
 
-        ##self.tb_desc.AppendText("{}\n".format(self.table[self.fam_data[self.pos.fam][0]][self.gen_data[self.pos.gen][0]]))    
+        ##self.tb_desc.AppendText("{}\n".format(self.table[self.fam_data[self.pos.fam][0]][self.gen_data[self.pos.gen][0]]))
 
         self.grids_splitter.AppendWindow(self.panel0,180)
         self.grids_splitter.AppendWindow(self.panel1,180)
@@ -1778,17 +1854,17 @@ class MainPanel(wx.Panel):
 
         self.fam_data = []
         self.fam_data_s = []
-        
+
         for fam in sorted(self.tree[self.div_data[self.pos.div][0]].keys()):
             n=0
             for gen in self.tree[self.div_data[self.pos.div][0]][fam]:
                 n+=len(self.tree[self.div_data[self.pos.div][0]][fam][gen])
             self.fam_data_s.append("{} ({})".format(fam,n))
             self.fam_data.append(fam)
-                
+
         if update:
             self.panel1.UpdateGrid(self, self.fam_data, self.fam_data_s, self.pos.fam)
-        
+
     #-------------------------------------------------------------------------------
     def UpdateGen(self,update):
         if self.fam_data == []:
@@ -1801,7 +1877,7 @@ class MainPanel(wx.Panel):
                 n = len(self.tree[self.div_data[self.pos.div][0]][self.fam_data[self.pos.fam]][gen])
                 self.gen_data_s.append("{} ({})".format(gen,n))
                 self.gen_data.append(gen)
-                             
+
         if update:
             self.panel2.UpdateGrid(self, self.gen_data, self.gen_data_s, self.pos.gen)
 
@@ -1811,8 +1887,8 @@ class MainPanel(wx.Panel):
             self.spe_data = []
             self.spe_data_s = []
         else:
-            
-            
+
+
             self.spe_data = [key for key in sorted(self.tree[self.div_data[self.pos.div][0]][self.fam_data[self.pos.fam]][self.gen_data[self.pos.gen]])]
             #self.spe_data_s = [[key] for key in sorted(self.tree[self.div_data[self.pos.div][0]][self.fam_data[self.pos.fam][0]][self.gen_data[self.pos.gen][0]])
 
@@ -1822,8 +1898,8 @@ class MainPanel(wx.Panel):
     #-------------------------------------------------------------------------------
     def UpdateDesc(self):
 
-        
-        try:            
+
+        try:
             struct = self.content[self.spe_data[self.pos.spe]]
             #print(struct)
             # test self.descPanel.UpdateHeader(struct)
@@ -1838,7 +1914,7 @@ class MainPanel(wx.Panel):
     def Update(self,num,index):
 
         print("wxflore.py / MainPanel.Update()",num,index)
-            
+
         if num == 0:
             self.pos.div = index
             self.pos.fam = 0
@@ -1896,15 +1972,15 @@ class MyDialog ( wx.Dialog ):
         self.SetSizer( mainSizer )
         self.m_staticText.SetLabel(msg)
         self.Fit()
-        
+
 
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 class MainApp(wx.Frame):
-    
+
     def build_tables(self,base_flore_path):
-        
+
         #print("base_flore_path",base_flore_path)
 
         struct_table  = fldb.python_table(base_flore_path,self.options)
@@ -1929,8 +2005,8 @@ class MainApp(wx.Frame):
             fam = struct["FA"]
 
             #print struct["NL"]
-            x, gen, spe = re.findall("(× )?([A-Z][a-z]+)\s+(.*)",struct["NL"])[0]        
-                
+            x, gen, spe = re.findall("(× )?([A-Z][a-z]+)\s+(.*)",struct["NL"])[0]
+
 #            if struct["NL"] in res_table[fam][gen]:
 #                error()
 
@@ -1973,7 +2049,7 @@ class MainApp(wx.Frame):
         self.stats = stats()
         self.table = res_table
         self.content = res_table_content
-        
+
     def __init__(self, options):
 
 
@@ -1997,8 +2073,8 @@ class MainApp(wx.Frame):
         self.button_config = {"cat":{
             "colors":{
                 u"Alpine":["#D1F5FA","#9D96A1"],
-                u"Aquatique":["#f0f0f0","#3399ff"], 
-                u"Foret":["#002900","#00cc00"], 
+                u"Aquatique":["#f0f0f0","#3399ff"],
+                u"Foret":["#002900","#00cc00"],
                 u"Fougere":["#0C5A10","#A4D765"],
                 u"Ligneuse":[-1,-1],
                 u"Littoral":["#117BA7","#E9D27C"],
@@ -2018,7 +2094,7 @@ class MainApp(wx.Frame):
                 "Sous-arbrisseau":u"Sous-arbrisseau",
             }
             },
-        
+
         "redlist":{"colors":
                        {"RE":["#e0e0e0","#6600cc"],
                         "CR":["#600060","red"],
@@ -2026,7 +2102,7 @@ class MainApp(wx.Frame):
                         "VU":["#600060","yellow"],
                         "NT":["#600060","grey"],
                         "LC":["#600060","green"],
-                        "DD":["yellow","grey"]},           
+                        "DD":["yellow","grey"]},
                    "names":{"RE":u"Disparue en Métropole",
                             "CR":u"En danger critique",
                             "EN":u"En danger",
@@ -2062,7 +2138,7 @@ class MainApp(wx.Frame):
 
         self.LoadMarkers()
         self.build_tables(options.paths.db)
-        
+
         # Application Menu
         #------------------
         menubar = wx.MenuBar()
@@ -2093,7 +2169,7 @@ class MainApp(wx.Frame):
         #---------
         toolbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
                                   wx.TB_FLAT | wx.TB_NODIVIDER)
-        
+
         toolbar.Realize()
 
         id = 40
@@ -2165,7 +2241,7 @@ class MainApp(wx.Frame):
         self.filter_cb.SetBackgroundColour("#99ff66") ##ccff99")
         #self.filter_cb.SetBackgroundColour("#008888") ##ccff99")
         self.filter_cb.SetForegroundColour("#050505") ##ccff99")
-        
+
         self.filter_cb.Clear()
 #        statusbar_sozer.Add(self.filter_cb, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
         self.statusbar.AddControl(self.filter_cb)
@@ -2174,7 +2250,7 @@ class MainApp(wx.Frame):
         self.Bind(wx.EVT_LEFT_DOWN, self.onCbSelect, self.filter_cb)
         self.Bind(wx.EVT_TEXT, self.onTextEntered, self.filter_cb)
         self.filter_cb.Bind(wx.EVT_LEFT_DOWN, self.onCbSelect)
-           
+
 
         # Advanced Search
         #-----------------
@@ -2192,7 +2268,7 @@ class MainApp(wx.Frame):
 
         self.statusbar.Realize()
         #self.stats.fam_count[key[0]]
-        
+
         #print(self.div_data)
         #print "=========",self.stats.fam_count.keys()
         #print "////////",classification.divisions
@@ -2201,7 +2277,7 @@ class MainApp(wx.Frame):
         self.tree = {}
         self.div_data = []
         self.div_data_s = []
-        
+
         for div in classification.divisions:
             n = 0
             self.tree[div[0]] = {}
@@ -2213,9 +2289,9 @@ class MainApp(wx.Frame):
                         n+=len(self.table[fam][gen])
             self.div_data.append([div[0]])
             self.div_data_s.append("{} ({})".format(div[0],n))
-                    
+
         print("DATA",self.div_data)
-        
+
         classified_fam_list =  sum([div[1] for div in classification.divisions],[])
 
         # Other classified Famillies
@@ -2230,17 +2306,17 @@ class MainApp(wx.Frame):
                     n+=len(self.table[fam][gen])
         self.div_data.append(["Other"])
         self.div_data_s.append("Other ({})".format(n))
-        
+
         count = {}
         count["LIGNEUX"] = 0
         self.div_data.append(["LIGNEUX"])
         self.tree["LIGNEUX"] = {}
-        
+
         for tl in classification.type_ligneux:
             self.div_data.append([tl])
             self.tree[tl] = {}
             count[tl] = 0
-                
+
         for fam in self.table.keys():
             for gen in self.table[fam].keys():
                 for spe in self.table[fam][gen]:
@@ -2250,7 +2326,7 @@ class MainApp(wx.Frame):
                             tl = struct["baseflor"]["TL"]
                             if tl not in classification.type_ligneux:
                                 tl = "other"
-                                
+
                             for cat in ["LIGNEUX",tl]:
                                 if fam not in self.tree[cat].keys():
                                     self.tree[cat][fam] = {gen:[spe]}
@@ -2259,28 +2335,34 @@ class MainApp(wx.Frame):
                                         self.tree[cat][fam][gen] = [spe]
                                     else:
                                         self.tree[cat][fam][gen].append(spe)
-                                count[cat]+=1        
+                                count[cat]+=1
 
-        self.div_data_s.append("{} ({})".format("LIGNEUX",count["LIGNEUX"])) 
+        self.div_data_s.append("{} ({})".format("LIGNEUX",count["LIGNEUX"]))
         for tl in classification.type_ligneux:
-            self.div_data_s.append("    {} ({})".format(tl,count[tl]))  
+            self.div_data_s.append("    {} ({})".format(tl,count[tl]))
 
         self.notebook = aui.AuiNotebook(self) #,aui.AUI_NB_CLOSE_ON_ALL_TABS)
-        self.notebook.SetArtProvider(aui.ChromeTabArt())
+
+        tabArt = aui.ChromeTabArt()
+        tabArt.SetDefaultColours(wx.Colour(30, 30, 30))
+        print(dir(tabArt))
+        self.notebook.SetArtProvider(tabArt)
         #self.notebook.SetArtProvider(aui.AuiDefaultTabArt())
 
         self.mainPanel = MainPanel(self)
         self.notebook.AddPage(self.mainPanel, "Main", True)
+        PageIndex = self.notebook.GetSelection()
+        self.notebook.SetPageTextColour(PageIndex,'#669900')
 
         #self.mainPanel = MainPanel(self)
         #self.notebook.AddPage(self.mainPanel, "Main", True)
-        
+
         #sizer_0.Add(self.notebook, 1, flag=wx.ALIGN_LEFT|wx.EXPAND)
         #sizer_0.Add(self.statusbar, 1, flag=wx.ALIGN_LEFT) #|wx.EXPAND)
 
         sizer_0 = wx.BoxSizer(wx.VERTICAL)
-        
-        sizer_0.Add(toolbar, 0, wx.EXPAND)        
+
+        sizer_0.Add(toolbar, 0, wx.EXPAND)
         sizer_0.Add(self.notebook, 1, wx.ALL|wx.EXPAND)
         sizer_0.Add(self.statusbar, 0, wx.ALIGN_LEFT) #|wx.EXPAND)
 
@@ -2315,19 +2397,19 @@ class MainApp(wx.Frame):
             f.close()
         except:
             pass
-        
+
         print(self.marker_table)
 
     #-------------------------------------------------------------------------------
 #    def OnMouse_LeftClick():
 #        print("="*50)
 #        print("MainApp.OnMouse_LeftClick")
-    
+
     #-------------------------------------------------------------------------------
-    def SaveMarkers(self):        
+    def SaveMarkers(self):
         fn = os.path.join(options.wxflore,u"markers-{}".format(self.options.suffix))
         print(u"Writting \"{}\" ...".format(fn))
-        
+
         f = codecs.open(fn, "w", "utf-8")
         #f.write(codecs.BOM_UTF8)
         for index in range(0,len(self.marker_table)):
@@ -2347,7 +2429,7 @@ class MainApp(wx.Frame):
     #-------------------------------------------------------------------------------
     def onCloseWindows(self, evt):
         print "wxbp.py / MainApp.onCloseWindows()"
-        dlg = wx.MessageDialog(None, 'Are you sure to quit?', 'Question', 
+        dlg = wx.MessageDialog(None, 'Are you sure to quit?', 'Question',
                                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
 
         if dlg.ShowModal() == wx.ID_YES:
@@ -2369,7 +2451,7 @@ class MainApp(wx.Frame):
             msg+='\n\nStéphane Bausson (sbausson@gmail.com)'
             msg+='\n\nwxPython version {}'.format(wx.__version__)
             msg+='\n'
-            
+
             if self.options.bdtfx.version != '':
                 msg+='\nbdtfx [{}]'.format(options.bdtfx.version)
             if self.options.baseflor.version != '':
@@ -2380,7 +2462,7 @@ class MainApp(wx.Frame):
                 msg+='\nchorodep [{}]'.format(options.chorodep.version)
 
             print msg
-            msg = msg.decode('utf8','ignore') 
+            msg = msg.decode('utf8','ignore')
 
             wx.MessageBox(msg, "About",wx.OK | wx.ICON_INFORMATION)
 
@@ -2391,20 +2473,20 @@ class MainApp(wx.Frame):
     def onHelpCredits(self, event):
         msg = ''
 
-    
+
         msg += """
 - BDTFX : Base de données des Trachéophytes de France métropolitaine.
   Version: {}
   http://referentiels.tela-botanica.org/referentiel/index.php?module=Informations&ref=bdtfx
 """.format(options.bdtfx.version)
-        
+
         if options.baseflor.version != '':
             msg+="""
 - Baseflor: Index botanique, écologique et chorologique de la Flore de France.
   Catminat, Julve, Ph., 1998 : http://perso.wanadoo.fr/philippe.julve/catminat.htm
   Version: {}
 """.format(options.baseflor.version)
-        
+
         if options.baseveg.version != '':
             msg+="""
 - Baseveg : Index phytosociologique synonymique de la végétation de la France.
@@ -2420,16 +2502,18 @@ class MainApp(wx.Frame):
 """.format(options.chorodep.version)
 
         print(msg)
-        msg = msg.decode('utf8','ignore')         
+        msg = msg.decode('utf8','ignore')
         #wx.MessageBox(msg, "Credits",wx.OK | wx.ICON_INFORMATION)
         dlg = MyDialog(self,msg)
         dlg.ShowModal()
-        
+
     #-------------------------------------------------------------------------------
     def select_button(self,index):
 
+
+        self.s_buttons[i].SetForegroundColour("#202020")
         for i in range(0,self.n_s_buttons):
-            if index == i:                
+            if index == i:
                 self.s_buttons[i].SetBackgroundColour("#ccff66")
             else:
                 self.s_buttons[i].SetBackgroundColour("#cccccc")
@@ -2464,7 +2548,7 @@ class MainApp(wx.Frame):
 
 
                     sorted_list = sorted(struct_list, key=lambda k: (k['FA'], k['NL']))
-                    
+
                     attrib_list = [""]*len(sorted_list)
                     for i in range(0,len(sorted_list)):
                         struct = sorted_list[i]
@@ -2474,32 +2558,50 @@ class MainApp(wx.Frame):
 
                     self.selection_panels[selection] = FilteredPanel(self,sorted_list,attrib_list)
                     self.notebook.AddPage(self.selection_panels[selection], name, True)
+                    PageIndex = self.notebook.GetSelection()
+                    self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
     def onCbSelect(self,event):
         self.filter_cb.SetBackgroundColour("#99ff66")
         event.Skip()
-        
+
     #-------------------------------------------------------------------------------
     def onTextEntered(self,event):
         self.filter_cb.SetBackgroundColour("#99ff66")
         event.Skip()
-        
+
     #-------------------------------------------------------------------------------
     def onFilterTextEnter(self,event):
-                          
+
         import unicodedata
 
         s = self.filter_cb.GetValue()
+        flags = {}
+
+        re_notes = re.compile('(^| )\$notes',re.U)
+        re_dept = re.compile('^| \(\$dept=([0-9,]*)\)',re.U)
+
+        if re_notes.search(s):
+            s = re_notes.sub('',s,re.U)
+            flags['notes'] = 1
+
+        if re_dept.search(s):
+            dept = re_dept.findall(s)[-1]
+            if dept != '':
+                flags['dept'] = dept.split(',')
+                s = re_dept.sub('',s)
+                print(flags['dept'])
+
         search_s = ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c))
-        #search_p = search_s.split()
         search_p = [p for p in re.split(" |\\\"(.*?)\\\"|'.*?'", search_s) if p and p.strip()]
+
 
         self.filter_cb.SetValue("")
         print("onFilterTextEnter",search_s)
 
         filtered_struct_list = []
-        
+
         for fam in self.table.keys():
             #print("fam={}".format(fam))
             for gen in self.table[fam].keys():
@@ -2526,23 +2628,39 @@ class MainApp(wx.Frame):
                             break
 
                     if found:
-                        #print struct["NL"]
-                        #if struct in filtered_struct_list:
-                        #    print(struct["NL"])
-                        #    error()
+                        handled = 0
+                        if 'notes' in flags:
+                            note_filename = os.path.join(options.paths.meta,"notes",struct["N."]+".txt")
+                            if os.path.exists(note_filename):
+                                filtered_struct_list.append(struct)
+                            handled = 1
 
-                        filtered_struct_list.append(struct)
+                        if 'dept' in flags:
+                            handled = 1
+                            dept_match = 0
+                            for d in flags['dept']:
+                                if '1' in struct['chorodep'] and d in struct["chorodep"]["1"]:
+                                    dept_match = 1
+                                    break
+                            if dept_match:
+                                filtered_struct_list.append(struct)
+
+                        if handled == 0:
+                            filtered_struct_list.append(struct)
+
 
         sorted_list = sorted(filtered_struct_list, key=lambda k: (k['FA'], k['NL']))
         if len(filtered_struct_list) == 0:
             self.filter_cb.SetBackgroundColour("#ff5050")
-            #wx.MessageBox('Can not find \"%s\" ...' % search_s, 'Info', wx.OK | wx.ICON_INFORMATION)
         else:
-            print "else"
-            
             name = "{}".format(search_s)
-            new_panel = FilteredPanel(self,sorted_list) #parent, parent.notebook, name, grid, search_index_list, self, parent.options )
+            if 'dept' in flags:
+                name += ' ({})'.format(','.join(flags['dept']))
+
+            new_panel = FilteredPanel(self,sorted_list)
             self.notebook.AddPage( new_panel, name, True )
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
     def onOpenNewTab(self,event):
@@ -2550,16 +2668,18 @@ class MainApp(wx.Frame):
         print("onOpenNewTab")
         print event.GetEventObject().struct_list
         name = event.GetEventObject().name
-        
+
         sorted_list = sorted(event.GetEventObject().struct_list, key=lambda k: (k['FA'], k['NL']))
         if len(sorted_list) == 0:
             wx.MessageBox('Can not find ...' , wx.OK | wx.ICON_INFORMATION)
         else:
             print "else"
-            
+
             name = "{}".format(name)
             new_panel = FilteredPanel(self,sorted_list) #parent, parent.notebook, name, grid, search_index_list, self, parent.options )
             self.notebook.AddPage( new_panel, name, True )
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
     def onAdvancedSearch(self,even):
@@ -2571,6 +2691,8 @@ class MainApp(wx.Frame):
         else:
             panel = AdvancedSearchPanel(self)
             self.notebook.AddPage(panel, name, True)
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
     def Update(self,struct):
@@ -2593,7 +2715,7 @@ def parse_argv(options):
         elif re.match("-img",sys.argv[i]):
             options.paths.img = sys.argv[i+1]
             i+=1
-            
+
         elif re.match("-noconfig",sys.argv[i]):
             options.noconfig = 1
 
@@ -2614,13 +2736,13 @@ if __name__ == '__main__':
     options.noconfig = 0
     options.wxga = 0
     options.debug = 1
-    
+
     if os.getenv("HOME") == None:
         options.home  = os.getenv("HOMEPATH").decode(sys.stdout.encoding)
     else:
-        options.home = os.getenv("HOME").decode(sys.stdout.encoding)            
+        options.home = os.getenv("HOME").decode(sys.stdout.encoding)
 
-    options.wxflore = os.path.join(options.home,u".wxflore") 
+    options.wxflore = os.path.join(options.home,u".wxflore")
     if not os.path.exists(options.wxflore):
         os.makedirs(options.wxflore)
 
@@ -2642,19 +2764,19 @@ if __name__ == '__main__':
     except ImportError:
         default_config = 1
         options.paths.meta = ""
-        
+
     if default_config:
-        script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding))) 
+        script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding)))
         root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
         img_path = os.path.join(root,"img")
-        print(root,img_path)        
-    
+        print(root,img_path)
+
     if options.paths.db == "":
         db_base_dir = os.path.join(root,"db")
 
         if options.paths.meta == "":
             options.paths.meta = os.path.join(root,"meta")
-            
+
         options.paths.db = os.path.join(db_base_dir,"flore.main")
         options.paths.coste = os.path.join(db_base_dir,"flore.coste")
         options.paths.telacol = os.path.join(db_base_dir,"flore.telacol")

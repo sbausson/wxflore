@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $# == 1 ]; then
+    version=$1
+else
+    version=`date +"%Y.%m.%d [%H:%M]"`
+fi
+
+file=wxflore-x.x/version.py
+
+echo "Setting version '"$version"'"
+echo "version='$version'" > $file
