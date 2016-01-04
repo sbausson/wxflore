@@ -2513,8 +2513,10 @@ class MainApp(wx.Frame):
         for i in range(0,self.n_s_buttons):
             self.s_buttons[i].SetForegroundColour("#202020")
             if index == i:
+                self.s_buttons[i].SetForegroundColour("#101010")
                 self.s_buttons[i].SetBackgroundColour("#ccff66")
             else:
+                self.s_buttons[i].SetForegroundColour("#808080")
                 self.s_buttons[i].SetBackgroundColour("#cccccc")
 
     #-------------------------------------------------------------------------------
@@ -2774,8 +2776,8 @@ if __name__ == '__main__':
         db_base_dir = os.path.join(root,"db")
 
         if options.paths.meta == "":
-            options.paths.meta = os.path.join(root,"meta")
-
+            options.paths.meta = os.path.join(options.wxflore,'meta')
+        print(db_base_dir)
         options.paths.db = os.path.join(db_base_dir,"flore.main")
         options.paths.coste = os.path.join(db_base_dir,"flore.coste")
         options.paths.telacol = os.path.join(db_base_dir,"flore.telacol")
@@ -2799,10 +2801,12 @@ if __name__ == '__main__':
     options.suffix='.'.join([x for x in options.paths.db.split(os.sep) if x !=""])
 
     print(os.sep)
-    print(options.paths.db)
-    print("meta= {}".format(options.paths.meta))
+    print('options.paths.db   : {}'.format(options.paths.db))
+    print('options.paths.img  : {}'.format(options.paths.img))
+    print('options.paths.meta : {}'.format(options.paths.meta))
     print(options.suffix)
 
+    error()
     app = wx.App(redirect=False)
     MainApp(options)
     app.MainLoop()
