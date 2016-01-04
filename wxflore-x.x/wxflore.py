@@ -2806,7 +2806,6 @@ if __name__ == '__main__':
     print('options.paths.meta : {}'.format(options.paths.meta))
     print(options.suffix)
 
-    error()
     app = wx.App(redirect=False)
     MainApp(options)
     app.MainLoop()
