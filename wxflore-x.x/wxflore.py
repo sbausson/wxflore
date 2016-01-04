@@ -1648,7 +1648,11 @@ class DescriptionPanel(wx.Panel):
 
         # Description Notebook
         self.notebook = aui.AuiNotebook(self) #,"True",aui.AUI_NB_HIDE_ON_SINGLE_TAB) #,aui.AUI_NB_CLOSE_ON_ALL_TABS)
-        self.notebook.SetArtProvider(aui.ChromeTabArt())
+
+        tabArt = aui.ChromeTabArt()
+        tabArt.SetDefaultColours(wx.Colour(20, 20, 20))
+        #print(dir(tabArt))
+        self.notebook.SetArtProvider(tabArt)
         #self.notebook.SetAGWFlags(self.aui_mgr.GetAGWFlags()|wx.aui.AUI_MGR_ALLOW_ACTIVE_PANE )
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.onNotebookClose)
 
@@ -2202,7 +2206,7 @@ class MainApp(wx.Frame):
         self.statusbar.AddControl(statictext)
         self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
 
-        button = wx.Button(self.statusbar, id, "m1", wx.DefaultPosition, (30,-1))
+        button = wx.Button(self.statusbar, id, "m1", wx.DefaultPosition, (35,-1))
         button.selection = 0
 #        statusbar_sizer.Add(button,0)
         self.statusbar.AddControl(button)
@@ -2210,7 +2214,7 @@ class MainApp(wx.Frame):
         wx.EVT_BUTTON( self, id, self.Button_MARKER)
         id+=1
 
-        button = wx.Button(self.statusbar, id, "m2", wx.DefaultPosition, (30,-1))
+        button = wx.Button(self.statusbar, id, "m2", wx.DefaultPosition, (35,-1))
         button.selection = 1
 #        statusbar_sizer.Add(button,0)
         self.statusbar.AddControl(button)
@@ -2218,7 +2222,7 @@ class MainApp(wx.Frame):
         wx.EVT_BUTTON( self, id, self.Button_MARKER)
         id+=1
 
-        button = wx.Button(self.statusbar, id, "m3", wx.DefaultPosition, (30,-1))
+        button = wx.Button(self.statusbar, id, "m3", wx.DefaultPosition, (35,-1))
         button.selection = 2
 #        statusbar_sizer.Add(button,0)
         self.statusbar.AddControl(button)
@@ -2344,10 +2348,9 @@ class MainApp(wx.Frame):
         self.notebook = aui.AuiNotebook(self) #,aui.AUI_NB_CLOSE_ON_ALL_TABS)
 
         tabArt = aui.ChromeTabArt()
-        tabArt.SetDefaultColours(wx.Colour(30, 30, 30))
-        print(dir(tabArt))
+        tabArt.SetDefaultColours(wx.Colour(20, 20, 20))
+        #print(dir(tabArt))
         self.notebook.SetArtProvider(tabArt)
-        #self.notebook.SetArtProvider(aui.AuiDefaultTabArt())
 
         self.mainPanel = MainPanel(self)
         self.notebook.AddPage(self.mainPanel, "Main", True)
