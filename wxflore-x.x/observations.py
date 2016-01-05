@@ -7,7 +7,9 @@ import wx.calendar
 
 class colors:
 
-    text = ['#aaa','#050505']
+    cells = ['#2eb8b8','#101010']
+    names = ['#bbff33','#101010']
+    labels = ['#bbff33','#303030']
 
 #-------------------------------------------------------------------------------
 #
@@ -16,14 +18,16 @@ class MainApp(wx.Frame):
 
     #-------------------------------------------------------------------------------
     def __init__(self):
-        wx.Frame.__init__(self, None, title="MainFrame", size=(800, 500))
+        wx.Frame.__init__(self, None, title="Observations", size=(850, 500))
         self.SetBackgroundColour("#202020")
 
         self.colors = colors()
         self.grid = wx.grid.Grid(self,-1)
 
-        self.grid.SetDefaultCellBackgroundColour(self.colors.text[1])
-        self.grid.SetDefaultCellTextColour(self.colors.text[0])
+        self.grid.SetDefaultCellBackgroundColour(self.colors.cells[1])
+        self.grid.SetDefaultCellTextColour(self.colors.cells[0])
+        self.grid.SetLabelBackgroundColour(self.colors.labels[1])
+        self.grid.SetLabelTextColour(self.colors.labels[0])
 
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
@@ -34,44 +38,63 @@ class MainApp(wx.Frame):
         self.grid.SetColLabelValue(3,"Coord. GPS")
         self.grid.SetColLabelValue(4,"Densité")
         self.grid.SetColLabelValue(5,"Commentaire")
+        self.grid.AutoSizeColumns()
 
         gridSizer = wx.GridSizer(7,2,6,0)
 
         st = wx.StaticText(self, -1, 'Date')
+        st.SetForegroundColour(self.colors.names[0])
         self.dateInput = wx.TextCtrl(self, -1)
+        self.dateInput.SetBackgroundColour(self.colors.cells[1])
+        self.dateInput.SetForegroundColour(self.colors.cells[0])
         self.dateInput.Bind(wx.EVT_KEY_UP, self.checkValid)
         self.dateInput.Bind(wx.EVT_LEFT_DCLICK,self.onCalendar)
         gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.dateInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
-        st1 = wx.StaticText(self, -1, 'Departement')
+        st = wx.StaticText(self, -1, 'Departement')
+        st.SetForegroundColour(self.colors.names[0])
         self.firstInput = wx.TextCtrl(self, -1)
+        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+        self.firstInput.SetForegroundColour(self.colors.cells[0])
         self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st1, 0, wx.ALIGN_CENTER_VERTICAL)
+        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
-        st1 = wx.StaticText(self, -1, 'Commune (CP)')
+        st = wx.StaticText(self, -1, 'Commune (CP)')
+        st.SetForegroundColour(self.colors.names[0])
         self.firstInput = wx.TextCtrl(self, -1)
+        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+        self.firstInput.SetForegroundColour(self.colors.cells[0])
         self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st1, 0, wx.ALIGN_CENTER_VERTICAL)
+        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
-        st1 = wx.StaticText(self, -1, 'Coord. GPS')
+        st = wx.StaticText(self, -1, 'Coord. GPS')
+        st.SetForegroundColour(self.colors.names[0])
         self.firstInput = wx.TextCtrl(self, -1)
         self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st1, 0, wx.ALIGN_CENTER_VERTICAL)
+        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+        self.firstInput.SetForegroundColour(self.colors.cells[0])
+        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
-        st1 = wx.StaticText(self, -1, 'Densité')
+        st = wx.StaticText(self, -1, 'Densité')
+        st.SetForegroundColour(self.colors.names[0])
         self.firstInput = wx.TextCtrl(self, -1)
+        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+        self.firstInput.SetForegroundColour(self.colors.cells[0])
         self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st1, 0, wx.ALIGN_CENTER_VERTICAL)
+        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
-        st1 = wx.StaticText(self, -1, 'Commentaire')
-        self.firstInput = wx.TextCtrl(self, -1)
+        st = wx.StaticText(self, -1, 'Commentaire')
+        st.SetForegroundColour(self.colors.names[0])
+        self.firstInput = wx.TextCtrl(self, size=(200,-1))
+        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+        self.firstInput.SetForegroundColour(self.colors.cells[0])
         self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st1, 0, wx.ALIGN_CENTER_VERTICAL)
+        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
         sizer1 = wx.BoxSizer(wx.VERTICAL)
@@ -80,6 +103,20 @@ class MainApp(wx.Frame):
         self.calendar.Bind(wx.calendar.EVT_CALENDAR, self.onCalendarSelect)
         self.calendar.Bind(wx.calendar.EVT_CALENDAR_SEL_CHANGED, self.onCalendarSelect)
 
+        sizerButton = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.button_add = wx.Button(self, label='Add to List')
+        self.Bind(wx.EVT_BUTTON,self.onButtonAddToList,self.button_add)
+        self.button_add.SetBackgroundColour("#2594FD")
+        self.button_add.SetForegroundColour("#ffffff")
+        sizerButton.Add(self.button_add,0,wx.ALL)
+
+        self.button_done = wx.Button(self, label='Done')
+        self.Bind(wx.EVT_BUTTON,self.onButtonDone,self.button_done)
+        self.button_done.SetBackgroundColour("#ccff33")
+        self.button_done.SetForegroundColour("#303030")
+        sizerButton.Add(self.button_done,0,wx.ALL)
+
         sizer2.Add(gridSizer,0,wx.ALL,10)
         sizer2.Add(self.calendar,0,wx.ALL,10)
 
@@ -87,8 +124,18 @@ class MainApp(wx.Frame):
         sizer1.Add(sizer2,0,wx.ALL,10)
         #sizer2.Add(vsizer,0,wx.ALL,10)
 
+        sizer1.Add(sizerButton,0,wx.ALL,10)
+
         self.SetSizer(sizer1)
         self.Show()
+
+    #-------------------------------------------------------------------------------
+    def onButtonAddToList(self,evt):
+        print("onButtonAddToList")
+
+    #-------------------------------------------------------------------------------
+    def onButtonDone(self,evt):
+        print("onButtonDone")
 
     #-------------------------------------------------------------------------------
     def onCalendar(self,evt):
