@@ -31,6 +31,7 @@ ID_HELP_CREDITS = 301
 
 
 class colors:
+    # [FG,BG]
     #selected = ["#cc3399","#99ff33"]
     #selected = ["#ccff66","#808080"]
     selected = ["#ccff33","#707070"]

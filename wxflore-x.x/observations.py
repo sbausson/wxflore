@@ -1,23 +1,30 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-
 import wx
 import wx.grid
-import wx.calendar 
+import wx.calendar
+
+class colors:
+
+    grid = ['#000','#bbff33']
 
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 class MainApp(wx.Frame):
-    
+
     #-------------------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, None, title="MainFrame", size=(800, 500))
         self.SetBackgroundColour("#202020")
 
-
+        self.colors = colors()
         self.grid = wx.grid.Grid(self,-1)
+
+        self.grid.SetDefaultCellBackgroundColour(self.colors.grid[1])
+        self.grid.SetDefaultCellTextColour(self.colors.grid[0])
+
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
         self.grid.CreateGrid(6,6)
