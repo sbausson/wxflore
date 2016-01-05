@@ -7,7 +7,7 @@ import wx.calendar
 
 class colors:
 
-    grid = ['#000','#bbff33']
+    text = ['#aaa','#050505']
 
 #-------------------------------------------------------------------------------
 #
@@ -22,8 +22,8 @@ class MainApp(wx.Frame):
         self.colors = colors()
         self.grid = wx.grid.Grid(self,-1)
 
-        self.grid.SetDefaultCellBackgroundColour(self.colors.grid[1])
-        self.grid.SetDefaultCellTextColour(self.colors.grid[0])
+        self.grid.SetDefaultCellBackgroundColour(self.colors.text[1])
+        self.grid.SetDefaultCellTextColour(self.colors.text[0])
 
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
