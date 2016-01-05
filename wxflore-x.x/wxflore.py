@@ -785,7 +785,7 @@ class DescriptionPanel(wx.Panel):
         self.headerRTC.BeginTextColour("#808080")
         self.headerRTC.WriteText("     /     ")
         self.headerRTC.BeginTextColour(self.colors.fa[0])
-        self.headerRTC.WriteText("{}".format(struct["FA"]))
+        self.headerRTC.WriteText("{} ".format(struct["FA"]))
         self.headerRTC.EndTextColour()
         self.headerRTC.Newline()
 
@@ -1315,32 +1315,32 @@ class DescriptionPanel(wx.Panel):
 
             s = u"***{}***  {}  /  **{}**".format(nl1,nl2,self.struct["FA"])
             try:
-                s+=u"\nNom(s) français: {}".format(self.struct["NV"].replace(";",",")) #.encode("utf-8"))
+                s+=u"\n**Nom(s) français:** {}".format(self.struct["NV"].replace(";",",")) #.encode("utf-8"))
             except:
                 pass
 
             try:
-                s+=u"\nEnglish: {}".format(self.struct["N.UK"].replace(";",","))
+                s+=u"\n**English:** {}".format(self.struct["N.UK"].replace(";",","))
             except:
                 pass
 
             try:
-                s+=u"\nNederlands: {}".format(self.struct["N.NL"].replace(";",","))
+                s+=u"\n**Nederlands:** {}".format(self.struct["N.NL"].replace(";",","))
             except:
                 pass
 
             try:
-                s+=u"\nDeutsch: {}".format(self.struct["N.DE"].replace(";",","))
+                s+=u"\n**Deutsch:** {}".format(self.struct["N.DE"].replace(";",","))
             except:
                 pass
 
             try:
-                s+=u"\nItaliano: {}".format(self.struct["N.IT"].replace(";",","))
+                s+=u"\n**Italiano:** {}".format(self.struct["N.IT"].replace(";",","))
             except:
                 pass
 
             try:
-                s+=u"\nEspañol: {}".format(self.struct["N.ES"].replace(";",","))
+                s+=u"\n**Español:** {}".format(self.struct["N.ES"].replace(";",","))
             except:
                 pass
 
