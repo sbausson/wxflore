@@ -8,6 +8,10 @@ import wx.calendar
 class colors:
 
     cells = ['#2eb8b8','#101010']
+    calendar_main = ['#2eb8b8','#101010']
+    calendar_head = ['#bbff33','#308830']
+
+    grid_lines = '#303030'
     names = ['#bbff33','#101010']
     labels = ['#bbff33','#303030']
 
@@ -18,7 +22,7 @@ class MainApp(wx.Frame):
 
     #-------------------------------------------------------------------------------
     def __init__(self):
-        wx.Frame.__init__(self, None, title="Observations", size=(850, 500))
+        wx.Frame.__init__(self, None, title="Observations", size=(850, 550))
         self.SetBackgroundColour("#202020")
 
         self.colors = colors()
@@ -28,6 +32,7 @@ class MainApp(wx.Frame):
         self.grid.SetDefaultCellTextColour(self.colors.cells[0])
         self.grid.SetLabelBackgroundColour(self.colors.labels[1])
         self.grid.SetLabelTextColour(self.colors.labels[0])
+        self.grid.SetGridLineColour(self.colors.grid_lines)
 
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
@@ -99,10 +104,27 @@ class MainApp(wx.Frame):
 
         sizer1 = wx.BoxSizer(wx.VERTICAL)
         sizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.calendar = wx.calendar.CalendarCtrl(self, -1, wx.DateTime_Now())
+
+        # Calendar
+        #--------------------------------------------------------------------
+        self.calendar = wx.calendar.CalendarCtrl(self,
+                                                 -1,
+                                                 wx.DateTime_Now(),
+                                                 style=wx.calendar.CAL_MONDAY_FIRST)
+
+        self.calendar.SetForegroundColour(self.colors.calendar_main[0])
+        self.calendar.SetBackgroundColour(self.colors.calendar_main[1])
+        self.calendar.SetHeaderColours(self.colors.calendar_head[0],self.colors.calendar_head[1])
+        self.calendar.SetHighlightColours('#550000','#FF00FF')
+        #self.calendar.SetOwnBackgroundColour('#000088')
+
         self.calendar.Bind(wx.calendar.EVT_CALENDAR, self.onCalendarSelect)
         self.calendar.Bind(wx.calendar.EVT_CALENDAR_SEL_CHANGED, self.onCalendarSelect)
+        self.calendar.SetDate(wx.DateTime_Now())
+        #print(dir(self.calendar))
 
+        # Buttons
+        #--------------------------------------------------------------------
         sizerButton = wx.BoxSizer(wx.HORIZONTAL)
 
         self.button_add = wx.Button(self, label='Add to List')
@@ -141,6 +163,8 @@ class MainApp(wx.Frame):
     def onCalendar(self,evt):
         print("onCalendar")
         self.cal = wx.calendar.CalendarCtrl(self, -1, wx.DateTime_Now())
+        #self.cal.SetHeaderColours('#005500')
+        #self.cal.SetHighlightColours('#550000')
 
     #-------------------------------------------------------------------------------
     def onCalendarSelect(self,evt):
@@ -151,8 +175,6 @@ class MainApp(wx.Frame):
         date = "{:4}.{:02}.{:02}".format(y,m,d)
         self.dateInput.Clear()
         self.dateInput.AppendText(date)
-
-
 
     #-------------------------------------------------------------------------------
     def onSelect(self,evt):
