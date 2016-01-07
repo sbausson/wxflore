@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -38,9 +38,10 @@ class OPTIONS:
     more_directories = []
     warning = 0
     paths = PATHS()
-    
+
     class debug:
         not_updated = 0
+        chorodep = 0
 
 
 key_list = ["NL","SY","NV",
@@ -90,7 +91,7 @@ def warning(s,color,options):
         f.write(s+"\n")
 
 #-------------------------------------------------------------------------------
-# 
+#
 #-------------------------------------------------------------------------------
 def expend_pattern(pattern):
     pattern = pattern.replace("a","[aáàâäÁÀÂÄ]")
@@ -98,11 +99,11 @@ def expend_pattern(pattern):
     pattern = pattern.replace("i","[iíìïîÍÌÎÏ]")
     pattern = pattern.replace("o","[oóòöôÓÒÔÖ]")
     pattern = pattern.replace("u","[uúùüûÚÙÛÜ]")
-    pattern = pattern.replace("c","[cçÇ]")    
+    pattern = pattern.replace("c","[cçÇ]")
     return pattern
 
 #-------------------------------------------------------------------------------
-# 
+#
 #-------------------------------------------------------------------------------
 def reduce_pattern(pattern):
     pattern = re.sub("[aáàâäÁÀÂÄ]","a",pattern)
@@ -114,7 +115,7 @@ def reduce_pattern(pattern):
     return pattern
 
 #-------------------------------------------------------------------------------
-# 
+#
 #-------------------------------------------------------------------------------
 def parse_struct(line,struct,options):
 
@@ -128,7 +129,7 @@ def parse_struct(line,struct,options):
         ERROR()
 
     if keyword in key_list:
-        struct[keyword] = value.strip()    
+        struct[keyword] = value.strip()
     else:
         print("--->"+line+"<---")
         ERROR()
@@ -141,15 +142,15 @@ def parse_struct(line,struct,options):
 def display_struct(struct,compressed,i,options):
 
     global line_parity
-    
-    nl = struct["NL"]    
-    
+
+    nl = struct["NL"]
+
     if "NV" not in struct:
         nv = ""
     else:
         nv = struct["NV"]
 
-        
+
     if "N.UK" not in struct:
         nuk = ""
     else:
@@ -175,8 +176,8 @@ def display_struct(struct,compressed,i,options):
     else:
         nde = struct["N.DE"]
 
-        
-        
+
+
     if "NE" not in struct:
         ne = ""
     else:
@@ -186,12 +187,12 @@ def display_struct(struct,compressed,i,options):
         sy = ""
     else:
         sy = struct["SY"]
-        
+
     if "FA" not in struct:
         fa = ""
     else:
         fa = struct["FA"]
-        
+
     if "ZO" not in struct:
         zo = ""
     else:
@@ -202,7 +203,7 @@ def display_struct(struct,compressed,i,options):
     #    tg = "***"
     #else:
     #    tg = ""
-        
+
 
     if compressed == 1:
         if options.short == 2:
@@ -278,17 +279,17 @@ def display_struct(struct,compressed,i,options):
                     s+="%-25s :\n" % ("Synonymes")
                     for syn in sy:
                         s+="\t- %s\n" % syn #s+="{0:25} : {1}\n".format("Synonyme(s)",', '.join(sy))
-    
+
                 if options.short in  [0,1]:
                     s+="%s :\n" % ("Description")
                     for ds in struct["DS"]:
                         s+="\t- %s\n" % ds
-                
-        
+
+
         #print "-"*90
 
             if options.short == 0:
-                
+
                 try:
                     s+="%-25s : %s\n" % ("Habitat",struct["HB"])
                 except:
@@ -310,7 +311,7 @@ def display_struct(struct,compressed,i,options):
                     pass
 
                 try:
-                    if struct["true_coste"]:           
+                    if struct["true_coste"]:
                         c = color.GREEN
                     else:
                         c = color.RED
@@ -339,19 +340,19 @@ def display_struct(struct,compressed,i,options):
                 except:
                     pass
 
-            
+
         print(s) #.encode("utf-8"))
 
         #print "-"*90
 
-        
+
     else:
         for key in key_list:
             if struct.has_key(key):
                 print("{0}: {1}".format(key,struct[key]))
         print("")
 
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -366,7 +367,7 @@ def filter_struct(struct,patterns,options):
         if isinstance(struct[key],str):
             s +=  struct[key]
         elif isinstance(struct[key],list):
-            s += ''.join(struct[key])            
+            s += ''.join(struct[key])
 
     s = ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c))
 
@@ -378,7 +379,7 @@ def filter_struct(struct,patterns,options):
 
     if options.tag != "":
         found = found and (struct["TG"].upper() == options.tag.upper())
-        
+
     return found
 
 
@@ -418,7 +419,7 @@ def print_total(struct):
             print(" [ {} ]".format(letter))
             for fam_group in [l[x:x+n] for x in range(0, len(l), n)]:
                 print(''.join(["%22s : %3s" % (fam,fam_t[fam]) for fam in fam_group]))
-        
+
 
 #    split=[l[i:i+len(l)/num_cols] for i in range(0,len(l),len(l)//num_cols)]
 #    print split
@@ -439,12 +440,12 @@ def handle_coste(struct,options):
 
     coste_list_files = os.listdir(options.paths.coste)
     coste_removed = [int(x.split(".")[0]) for x in coste_list_files if re.match("[0-9]+\.coste$",x)]
-    
+
 #    coste_removed = [210,273,
 #                     1162,1170,1185,1190,
 #                     3662,
 #                     4254,4329]
-    
+
     coste_t = [0]*4355
 
     tot = 0
@@ -454,13 +455,13 @@ def handle_coste(struct,options):
             if id_coste not  in coste_removed:
                 print(struct[key]["ID.tela"], end=" ")
                 tot += 1
-     
+
     print()
     print("-"*100," ",tot)
 
     tot = 0
     for key in struct.keys():
-        
+
         try:
             coste_id = int(struct[key]["ID.coste"])
             coste_t[coste_id] = 1
@@ -510,7 +511,7 @@ def parse_argv(options):
 
         elif sys.argv[i] == "-html":
             options.html = 1
-            
+
         elif sys.argv[i] in ["-short","-s"]:
             options.short = 1
 
@@ -522,7 +523,7 @@ def parse_argv(options):
 
         elif sys.argv[i] in ["-l"]:
             options.short = 4
-        
+
         elif sys.argv[i] in ["-nyd"]:
             options.nyd = 1
             options.args = sys.argv[i+1:]
@@ -531,16 +532,16 @@ def parse_argv(options):
 
         elif sys.argv[i] in ["-py"]:
             options.py = 1
-        
+
         elif re.match("-tag=[ynYN]",sys.argv[i]):
             options.tag = sys.argv[i].split("=")[1].strip().upper()
-            
+
         elif sys.argv[i] == "-verbose":
             options.verbose = 1
-            
+
         else:
             return sys.argv[i:]
-        
+
         i+=1
 
     return ""
@@ -555,7 +556,7 @@ def nyd(filename,struct_table,options):
 
     in_list = []
     out_list = []
-    
+
     f = open(filename)
     for line in f.readlines():
         if line.strip() != "":
@@ -581,7 +582,7 @@ def nyd(filename,struct_table,options):
                     print("Not yet DONE !")
                     found = 1
                     break
-            
+
         if not found:
             print("Not in Database")
 
@@ -589,10 +590,10 @@ def nyd(filename,struct_table,options):
         n = 5
         z = [in_list[x:x+n] for x in range(0, len(in_list), n)]
         print("-"*100)
-        print('\n'.join([''.join(s.rjust(35)for s in row) for row in z])) 
+        print('\n'.join([''.join(s.rjust(35)for s in row) for row in z]))
         print("-"*100)
         z = [out_list[x:x+n] for x in range(0, len(out_list), n)]
-        print('\n'.join([''.join(s.rjust(35)for s in row) for row in z])) 
+        print('\n'.join([''.join(s.rjust(35)for s in row) for row in z]))
         print("-"*100)
 
 
@@ -615,7 +616,7 @@ def python_table(base_flore_path,options=OPTIONS()):
 #    filenames = [os.path.join(base_flore_path[0],"flore.main")]
     filenames = [options.paths.db] #[os.path.join(base_flore_path[0],"flore.main")]
 
-    
+
     path = os.path.join(options.paths.db,"python")
     try:
         import bdtfx
@@ -633,22 +634,22 @@ def python_table(base_flore_path,options=OPTIONS()):
         print('## WARNING ## : Can not load "baseflor.py" !')
 
     try:
-        import chorodep        
+        import chorodep
         options.chorodep = chorodep
         print('Loading "chorodep.py" ...')
     except:
         print('## WARNING ## : Can not load "chorodep.py !')
 
     try:
-        import baseveg        
+        import baseveg
         #options.baseveg_table = baseveg.table
         options.baseveg = baseveg
         print('Loading "baseveg.py" ...')
     except:
         print('## WARNING ## : Can not load "baseveg.py !')
 
-    
-    # Import RED LIST 
+
+    # Import RED LIST
     #-----------------
     try:
         import redlist
@@ -666,7 +667,7 @@ def python_table(base_flore_path,options=OPTIONS()):
         dir_prot = os.path.join(options.paths.python,"prot",prot_type)
         sys.path.append(dir_prot)
         if os.path.exists(dir_prot):
-            print("Loading prot/reg ",end="") 
+            print("Loading prot/reg ",end="")
             for region in [fn.split(".")[0] for fn in os.listdir(dir_prot) if re.match(".*\.py$",fn)]:
                 try:
                     #print(region)
@@ -676,7 +677,7 @@ def python_table(base_flore_path,options=OPTIONS()):
                     #options.prot[mod.name] = mod.liste
                     options.prot[prot_type][region] = mod.liste
                     print("'{}'".format(region),end=" ")
-        
+
                 except IOError:
                     print("error")
                     pass
@@ -700,41 +701,41 @@ def python_table(base_flore_path,options=OPTIONS()):
                         options.cat[cat].append(id)
     #print(options.cat)
 
-    # Read Taxon files 
+    # Read Taxon files
     #------------------
     for filename in filenames :
         print(filename)
         for root, dirs, files in os.walk(filename, topdown=False):
             for name in files:
                 if re.match("[A-Z][a-z]+\.[a-z_]+(\-)?[a-z_]*$",name):
-                    #full_filename = os.path.join(root, name)
-                    #parse_file(root,name,struct_table,options)
-
-                    #parse_file(root,name,struct_table,options)
-                    
                     filename = os.path.join(root, name)
                     struct_table[filename] = parse_file(filename,name,options)
 
 
+    chorodep_counter=0
     photos_path_list = []
     for key in struct_table.keys():
         struct = struct_table[key]
         #print(key,struct.keys())
         name_reduced = bota.ReduceName(struct["NL"])
         photos_path_list.append(name_reduced)
+        if struct['ID.tela'] in options.chorodep.table:
+            chorodep_counter += 1
 
     if os.path.exists(os.path.join(options.paths.img,"photos")):
         for filename in  os.listdir(os.path.join(options.paths.img,"photos")):
             if filename not in photos_path_list:
                 warning("## WARNING ## {} photo not linked to any taxon ...".format(filename),"magenta",options)
 
-    return struct_table 
+    print("="*50)
+    print("chorodep count={}".format(chorodep_counter))
+    return struct_table
 
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 def parse_file_telacol(filename,struct,options):
-                
+
     import codecs
 
     try:
@@ -747,12 +748,12 @@ def parse_file_telacol(filename,struct,options):
         sys.stderr.write("## WARNING {} ## \"{}\" Reading error ...\n".format(options.warning,filename))
         struct["telacol_ds"] = ""
         return
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 def parse_file_coste(coste_id,struct,options):
-                
+
     import codecs
     filename = os.path.join(options.paths.coste,"{}.coste".format(coste_id))
 
@@ -765,24 +766,24 @@ def parse_file_coste(coste_id,struct,options):
         options.warning+=1
         sys.stderr.write("## WARNING {} ## \"{}\" Not found [ Tela {} ]...\n".format(options.warning,filename,struct["ID.tela"]))
         struct["true_coste"] = 0
-        return    
+        return
 
     struct["FN.coste"]  = filename
 
     i=0
     #print(content)
     while i < len(content):
-        
+
         line = content[i]
 
-        if line.strip() == "" or re.match('#',line):                                    
+        if line.strip() == "" or re.match('#',line):
             in_struct = 0
             if re.match('#',line):
                 comments.append(line.strip())
             i+=1
-        else: 
+        else:
             in_struct = 1
-            
+
             try:
                 keyword,value = line.split(":",1)
             except:
@@ -793,7 +794,7 @@ def parse_file_coste(coste_id,struct,options):
 
             if keyword == "DS":
                 if value.strip() != "":
-                    struct[keyword] = [x.strip() for x in value.split(";")]  
+                    struct[keyword] = [x.strip() for x in value.split(";")]
                     i+=1
                 else:
                     i+=1
@@ -806,7 +807,7 @@ def parse_file_coste(coste_id,struct,options):
                         i+=1
 
             elif keyword in ["N.coste","HB","ZO","FL","FR","US"]:
-                struct[keyword] = value.strip()    
+                struct[keyword] = value.strip()
                 i+=1
             else:
                 i+=1
@@ -816,7 +817,7 @@ def parse_file_coste(coste_id,struct,options):
 #
 #-------------------------------------------------------------------------------
 def parse_file_user(filename,struct,options):
-                
+
     import codecs
 
     try:
@@ -830,23 +831,23 @@ def parse_file_user(filename,struct,options):
     except:
         options.warning+=1
         sys.stderr.write("## WARNING {} ## \"{}\" Not found [ Tela {} ]...\n".format(options.warning,filename,struct["ID.tela"]))
-        return    
+        return
 
     i=0
     struct["user"] = {}
     #print(content)
     while i < len(content):
-        
+
         line = content[i]
 
-        if line.strip() == "" or re.match('#',line):                                    
+        if line.strip() == "" or re.match('#',line):
             in_struct = 0
             if re.match('#',line):
                 comments.append(line.strip())
             i+=1
-        else: 
+        else:
             in_struct = 1
-            
+
             try:
                 keyword,value = line.split(":",1)
             except:
@@ -857,7 +858,7 @@ def parse_file_user(filename,struct,options):
 
             if keyword == "DS":
                 if value.strip() != "":
-                    struct["user"][keyword] = [x.strip() for x in value.split(";")]  
+                    struct["user"][keyword] = [x.strip() for x in value.split(";")]
                     i+=1
                 else:
                     i+=1
@@ -870,7 +871,7 @@ def parse_file_user(filename,struct,options):
                         i+=1
 
             elif keyword in ["HB","ZO","FR",]:
-                struct["user"][keyword] = value.strip()    
+                struct["user"][keyword] = value.strip()
                 i+=1
             else:
                 i+=1
@@ -881,7 +882,7 @@ def parse_file_user(filename,struct,options):
 def parse_BOT(filename,struct,options):
 
     print(filename)
-    
+
     import codecs
 
     f = codecs.open(filename,'r','utf-8')
@@ -896,18 +897,18 @@ def parse_BOT(filename,struct,options):
             except:
                 print(line)
                 error()
-            
+
             if keyword == "FL.co":
                 struct["bot"]["FL.co"] = value
                 print("bot / FL.co")
-        
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 def parse_BASEFLOR(filename,struct,options):
 
     #print(filename)
-    
+
     import codecs
 
     f = codecs.open(filename,'r','utf-8')
@@ -928,32 +929,8 @@ def parse_BASEFLOR(filename,struct,options):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def parse_CHORODEP(filename,struct,options):
-
-    #print(filename)
-    
-    import codecs
-
-    f = codecs.open(filename,'r','utf-8')
-    content = f.readlines()
-    f.close()
-
-    struct["chorodep"] = {}
-    for line in content:
-        if line.strip():
-            try:
-                keyword,value = line.split(":",1)
-            except:
-                print(line)
-                error()
-
-            struct["chorodep"][keyword] = value.strip()
-
-#-------------------------------------------------------------------------------
-#
-#-------------------------------------------------------------------------------
 def parse_TAGS(filename,struct,options):
-    
+
     tags_t = []
     f = codecs.open(filename,'r','utf-8')
     for line in f.readlines():
@@ -965,7 +942,7 @@ def parse_TAGS(filename,struct,options):
 #
 #-------------------------------------------------------------------------------
 def parse_SEEALSO(filename,struct,options):
-    
+
     t = []
     f = codecs.open(filename,'r','utf-8')
     for line in f.readlines():
@@ -989,13 +966,13 @@ def update_file(filename,nl):
     with codecs.open(filename,'w','utf-8') as f:
         for l in t:
             f.write(l)
-            
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
 #def parse_file(root,name,struct,options):
 def parse_file(filename,name,options):
-    
+
     #filename = os.path.join(root, name)
 
     #print(root)
@@ -1021,19 +998,19 @@ def parse_file(filename,name,options):
 
     #print(filename)
     while i < len(content):
-        
+
         line = content[i]#.decode("utf-8")
         #print i,line.strip()
 
         if line.strip() == "" or re.match('#',line):
-                                    
+
             in_struct = 0
             if re.match('#',line):
                 comments.append(line.strip())
             i+=1
-        else: 
+        else:
             in_struct = 1
-            
+
             try:
                 keyword,value = line.split(":",1)
                 #value = value.decode('utf-8')
@@ -1044,7 +1021,7 @@ def parse_file(filename,name,options):
 
             if keyword == "SY":
                 if value.strip() != "":
-                    struct[keyword] = [x.strip() for x in value.split(";")]  
+                    struct[keyword] = [x.strip() for x in value.split(";")]
                     i+=1
                 else:
                     i+=1
@@ -1058,7 +1035,7 @@ def parse_file(filename,name,options):
 
             elif keyword == "DS":
                 if value.strip() != "":
-                    struct[keyword] = [x.strip() for x in value.split(";")]  
+                    struct[keyword] = [x.strip() for x in value.split(";")]
                     i+=1
                 else:
                     i+=1
@@ -1073,7 +1050,7 @@ def parse_file(filename,name,options):
                 #print "DS,%s:\n%s" % (keyword,struct["DS"])
 
             elif keyword in key_list:
-                struct[keyword] = value.strip()    
+                struct[keyword] = value.strip()
                 i+=1
             else:
                 i+=1
@@ -1101,7 +1078,7 @@ def parse_file(filename,name,options):
                     resp = raw_input('Update "{}" ? (y/n) '.format(filename))
                     if resp == "y":
                         update_file(filename,struct["NL"])
-                        
+
             elif struct["FA"] != options.bdtfx.table[struct["ID.tela"]]["fam"]:
                 warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx.table[struct["ID.tela"]]["fam"]),
                         "cyan",
@@ -1117,14 +1094,14 @@ def parse_file(filename,name,options):
 #                    pass
 #
             #print(syn_t)
-            struct["SY"] = options.bdtfx.table[struct["ID.tela"]]["syn"] 
-            struct["ID.inpn"] = options.bdtfx.table[struct["ID.tela"]]["ID.inpn"] 
+            struct["SY"] = options.bdtfx.table[struct["ID.tela"]]["syn"]
+            struct["ID.inpn"] = options.bdtfx.table[struct["ID.tela"]]["ID.inpn"]
 
         else:
             warning("{} not in bdtfx ... {}".format(struct["ID.tela"],filename),
                     "yellow",options)
-        
-    
+
+
     # COSTE Description file
     #------------------------
     if "ID.coste" in struct.keys() and "N.coste" not in struct.keys():
@@ -1150,12 +1127,12 @@ def parse_file(filename,name,options):
     if hasattr(options.paths,"meta"):
         fn = os.path.join(options.paths.meta,"tags",name)
         if os.path.exists(fn):
-            parse_TAGS(fn,struct,options)        
+            parse_TAGS(fn,struct,options)
 
     if hasattr(options.paths,"seealso"):
         fn = os.path.join(options.paths.seealso,name)
         if os.path.exists(fn):
-            parse_SEEALSO(fn,struct,options)            
+            parse_SEEALSO(fn,struct,options)
 
 
     struct["cat"] = []
@@ -1175,9 +1152,10 @@ def parse_file(filename,name,options):
     #---------------------
     try:
         struct["chorodep"] = options.chorodep.table[struct["ID.tela"]]
+        #options.debug.chorodep+=1
     except:
         pass
-    
+
     # Catminat / RedList
     #---------------------
     try:
@@ -1209,7 +1187,7 @@ def parse_file(filename,name,options):
 #    if os.path.exists(BOT_filename):
 #        print(options.db_base_dir)
 #        parse_BOT(BOT_filename,struct,options)
-    
+
     struct["N."] = name
     struct["nl"] = struct["NL"].replace("["," ").replace("]","")
     struct["FN"] = filename
@@ -1250,6 +1228,13 @@ def parse_files(pattern_list,options):
     print("locations={}".format(locations))
 
     try:
+        import bdtfx
+        options.bdtfx = bdtfx
+        print('Loading "bdtfx.py" ...')
+    except:
+        print("## WARNING ## : Can not load 'bdtfx' ...")
+
+    try:
         import baseflor
         options.baseflor = baseflor
         print('Loading "baseflor.py" ...')
@@ -1257,7 +1242,7 @@ def parse_files(pattern_list,options):
         print('Can not load "baseflor.py" !')
 
     try:
-        import chorodep        
+        import chorodep
         options.chorodep = chorodep
         print('Loading "chorodep.py" ...')
     except:
@@ -1269,28 +1254,20 @@ def parse_files(pattern_list,options):
         print('Loading "redlist.py" ...')
     except:
         print('Can not load "redlist.py !')
-        
+
     for location in locations:
 
         for root, dirs, files in os.walk(location, topdown=False):
             for name in files:
                 if re.match("[A-Z][a-z]+\.[a-z_]+(\-)?[a-z_]*$",name):
-                    
+
                     try:
                         filename = os.path.join(root, name)
-                        #parse_file(root,name,struct_table,options)
                         struct_table[filename] = parse_file(filename,name,options)
-                    except:
+                    except IOError:
                         print(root,name)
-                        error()                   
+                        error()
 
-
-#    os.path.join(self.options.paths.img,"photos",name_reduced
-    #if os.path.exists(os.path.join(self.options.paths.img,"photos",name_reduced)):
-    #    attrib_list[i] = "#1F7A1F"
-
-    
-    # photos #
 
     if options.total:
         print_total(struct_table)
@@ -1305,7 +1282,7 @@ def parse_files(pattern_list,options):
     elif options.py:
         python_table(struct_table)
 
-    else:        
+    else:
         for key in struct_table.keys():
             if filter_struct(struct_table[key],patterns,options):
                 struct_table_filtered[key] = struct_table[key]
@@ -1321,7 +1298,7 @@ def parse_files(pattern_list,options):
                 print(key)
                 ERROR()
 
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -1343,7 +1320,7 @@ if __name__ == '__main__':
     options.paths.telacol = os.path.join(db_base_dir,"flore.telacol")
     options.paths.seealso = os.path.join(db_base_dir,"see.also")
     options.paths.cat = os.path.join(db_base_dir,"cat")
-                               
+
     options.paths.meta = os.path.join(options.db_directory,"meta")
 
     sys.path.append(os.path.join(db_base_dir,"python"))

@@ -21,7 +21,7 @@ conv_table = [
     ["auteur","auteur"],
     ["annee","annee"],
     ["cd_nom","cd_nom"],
-    
+
 ]
 
 table = {}
@@ -42,7 +42,7 @@ filename = "bdtfx_{}.py".format(version)
 #f = open(filename,"w")
 f = codecs.open(filename,'w','utf-8')
 
-with open(bdtfx_in_file, "r") as csvfile: 
+with open(bdtfx_in_file, "r") as csvfile:
     reader = csv.reader(csvfile, delimiter='\t', quotechar='"')
     i=0
     for row in reader:
@@ -62,7 +62,7 @@ with open(bdtfx_in_file, "r") as csvfile:
             author = row[indexes.index("auteur")]
             author_date = row[indexes.index("annee")]
             id_inpn = row[indexes.index("cd_nom")]
-                        
+
             s = "{}".format(name_sci)
             if author.strip() != "" and author_date.strip() != "":
                 s += " [{}, {}]".format(author,author_date)
@@ -82,24 +82,23 @@ with open(bdtfx_in_file, "r") as csvfile:
 
             if num_ref != "":
                 if num_ref not in table.keys():
-                    table[num_ref] = {"syn":[]                              
-                                  }
-                
+                    table[num_ref] = {"syn.id":[]}
+
                 if rang == 180:
                     fam_t[num_ref] = name_sci
-                
+
                 elif rang == 220 and sup_ref != "":
                     gen_t[name_sci] = sup_ref
-                    
+
                 elif num != num_ref:
-                    table[num_ref]["syn"].append(num)
-                
+                    table[num_ref]["syn.id"].append(num)
+
                 elif num_ref != "":
                     table[num_ref]["NL"] = nl
                     table[num_ref]["ID.inpn"] = id_inpn
                     table[num_ref]["gen"] = genre
-                
-            
+
+
 #f.write("'{}':{}\n".format(num_ref,table[num_ref]))
 f.write("# -*- coding: utf-8 -*-\n")
 f.write("version='{}'\n".format(version))
@@ -107,13 +106,9 @@ f.write("table={\n")
 for key in table.keys():
     #print(table[key])
     if key != "":
-        for i in range(0,len(table[key]["syn"])):
-            table[key]["syn"][i] = nl_t[table[key]["syn"][i]]
-
-#        if table[key]["fam"] not in ["","0"]:
-#            print(table[key])
-#            table[key]["fam"] = nl_t[table[key]["fam"]]
-
+        table[key]["syn"] = []
+        for i in range(0,len(table[key]["syn.id"])):
+            table[key]["syn"].append(nl_t[table[key]["syn.id"][i]])
 
         try:
             #print(table[key]["gen"])
