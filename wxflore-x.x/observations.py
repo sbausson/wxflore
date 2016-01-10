@@ -4,6 +4,7 @@
 import wx
 import wx.grid
 import wx.calendar
+import csv
 
 class colors:
 
@@ -22,10 +23,13 @@ class MainApp(wx.Frame):
 
     #-------------------------------------------------------------------------------
     def __init__(self):
-        wx.Frame.__init__(self, None, title="Observations", size=(850, 550))
+        wx.Frame.__init__(self, None, title="Observations", size=(950, 550))
         self.SetBackgroundColour("#202020")
 
         self.colors = colors()
+
+        # Grid
+        #--------------------------------
         self.grid = wx.grid.Grid(self,-1)
 
         self.grid.SetDefaultCellBackgroundColour(self.colors.cells[1])
@@ -36,14 +40,31 @@ class MainApp(wx.Frame):
 
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
-        self.grid.CreateGrid(6,6)
+        self.grid.CreateGrid(1,6)
+
+        self.grid_col_list = ['Date','Dept.','Commune (CP)','Coord. GPS','Densité','Commentaire']
+
         self.grid.SetColLabelValue(0,"Date")
-        self.grid.SetColLabelValue(1,"Departement")
-        self.grid.SetColLabelValue(2,"Commune (CP)")
+        self.grid.SetColSize(0,80)
+
+        self.grid.SetColLabelValue(1,"Dept.")
+        self.grid.SetColSize(1,60)
+
+        self.grid.SetColLabelValue(2,"Commune")
+        self.grid.SetColSize(2,140)
+
         self.grid.SetColLabelValue(3,"Coord. GPS")
+        self.grid.SetColSize(3,100)
+
         self.grid.SetColLabelValue(4,"Densité")
+        self.grid.SetColSize(4,100)
+
         self.grid.SetColLabelValue(5,"Commentaire")
-        self.grid.AutoSizeColumns()
+        self.grid.SetColSize(5,350)
+
+        #self.grid.AutoSizeColumns()
+
+        self.grid_index = 0
 
         gridSizer = wx.GridSizer(7,2,6,0)
 
@@ -53,7 +74,7 @@ class MainApp(wx.Frame):
         self.dateInput.SetBackgroundColour(self.colors.cells[1])
         self.dateInput.SetForegroundColour(self.colors.cells[0])
         self.dateInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        self.dateInput.Bind(wx.EVT_LEFT_DCLICK,self.onCalendar)
+        #self.dateInput.Bind(wx.EVT_LEFT_DCLICK,self.onCalendar)
         gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
         gridSizer.Add(self.dateInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
@@ -105,6 +126,7 @@ class MainApp(wx.Frame):
         sizer1 = wx.BoxSizer(wx.VERTICAL)
         sizer2 = wx.BoxSizer(wx.HORIZONTAL)
 
+
         # Calendar
         #--------------------------------------------------------------------
         self.calendar = wx.calendar.CalendarCtrl(self,
@@ -139,6 +161,12 @@ class MainApp(wx.Frame):
         self.button_done.SetForegroundColour("#303030")
         sizerButton.Add(self.button_done,0,wx.ALL)
 
+        self.button_debug = wx.Button(self, label='Debug')
+        self.Bind(wx.EVT_BUTTON,self.onButtonDebug,self.button_debug)
+        self.button_debug.SetBackgroundColour("#000033")
+        self.button_debug.SetForegroundColour("#303030")
+        sizerButton.Add(self.button_debug,0,wx.ALL)
+
         sizer2.Add(gridSizer,0,wx.ALL,10)
         sizer2.Add(self.calendar,0,wx.ALL,10)
 
@@ -154,10 +182,40 @@ class MainApp(wx.Frame):
     #-------------------------------------------------------------------------------
     def onButtonAddToList(self,evt):
         print("onButtonAddToList")
+        self.grid.AppendRows(1)
+        self.Layout()
+
+#        s = self.dateInput.GetLineText(0)
+#        print(s)
+#        self.grid.SetCellValue(self.grid_index,0,s)
+        self.grid_index += 1
 
     #-------------------------------------------------------------------------------
     def onButtonDone(self,evt):
         print("onButtonDone")
+
+        with open('observation.csv', 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile,
+                                    delimiter=';',
+                                    quotechar='"',
+                                    quoting=csv.QUOTE_MINIMAL)
+
+
+            csvwriter.writerow(self.grid_col_list)
+            for i in range(0,self.grid.GetNumberRows()):
+                row = []
+                for j in range(0,self.grid.GetNumberCols()):
+                    row.append(self.grid.GetCellValue(i,j))
+                print(row)
+                csvwriter.writerow(row)
+
+        self.Destroy()
+
+    #-------------------------------------------------------------------------------
+    def onButtonDebug(self,evt):
+        print("onButtonDebug")
+        print("IsSelection",self.grid.IsSelection())
+        print("GetSelectedCells",self.grid.GetSelectedCells())
 
     #-------------------------------------------------------------------------------
     def onCalendar(self,evt):
@@ -179,6 +237,7 @@ class MainApp(wx.Frame):
     #-------------------------------------------------------------------------------
     def onSelect(self,evt):
         print("onSelect")
+        print(evt.GetRow(),evt.GetCol())
 
     #-------------------------------------------------------------------------------
     def checkValid(self,evt):

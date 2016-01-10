@@ -98,10 +98,9 @@ def build_python_module():
                 if niv in ['ALL',
                            'ASS',
                            'ASSGR',
-                           'CLA',
-                           'ORD',
+                           'CLA','SUBCLA',
+                           'ORD','SUBORD',
                            'SUBALL',
-                           'SUBCLA',
                 ]:
 
                     s=''
