@@ -2185,9 +2185,12 @@ class MainApp(wx.Frame):
         #self.statusbar = self.CreateStatusBar()
         #statusbar_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        sep = "    "
         self.statusbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
                                     wx.TB_FLAT | wx.TB_NODIVIDER)
-        sep = "    "
+
+        self.statusbar.SetBackgroundColour(self.colors.normal[1])
+        self.statusbar.SetForegroundColour(self.colors.normal[0])
 
         statictext = wx.StaticText(self.statusbar, -1, "Familles: {}".format(len(self.stats.fam_list)))
 #        statusbar_sizer.Add(, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
@@ -2239,7 +2242,7 @@ class MainApp(wx.Frame):
 #        statusbar_sizer.Add((10,-1))
 
         self.statusbar.AddControl(wx.StaticText(self.statusbar, label=" Search"))
-#        self.statusbar.AddControl((10,-1))
+        #self.statusbar.AddControl((10,-1))
 
         self.filter_cb = wx.ComboBox(self.statusbar,  wx.CB_DROPDOWN, style=wx.TE_PROCESS_ENTER, pos=(25,25), size=(400,-1)) #|wx.TE_PROCESS_ENTER
         self.filter_cb.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL))
