@@ -19,14 +19,54 @@ class colors:
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
+def observation_read(filename):
+
+    obs = []
+    with open(filename, 'rb') as csvfile:
+        csvreader = csv.reader(csvfile,
+                               delimiter=';',
+                               quotechar='"',
+                               quoting=csv.QUOTE_MINIMAL)
+
+        i = 0
+        for row in csvreader:
+            if i == 0:
+                labels = row
+            else:
+                obs.append(row)
+
+        return obs
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+def observation_write(filename,labels,obs):
+
+    with open(filenama, 'wb') as csvfile:
+        csvwriter = csv.writer(csvfile,
+                               delimiter=';',
+                               quotechar='"',
+                               quoting=csv.QUOTE_MINIMAL)
+
+        csvwriter.writerow(labels)
+        for row in obs:
+            csvwriter.writerow(row)
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
 class MainApp(wx.Frame):
 
     #-------------------------------------------------------------------------------
     def __init__(self):
+
         wx.Frame.__init__(self, None, title="Observations", size=(950, 550))
         self.SetBackgroundColour("#202020")
-
         self.colors = colors()
+
+        obs = observation_read('observations.csv')
+        print(obs)
+        error()
 
         # Grid
         #--------------------------------
@@ -179,6 +219,7 @@ class MainApp(wx.Frame):
         self.SetSizer(sizer1)
         self.Show()
 
+
     #-------------------------------------------------------------------------------
     def onButtonAddToList(self,evt):
         print("onButtonAddToList")
@@ -194,21 +235,15 @@ class MainApp(wx.Frame):
     def onButtonDone(self,evt):
         print("onButtonDone")
 
-        with open('observation.csv', 'wb') as csvfile:
-            csvwriter = csv.writer(csvfile,
-                                    delimiter=';',
-                                    quotechar='"',
-                                    quoting=csv.QUOTE_MINIMAL)
+        csvwriter.writerow()
+        obs = []
+        for i in range(0,self.grid.GetNumberRows()):
+            row = []
+            for j in range(0,self.grid.GetNumberCols()):
+                row.append(self.grid.GetCellValue(i,j))
+            obs.append(row)
 
-
-            csvwriter.writerow(self.grid_col_list)
-            for i in range(0,self.grid.GetNumberRows()):
-                row = []
-                for j in range(0,self.grid.GetNumberCols()):
-                    row.append(self.grid.GetCellValue(i,j))
-                print(row)
-                csvwriter.writerow(row)
-
+        observation_write('observations.csv', obs, self.grid_col_list)
         self.Destroy()
 
     #-------------------------------------------------------------------------------
