@@ -16,42 +16,58 @@ class colors:
     names = ['#bbff33','#101010']
     labels = ['#bbff33','#303030']
 
-#-------------------------------------------------------------------------------
-#
-#-------------------------------------------------------------------------------
-def observation_read(filename):
+col_label_size = {"Date":80,
+                  "Dept.":60,
+                  "Commune":140,
+                  "Coord. GPS":100,
+                  "Densité":100,
+                  "Commentaire":350}
 
-    obs = []
-    with open(filename, 'rb') as csvfile:
-        csvreader = csv.reader(csvfile,
-                               delimiter=';',
-                               quotechar='"',
-                               quoting=csv.QUOTE_MINIMAL)
-
-        i = 0
-        for row in csvreader:
-            if i == 0:
-                labels = row
-            else:
-                obs.append(row)
-
-        return obs
 
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def observation_write(filename,labels,obs):
+class Observations():
 
-    with open(filenama, 'wb') as csvfile:
-        csvwriter = csv.writer(csvfile,
-                               delimiter=';',
-                               quotechar='"',
-                               quoting=csv.QUOTE_MINIMAL)
+    #-------------------------------------------------------------------------------
+    def __init__(self,filename):
 
-        csvwriter.writerow(labels)
-        for row in obs:
-            csvwriter.writerow(row)
+        self.labels = []
+        self.obs = []
+        self.filename = filename
 
+        with open(filename, 'rb') as csvfile:
+            csvreader = csv.reader(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            i = 0
+            for row in csvreader:
+                if i == 0:
+                    self.labels = row
+                else:
+                    self.obs.append(row)
+                i+=1
+
+    #-------------------------------------------------------------------------------
+    def write(self):
+
+        with open(self.filename, 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writerow(self.labels)
+            for row in self.obs:
+                csvwriter.writerow(row)
+
+    #-------------------------------------------------------------------------------
+    def __repr__(self):
+        s=""
+        fmt="{:12} {:8} {:20} {:15} {:15} {:40}\n"
+        s+=fmt.format(*self.labels)
+        s+="-"*100+"\n"
+        for row in self.obs:
+            s+=fmt.format(*row)
+        return(s)
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -64,9 +80,7 @@ class MainApp(wx.Frame):
         self.SetBackgroundColour("#202020")
         self.colors = colors()
 
-        obs = observation_read('observations.csv')
-        print(obs)
-        error()
+        self.obs = Observations('observations.csv')
 
         # Grid
         #--------------------------------
@@ -80,29 +94,19 @@ class MainApp(wx.Frame):
 
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
         self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
-        self.grid.CreateGrid(1,6)
+        self.grid.CreateGrid(len(self.obs.observations),len(self.obs.observations[0]))
 
-        self.grid_col_list = ['Date','Dept.','Commune (CP)','Coord. GPS','Densité','Commentaire']
+        #self.grid_col_list = ['Date','Dept.','Commune (CP)','Coord. GPS','Densité','Commentaire']
 
-        self.grid.SetColLabelValue(0,"Date")
-        self.grid.SetColSize(0,80)
+        for i in range(0,len(self.obs.labels)):
+            self.grid.SetColLabelValue(i,self.obs.labels[i])
+            self.grid.SetColSize(i,col_label_size[self.obs.labels[i]])
 
-        self.grid.SetColLabelValue(1,"Dept.")
-        self.grid.SetColSize(1,60)
 
-        self.grid.SetColLabelValue(2,"Commune")
-        self.grid.SetColSize(2,140)
+        for row in range(0,len(self.obs.observations)):
+            for col in range(0,len(row)):
+                self.grid.SetCellValue(row,col,self.obs.observations[row][col])
 
-        self.grid.SetColLabelValue(3,"Coord. GPS")
-        self.grid.SetColSize(3,100)
-
-        self.grid.SetColLabelValue(4,"Densité")
-        self.grid.SetColSize(4,100)
-
-        self.grid.SetColLabelValue(5,"Commentaire")
-        self.grid.SetColSize(5,350)
-
-        #self.grid.AutoSizeColumns()
 
         self.grid_index = 0
 
@@ -243,7 +247,7 @@ class MainApp(wx.Frame):
                 row.append(self.grid.GetCellValue(i,j))
             obs.append(row)
 
-        observation_write('observations.csv', obs, self.grid_col_list)
+        self.obs.write('observations.csv')
         self.Destroy()
 
     #-------------------------------------------------------------------------------
