@@ -36,6 +36,7 @@ class colors:
     #selected = ["#ccff66","#808080"]
     selected = ["#ccff33","#707070"]
     selection = ["#ff9933","#202020"]
+
     #normal = ["#000000","#ffffff"]
     normal = ["#ffffff","#101010"]
     #nl = ["#ffffff","#202020"]
@@ -47,6 +48,11 @@ class colors:
     #fa = ["#990033","#202020"]
     fa = ["#ff5c5c","#202020"]
 
+    class button:
+        #default = [None,'#DDDDDD'] #5cd65c'
+        default = ['#adff2f','#303030']
+        obs =     ['#1905AE','#ffcc00']
+        note =    ['#1905AE','#00BFFF']
 
     flower = {"blanc":["#ffffff",None],
               "bleu" :["#4d4dff",None],
@@ -701,11 +707,11 @@ class DescriptionPanel(wx.Panel):
     def OnNoteUpdate(self,event):
         print("OnNoteUpdate")
         if os.path.exists(self.note_fn):
-            self.button_note.SetForegroundColour("#101010")
-            self.button_note.SetBackgroundColour("#33CCCC")
+            self.button_note.SetForegroundColour(self.colors.button.note[0]) #"#101010")
+            self.button_note.SetBackgroundColour(self.colors.button.note[1]) #"#33CCCC")
         else:
-            self.button_note.SetForegroundColour("#101010")
-            self.button_note.SetBackgroundColour("#D0D0D0")
+            self.button_note.SetForegroundColour(self.colors.button.default[0]) #"#101010")
+            self.button_note.SetBackgroundColour(self.colors.button.default[1]) #"#D0D0D0")
 
     #-------------------------------------------------------------------------------
     def onNotebookClose(self,event):
@@ -1442,9 +1448,9 @@ class DescriptionPanel(wx.Panel):
         self.descSizer.Clear(1)
         #self.descSizer = wx.BoxSizer(wx.VERTICAL)
 
-        print("DescriptionPanl.UpdateDesc() -> call to UpdateHeader()")
+        print("DescriptionPanel.UpdateDesc() -> call to UpdateHeader()")
         self.UpdateHeader(struct)
-        print("DescriptionPanl.UpdateDesc() -> return from UpdateHeader()")
+        print("DescriptionPanel.UpdateDesc() -> return from UpdateHeader()")
 
         self.descRTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER);
         self.descRTC.SetBackgroundColour(colors.normal[1])
@@ -1587,38 +1593,47 @@ class DescriptionPanel(wx.Panel):
 
             self.descRTC.EndFontSize()
 
-        # Toolbar
-        self.toolbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
-                                  wx.TB_FLAT | wx.TB_NODIVIDER)
+        # DescriptionPanel Toolbar
+        #----------------------------------
+        # self.descTB = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
+        # wx.TB_FLAT | wx.TB_NODIVIDER)
+
+        self.descTB_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.descTB = wx.Panel(self,size=(-1,32))
+
+        self.descTB.SetBackgroundColour(self.colors.normal[1])
+        self.descTB.SetForegroundColour(self.colors.normal[0])
 
         id = wx.NewId()
-
-        button = wx.Button(self.toolbar, id, "Synonymes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
-        #button.selection = 0
-        self.toolbar.AddControl(button)
+        button = wx.Button(self.descTB, id, "Synonymes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
+        button.SetForegroundColour(self.colors.button.default[0])
+        button.SetBackgroundColour(self.colors.button.default[1])
+        # self.descTB.AddControl(button)
+        self.descTB_sizer.Add(button,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2) #wx.ALL)
         wx.EVT_BUTTON( self, id, self.Button_SYN)
-        #self.s_buttons.append(button)
         id+=1
 
-        button = wx.Button(self.toolbar, id, "Observations", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
-        self.toolbar.AddControl(button)
+        button = wx.Button(self.descTB, id, "Observations", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
+        # self.descTB.AddControl(button)
+        self.descTB_sizer.Add(button,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2) #wx.ALL)
         wx.EVT_BUTTON( self, id, self.Button_OBS)
         id+=1
 
         self.Bind(EVT_NOTE_UPDATE_ID, self.OnNoteUpdate)
 
-        self.button_note = wx.Button(self.toolbar, id, "Notes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
-        self.button_note.SetForegroundColour("#101010")
-        self.button_note.SetBackgroundColour("#D0D0D0")
-        self.toolbar.AddControl(self.button_note)
+        self.button_note = wx.Button(self.descTB, id, "Notes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
+        self.button_note.SetForegroundColour(self.colors.button.default[0])
+        self.button_note.SetBackgroundColour(self.colors.button.default[1])
+        #self.descTB.AddControl(self.button_note)
+        self.descTB_sizer.Add(self.button_note,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2) #wx.ALL)
 
         self.note_fn = ""
         if options.paths.meta != "":
             self.note_fn = os.path.join(options.paths.meta,"notes",struct["N."]+".txt")
             print(self.note_fn)
             if os.path.exists(self.note_fn):
-                self.button_note.SetForegroundColour("#101010")
-                self.button_note.SetBackgroundColour("#33CCCC")
+                self.button_note.SetForegroundColour(self.colors.button.note[0])
+                self.button_note.SetBackgroundColour(self.colors.button.note[1]) #"#33CCCC")
 
             wx.EVT_BUTTON( self, id, self.Button_NOTES)
             id+=1
@@ -1629,23 +1644,25 @@ class DescriptionPanel(wx.Panel):
 
             self.tagsSizer.Add((5,-1))
             #self.button_baseveg = wx.Button(self.scrolledTagPanel,
-            self.button_baseveg = wx.Button(self.toolbar,
+            self.button_baseveg = wx.Button(self.descTB,
                                             id,
                                             u" Cat: {} ".format(self.struct['baseflor']['ID.cat']),
                                             wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
             #button.SetForegroundColour("#600060")
             self.button_baseveg.SetForegroundColour("#000000")
+            #self.button_note.SetForegroundColour(self.colors.button.note[0])
+
             #button.SetBackgroundColour("#6699ff")
             self.button_baseveg.SetBackgroundColour("#ffffff")
             #self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
-            self.toolbar.AddControl(self.button_baseveg)
-            #self.tagFlag = 1
-
+            #self.descTB.AddControl(self.button_baseveg)
+            self.descTB_sizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
             wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
             id+=1
 
 
-        self.toolbar.Realize()
+        self.descTB.SetSizer(self.descTB_sizer)
+        self.descTB.Layout()
 
         # Description Notebook
         self.notebook = aui.AuiNotebook(self) #,"True",aui.AUI_NB_HIDE_ON_SINGLE_TAB) #,aui.AUI_NB_CLOSE_ON_ALL_TABS)
@@ -1666,7 +1683,7 @@ class DescriptionPanel(wx.Panel):
         #self.scrolled_header.SetSizer(self.headerSizer)
 
         self.descSizer.Add(self.headerSizer,0,wx.ALIGN_LEFT|wx.EXPAND)
-        self.descSizer.Add(self.toolbar,0,wx.ALIGN_LEFT) #|wx.EXPAND)
+        self.descSizer.Add(self.descTB,0,wx.ALIGN_LEFT)
         self.descSizer.Add(self.notebook,1,wx.ALIGN_LEFT|wx.EXPAND)
 
         self.SetSizer(self.descSizer)
@@ -2172,10 +2189,10 @@ class MainApp(wx.Frame):
 
         # Toolbar
         #---------
-        toolbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
-                                  wx.TB_FLAT | wx.TB_NODIVIDER)
-
-        toolbar.Realize()
+#        toolbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
+#                                  wx.TB_FLAT | wx.TB_NODIVIDER)
+#
+#        toolbar.Realize()
 
         id = 40
 
@@ -2185,74 +2202,79 @@ class MainApp(wx.Frame):
         #self.statusbar = self.CreateStatusBar()
         #statusbar_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        sep = "    "
-        self.statusbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
-                                    wx.TB_FLAT | wx.TB_NODIVIDER)
+        #sep = "    "
+        #self.statusbar = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
+        #                            wx.TB_FLAT | wx.TB_NODIVIDER)
+
+
+        self.statusbar_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.statusbar = wx.Panel(self,size=(-1,35))
 
         self.statusbar.SetBackgroundColour(self.colors.normal[1])
         self.statusbar.SetForegroundColour(self.colors.normal[0])
 
+        self.statusbar_sizer.Add((10,-1))
         statictext = wx.StaticText(self.statusbar, -1, "Familles: {}".format(len(self.stats.fam_list)))
-#        statusbar_sizer.Add(, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
-#        statusbar_sizer.Add((30,-1))
-        self.statusbar.AddControl(statictext)
-        self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
+        self.statusbar_sizer.Add(statictext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
+        self.statusbar_sizer.Add((20,-1))
+        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
+        #self.statusbar_sizer.AddControl(statictext)
 
         statictext = wx.StaticText(self.statusbar, -1, "Genres: {}".format(len(self.stats.gen_list)))
-#        statusbar_sizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
-#        statusbar_sizer.Add((30,-1))
-        self.statusbar.AddControl(statictext)
-        self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
+        self.statusbar_sizer.Add(statictext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
+        self.statusbar_sizer.Add((20,-1))
+        #self.statusbar.AddControl(statictext)
+        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
 
         statictext = wx.StaticText(self.statusbar, -1, "Especes: {}".format(len(self.stats.spe_list)))
-#        statusbar_sizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
-#        statusbar_sizer.Add((30,-1))
-        self.statusbar.AddControl(statictext)
-        self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
+        self.statusbar_sizer.Add(statictext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
+        self.statusbar_sizer.Add((20,-1))
+        #self.statusbar.AddControl(statictext)
+        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
 
         button = wx.Button(self.statusbar, id, "m1", wx.DefaultPosition, (35,-1))
         button.selection = 0
-#        statusbar_sizer.Add(button,0)
-        self.statusbar.AddControl(button)
+        self.statusbar_sizer.Add(button,0,wx.ALL|wx.ALIGN_CENTER_VERTICAL)
+        #self.statusbar.AddControl(button)
         self.s_buttons.append(button)
         wx.EVT_BUTTON( self, id, self.Button_MARKER)
         id+=1
 
         button = wx.Button(self.statusbar, id, "m2", wx.DefaultPosition, (35,-1))
         button.selection = 1
-#        statusbar_sizer.Add(button,0)
-        self.statusbar.AddControl(button)
+        self.statusbar_sizer.Add(button,0,wx.ALL|wx.ALIGN_CENTER_VERTICAL)
+        #self.statusbar.AddControl(button)
         self.s_buttons.append(button)
         wx.EVT_BUTTON( self, id, self.Button_MARKER)
         id+=1
 
         button = wx.Button(self.statusbar, id, "m3", wx.DefaultPosition, (35,-1))
         button.selection = 2
-#        statusbar_sizer.Add(button,0)
-        self.statusbar.AddControl(button)
+        self.statusbar_sizer.Add(button,0,wx.ALL|wx.ALIGN_CENTER_VERTICAL)
+        #self.statusbar.AddControl(button)
         self.s_buttons.append(button)
         wx.EVT_BUTTON( self, id, self.Button_MARKER)
         id+=1
 
         self.select_button(self.marker_index)
 
-        self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
-
-#        statusbar_sizer.Add(wx.StaticText(self.statusbar, label=" Search"),0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
-#        statusbar_sizer.Add((10,-1))
-
-        self.statusbar.AddControl(wx.StaticText(self.statusbar, label=" Search"))
+        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
+        statictext = wx.StaticText(self.statusbar, label=" Search")
+        self.statusbar_sizer.Add(statictext ,0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
+        # statusbar_sizer.Add((10,-1))
+        #self.statusbar.AddControl(wx.StaticText(self.statusbar, label=" Search"))
         #self.statusbar.AddControl((10,-1))
 
-        self.filter_cb = wx.ComboBox(self.statusbar,  wx.CB_DROPDOWN, style=wx.TE_PROCESS_ENTER, pos=(25,25), size=(400,-1)) #|wx.TE_PROCESS_ENTER
+        self.filter_cb = wx.ComboBox(self.statusbar,  wx.CB_DROPDOWN,
+                                     style=wx.TE_PROCESS_ENTER, pos=(25,25), size=(400,28))
         self.filter_cb.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL))
         self.filter_cb.SetBackgroundColour("#99ff66") ##ccff99")
         #self.filter_cb.SetBackgroundColour("#008888") ##ccff99")
         self.filter_cb.SetForegroundColour("#050505") ##ccff99")
 
         self.filter_cb.Clear()
-#        statusbar_sozer.Add(self.filter_cb, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
-        self.statusbar.AddControl(self.filter_cb)
+        self.statusbar_sizer.Add(self.filter_cb, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL)
+        #self.statusbar.AddControl(self.filter_cb)
         #self.statusbar.SetSizer(statusbar_sizer)
         self.Bind(wx.EVT_TEXT_ENTER, self.onFilterTextEnter, self.filter_cb)
         self.Bind(wx.EVT_LEFT_DOWN, self.onCbSelect, self.filter_cb)
@@ -2265,7 +2287,8 @@ class MainApp(wx.Frame):
         button = wx.Button(self.statusbar, id, u" Advanced Search ", wx.DefaultPosition, (-1,-1)) #, style=wx.BU_EXACTFIT)
         button.SetForegroundColour("#D1DEFA")
         button.SetBackgroundColour("#53566E")
-        self.statusbar.AddControl(button,) #,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
+        self.statusbar_sizer.Add(button, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL)
+        #self.statusbar.AddControl(button,) #,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
         wx.EVT_BUTTON( self, id, self.onAdvancedSearch)
         id+=1
 
@@ -2274,13 +2297,8 @@ class MainApp(wx.Frame):
         self.div_data += [["Other"]]
         self.div_data += [["All"]]
 
-        self.statusbar.Realize()
-        #self.stats.fam_count[key[0]]
-
-        #print(self.div_data)
-        #print "=========",self.stats.fam_count.keys()
-        #print "////////",classification.divisions
-        #self.div_fam = [x[1] for x in classification.divisions if x[1] in self.stats.fam_count.keys()]
+        self.statusbar.SetSizer(self.statusbar_sizer)
+        #self.statusbar.Realize()
 
         self.tree = {}
         self.div_data = []
@@ -2369,9 +2387,9 @@ class MainApp(wx.Frame):
 
         sizer_0 = wx.BoxSizer(wx.VERTICAL)
 
-        sizer_0.Add(toolbar, 0, wx.EXPAND)
+#        sizer_0.Add(self.toolbar, 0, wx.EXPAND)
         sizer_0.Add(self.notebook, 1, wx.ALL|wx.EXPAND)
-        sizer_0.Add(self.statusbar, 0, wx.ALIGN_LEFT) #|wx.EXPAND)
+        sizer_0.Add(self.statusbar, 0, wx.ALIGN_LEFT|wx.EXPAND) #|wx.EXPAND)
 
         self.SetSizer(sizer_0)
 

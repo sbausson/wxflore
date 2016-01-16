@@ -33,26 +33,26 @@ class Observations():
     def __init__(self,filename):
 
         self.labels = []
-        self.obs = []
+        self.table = []
         self.filename = filename
 
-        with open(filename, 'rb') as csvfile:
+        with open(self.filename, 'rb') as csvfile:
             csvreader = csv.reader(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             i = 0
             for row in csvreader:
                 if i == 0:
                     self.labels = row
                 else:
-                    self.obs.append(row)
+                    self.table.append(row)
                 i+=1
 
     #-------------------------------------------------------------------------------
-    def write(self):
+    def write(self,table):
 
         with open(self.filename, 'wb') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             csvwriter.writerow(self.labels)
-            for row in self.obs:
+            for row in table:
                 csvwriter.writerow(row)
 
     #-------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ class MainApp(wx.Frame):
         self.SetBackgroundColour("#202020")
         self.colors = colors()
 
-        self.obs = Observations('observations.csv')
+        self.Obs = Observations('observations.csv')
 
         # Grid
         #--------------------------------
@@ -93,82 +93,85 @@ class MainApp(wx.Frame):
         self.grid.SetGridLineColour(self.colors.grid_lines)
 
         self.grid.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onSelect)
-        self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
-        self.grid.CreateGrid(len(self.obs.observations),len(self.obs.observations[0]))
+        #self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGE,self.onSelect)
+        #self.grid.Bind(wx.EVT_KILL_FOCUS,self.onFocusLost)
+        self.grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK,self.onLeftDClick)
+        self.grid.CreateGrid(len(self.Obs.table),len(self.Obs.table[0]))
 
+
+        self.grid.SetCellHighlightColour('#94b8b8')
         #self.grid_col_list = ['Date','Dept.','Commune (CP)','Coord. GPS','Densité','Commentaire']
 
-        for i in range(0,len(self.obs.labels)):
-            self.grid.SetColLabelValue(i,self.obs.labels[i])
-            self.grid.SetColSize(i,col_label_size[self.obs.labels[i]])
+        for i in range(0,len(self.Obs.labels)):
+            self.grid.SetColLabelValue(i,self.Obs.labels[i])
+            self.grid.SetColSize(i,col_label_size[self.Obs.labels[i]])
 
 
-        for row in range(0,len(self.obs.observations)):
-            for col in range(0,len(row)):
-                self.grid.SetCellValue(row,col,self.obs.observations[row][col])
+        for row in range(0,len(self.Obs.table)):
+            for col in range(0,len(self.Obs.table[row])):
+                self.grid.SetCellValue(row,col,self.Obs.table[row][col])
 
 
         self.grid_index = 0
 
-        gridSizer = wx.GridSizer(7,2,6,0)
+        #gridSizer = wx.GridSizer(7,2,6,0)
 
-        st = wx.StaticText(self, -1, 'Date')
-        st.SetForegroundColour(self.colors.names[0])
-        self.dateInput = wx.TextCtrl(self, -1)
-        self.dateInput.SetBackgroundColour(self.colors.cells[1])
-        self.dateInput.SetForegroundColour(self.colors.cells[0])
-        self.dateInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        #self.dateInput.Bind(wx.EVT_LEFT_DCLICK,self.onCalendar)
-        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
-        gridSizer.Add(self.dateInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
-
-        st = wx.StaticText(self, -1, 'Departement')
-        st.SetForegroundColour(self.colors.names[0])
-        self.firstInput = wx.TextCtrl(self, -1)
-        self.firstInput.SetBackgroundColour(self.colors.cells[1])
-        self.firstInput.SetForegroundColour(self.colors.cells[0])
-        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
-        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
-
-        st = wx.StaticText(self, -1, 'Commune (CP)')
-        st.SetForegroundColour(self.colors.names[0])
-        self.firstInput = wx.TextCtrl(self, -1)
-        self.firstInput.SetBackgroundColour(self.colors.cells[1])
-        self.firstInput.SetForegroundColour(self.colors.cells[0])
-        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
-        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
-
-        st = wx.StaticText(self, -1, 'Coord. GPS')
-        st.SetForegroundColour(self.colors.names[0])
-        self.firstInput = wx.TextCtrl(self, -1)
-        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        self.firstInput.SetBackgroundColour(self.colors.cells[1])
-        self.firstInput.SetForegroundColour(self.colors.cells[0])
-        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
-        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
-
-        st = wx.StaticText(self, -1, 'Densité')
-        st.SetForegroundColour(self.colors.names[0])
-        self.firstInput = wx.TextCtrl(self, -1)
-        self.firstInput.SetBackgroundColour(self.colors.cells[1])
-        self.firstInput.SetForegroundColour(self.colors.cells[0])
-        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
-        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
-
-        st = wx.StaticText(self, -1, 'Commentaire')
-        st.SetForegroundColour(self.colors.names[0])
-        self.firstInput = wx.TextCtrl(self, size=(200,-1))
-        self.firstInput.SetBackgroundColour(self.colors.cells[1])
-        self.firstInput.SetForegroundColour(self.colors.cells[0])
-        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
-        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
-        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
+#        st = wx.StaticText(self, -1, 'Date')
+#        st.SetForegroundColour(self.colors.names[0])
+#        self.dateInput = wx.TextCtrl(self, -1)
+#        self.dateInput.SetBackgroundColour(self.colors.cells[1])
+#        self.dateInput.SetForegroundColour(self.colors.cells[0])
+#        self.dateInput.Bind(wx.EVT_KEY_UP, self.checkValid)
+#        #self.dateInput.Bind(wx.EVT_LEFT_DCLICK,self.onCalendar)
+#        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+#        gridSizer.Add(self.dateInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
+#
+#        st = wx.StaticText(self, -1, 'Departement')
+#        st.SetForegroundColour(self.colors.names[0])
+#        self.firstInput = wx.TextCtrl(self, -1)
+#        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+#        self.firstInput.SetForegroundColour(self.colors.cells[0])
+#        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
+#        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+#        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
+#
+#        st = wx.StaticText(self, -1, 'Commune (CP)')
+#        st.SetForegroundColour(self.colors.names[0])
+#        self.firstInput = wx.TextCtrl(self, -1)
+#        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+#        self.firstInput.SetForegroundColour(self.colors.cells[0])
+#        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
+#        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+#        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
+#
+#        st = wx.StaticText(self, -1, 'Coord. GPS')
+#        st.SetForegroundColour(self.colors.names[0])
+#        self.firstInput = wx.TextCtrl(self, -1)
+#        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
+#        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+#        self.firstInput.SetForegroundColour(self.colors.cells[0])
+#        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+#        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
+#
+#        st = wx.StaticText(self, -1, 'Densité')
+#        st.SetForegroundColour(self.colors.names[0])
+#        self.firstInput = wx.TextCtrl(self, -1)
+#        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+#        self.firstInput.SetForegroundColour(self.colors.cells[0])
+#        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
+#        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+#        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
+#
+#        st = wx.StaticText(self, -1, 'Commentaire')
+#        st.SetForegroundColour(self.colors.names[0])
+#        self.firstInput = wx.TextCtrl(self, size=(200,-1))
+#        self.firstInput.SetBackgroundColour(self.colors.cells[1])
+#        self.firstInput.SetForegroundColour(self.colors.cells[0])
+#        self.firstInput.Bind(wx.EVT_KEY_UP, self.checkValid)
+#        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
+#        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
         sizer1 = wx.BoxSizer(wx.VERTICAL)
-        sizer2 = wx.BoxSizer(wx.HORIZONTAL)
 
 
         # Calendar
@@ -185,15 +188,18 @@ class MainApp(wx.Frame):
         #self.calendar.SetOwnBackgroundColour('#000088')
 
         self.calendar.Bind(wx.calendar.EVT_CALENDAR, self.onCalendarSelect)
-        self.calendar.Bind(wx.calendar.EVT_CALENDAR_SEL_CHANGED, self.onCalendarSelect)
+        #self.calendar.Bind(wx.calendar.EVT_CALENDAR_SEL_CHANGED, self.onCalendarSelect)
+        self.calendar.Bind(wx.EVT_KILL_FOCUS,self.onCalendarFocusLost)
+
         self.calendar.SetDate(wx.DateTime_Now())
+        self.calendar.SetFocus()
         #print(dir(self.calendar))
 
         # Buttons
         #--------------------------------------------------------------------
         sizerButton = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.button_add = wx.Button(self, label='Add to List')
+        self.button_add = wx.Button(self, label='New Observation')
         self.Bind(wx.EVT_BUTTON,self.onButtonAddToList,self.button_add)
         self.button_add.SetBackgroundColour("#2594FD")
         self.button_add.SetForegroundColour("#ffffff")
@@ -211,15 +217,17 @@ class MainApp(wx.Frame):
         self.button_debug.SetForegroundColour("#303030")
         sizerButton.Add(self.button_debug,0,wx.ALL)
 
-        sizer2.Add(gridSizer,0,wx.ALL,10)
-        sizer2.Add(self.calendar,0,wx.ALL,10)
+        self.calendarSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.calendarSizer.Add((10,10))
+        self.calendarSizer.Add(self.calendar,0,wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,10)
 
+        # calendarSizer
+        #------------------------------------------------
         sizer1.Add(self.grid,0,wx.ALL,10)
-        sizer1.Add(sizer2,0,wx.ALL,10)
-        #sizer2.Add(vsizer,0,wx.ALL,10)
+        sizer1.Add(self.calendarSizer,0,wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,10)
+        self.calendarSizer.Hide(1)
 
         sizer1.Add(sizerButton,0,wx.ALL,10)
-
         self.SetSizer(sizer1)
         self.Show()
 
@@ -239,15 +247,14 @@ class MainApp(wx.Frame):
     def onButtonDone(self,evt):
         print("onButtonDone")
 
-        csvwriter.writerow()
-        obs = []
+        table = []
         for i in range(0,self.grid.GetNumberRows()):
             row = []
             for j in range(0,self.grid.GetNumberCols()):
                 row.append(self.grid.GetCellValue(i,j))
-            obs.append(row)
+            table.append(row)
 
-        self.obs.write('observations.csv')
+        self.Obs.write(table)
         self.Destroy()
 
     #-------------------------------------------------------------------------------
@@ -255,6 +262,12 @@ class MainApp(wx.Frame):
         print("onButtonDebug")
         print("IsSelection",self.grid.IsSelection())
         print("GetSelectedCells",self.grid.GetSelectedCells())
+
+    #-------------------------------------------------------------------------------
+    def onCalendarFocusLost(self,evt):
+        print("onCalendarFocusLost")
+        self.calendarSizer.Hide(1)
+        self.Layout()
 
     #-------------------------------------------------------------------------------
     def onCalendar(self,evt):
@@ -270,13 +283,34 @@ class MainApp(wx.Frame):
         m = evt.GetDate().GetMonth()+1
         d = evt.GetDate().GetDay()
         date = "{:4}.{:02}.{:02}".format(y,m,d)
-        self.dateInput.Clear()
-        self.dateInput.AppendText(date)
+        print(date)
+        self.calendarSizer.Hide(1)
+        self.Layout()
+        self.grid.SetCellValue(self.date_edit_row,0,date)
 
     #-------------------------------------------------------------------------------
     def onSelect(self,evt):
         print("onSelect")
-        print(evt.GetRow(),evt.GetCol())
+        #self.last_select = (evt.GetRow(),evt.GetCol())
+        #print(self.last_select)
+
+    #-------------------------------------------------------------------------------
+    def onLeftDClick(self,evt):
+        print("onLeftDClick")
+
+        if evt.GetCol() == 0:
+            self.date_edit_row = evt.GetRow()
+            self.calendarSizer.Show(1)
+            self.calendar.SetFocus()
+            self.Layout()
+        else:
+            self.date_edit_row = -1
+
+    #-------------------------------------------------------------------------------
+    def onFocusLost(self,evt):
+        print("onLostFocus")
+        self.last_select = (-1,-1)
+        print(self.last_select)
 
     #-------------------------------------------------------------------------------
     def checkValid(self,evt):
