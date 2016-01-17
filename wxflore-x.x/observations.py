@@ -1,10 +1,15 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
+import os
 import wx
 import wx.grid
 import wx.calendar
 import csv
+import wx.lib.newevent
+import codecs
+
+from common import *
 
 class colors:
 
@@ -14,15 +19,22 @@ class colors:
 
     grid_lines = '#303030'
     names = ['#bbff33','#101010']
-    labels = ['#bbff33','#303030']
+    #labels = ['#bbff33','#303030']
+    labels = ['#bbff33','#101010']
 
-col_label_size = {"Date":80,
-                  "Dept.":60,
-                  "Commune":140,
-                  "Coord. GPS":100,
-                  "Densité":100,
-                  "Commentaire":350}
+col_label_size = {u'Date':80,
+                  u'Dept.':60,
+                  u'Commune':140,
+                  u'Coord. GPS':100,
+                  u'Densité':100,
+                  u'Commentaire':500}
 
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+def utf_8_encoder(unicode_csv_data):
+    for line in unicode_csv_data:
+        yield line.encode('utf-8')
 
 #-------------------------------------------------------------------------------
 #
@@ -30,30 +42,48 @@ col_label_size = {"Date":80,
 class Observations():
 
     #-------------------------------------------------------------------------------
-    def __init__(self,filename):
+    def __init__(self,parent,filename):
 
+        self.parent = parent
         self.labels = []
         self.table = []
         self.filename = filename
 
-        with open(self.filename, 'rb') as csvfile:
-            csvreader = csv.reader(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            i = 0
-            for row in csvreader:
-                if i == 0:
-                    self.labels = row
-                else:
-                    self.table.append(row)
-                i+=1
+        if os.path.exists(self.filename):
+
+            with open(self.filename, 'rb') as f:
+                csvreader = csv.reader(f, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                i = 0
+                for row in csvreader:
+                    row = [s.decode('utf-8') for s in row]
+                    if i == 0:
+                        self.labels = row
+                    else:
+                        self.table.append(row)
+                    i+=1
+        else:
+            self.labels = [u'Date',u'Dept.',u'Commune',u'Coord. GPS',u'Densité',u'Commentaire']
+            self.table = [['','','','','','']]
+
+        print(self.labels)
 
     #-------------------------------------------------------------------------------
     def write(self,table):
 
-        with open(self.filename, 'wb') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow(self.labels)
+        if len(table) == 1:
+            if False not in [x == '' for x in table[0]]:
+                print("## WARNING ## : Empty Oberservation, saving nothing ...")
+                return
+
+        with open(self.filename, 'wb') as f:
+            print("Saving {} ...".format(self.filename))
+            csvwriter = csv.writer(f, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            csvwriter.writerow([s.encode('utf-8') for s in self.labels])
             for row in table:
-                csvwriter.writerow(row)
+                csvwriter.writerow([s.encode('utf-8') for s in row])
+
+        nevent = ObsUpdateEvent()
+        wx.PostEvent(self.parent,nevent)
 
     #-------------------------------------------------------------------------------
     def __repr__(self):
@@ -71,16 +101,17 @@ class Observations():
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-class MainApp(wx.Frame):
+class ObsPanel(wx.Panel):
 
     #-------------------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self,parent,struct, filename, obs_button):
 
-        wx.Frame.__init__(self, None, title="Observations", size=(950, 550))
-        self.SetBackgroundColour("#202020")
+        wx.Panel.__init__(self, parent) #size=(950, 550))
+
+        self.SetBackgroundColour("#101010")
         self.colors = colors()
 
-        self.Obs = Observations('observations.csv')
+        self.Obs = Observations(parent,filename)
 
         # Grid
         #--------------------------------
@@ -112,7 +143,8 @@ class MainApp(wx.Frame):
                 self.grid.SetCellValue(row,col,self.Obs.table[row][col])
 
 
-        self.grid_index = 0
+        self.edit = True
+        self.grid.EnableEditing(0)
 
         #gridSizer = wx.GridSizer(7,2,6,0)
 
@@ -171,7 +203,7 @@ class MainApp(wx.Frame):
 #        gridSizer.Add(st, 0, wx.ALIGN_CENTER_VERTICAL)
 #        gridSizer.Add(self.firstInput, 0, wx.ALIGN_RIGHT | wx.EXPAND)
 
-        sizer1 = wx.BoxSizer(wx.VERTICAL)
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 
         # Calendar
@@ -197,51 +229,70 @@ class MainApp(wx.Frame):
 
         # Buttons
         #--------------------------------------------------------------------
-        sizerButton = wx.BoxSizer(wx.HORIZONTAL)
+        self.buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.button_add = wx.Button(self, label='New Observation')
-        self.Bind(wx.EVT_BUTTON,self.onButtonAddToList,self.button_add)
-        self.button_add.SetBackgroundColour("#2594FD")
-        self.button_add.SetForegroundColour("#ffffff")
-        sizerButton.Add(self.button_add,0,wx.ALL)
+        self.button_edit = wx.Button(self, label='Edit')
+        self.Bind(wx.EVT_BUTTON,self.onButtonEdit,self.button_edit)
+        self.button_edit.SetBackgroundColour("#d0d0d0")
+        self.button_edit.SetForegroundColour("#00264d")
+        self.buttonSizer.Add(self.button_edit,0,wx.ALL)
+
+        self.button_new = wx.Button(self, label='New Observation')
+        self.Bind(wx.EVT_BUTTON,self.onButtonNew,self.button_new)
+        self.button_new.SetBackgroundColour("#2594FD")
+        self.button_new.SetForegroundColour("#ffffff")
+        self.buttonSizer.Add(self.button_new,0,wx.ALL)
+        self.button_new.Hide()
 
         self.button_done = wx.Button(self, label='Done')
         self.Bind(wx.EVT_BUTTON,self.onButtonDone,self.button_done)
         self.button_done.SetBackgroundColour("#ccff33")
         self.button_done.SetForegroundColour("#303030")
-        sizerButton.Add(self.button_done,0,wx.ALL)
+        self.buttonSizer.Add(self.button_done,0,wx.ALL)
+        self.button_done.Hide()
 
         self.button_debug = wx.Button(self, label='Debug')
         self.Bind(wx.EVT_BUTTON,self.onButtonDebug,self.button_debug)
         self.button_debug.SetBackgroundColour("#000033")
         self.button_debug.SetForegroundColour("#303030")
-        sizerButton.Add(self.button_debug,0,wx.ALL)
+        self.buttonSizer.Add(self.button_debug,0,wx.ALL)
+        self.button_debug.Hide()
 
         self.calendarSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.calendarSizer.Add((10,10))
-        self.calendarSizer.Add(self.calendar,0,wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,10)
+        self.calendarSizer.Add(self.calendar,0,wx.ALL,10) #|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,10)
 
-        # calendarSizer
         #------------------------------------------------
-        sizer1.Add(self.grid,0,wx.ALL,10)
-        sizer1.Add(self.calendarSizer,0,wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,10)
-        self.calendarSizer.Hide(1)
+        mainSizer.Add(self.grid,1,wx.ALL|wx.EXPAND,10)
+        mainSizer.Add(self.calendarSizer,0,wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,10)
+        mainSizer.Add(self.buttonSizer,0,wx.ALL,10)
 
-        sizer1.Add(sizerButton,0,wx.ALL,10)
-        self.SetSizer(sizer1)
+        self.SetSizer(mainSizer)
+        self.calendarSizer.Hide(1)
         self.Show()
 
+    #-------------------------------------------------------------------------------
+    def onButtonEdit(self,evt):
+        print("onButtonEdit")
+        self.button_new.Show()
+        self.button_done.Show()
+        #self.button_debug.Show()
+        self.button_edit.Hide()
+
+        self.edit = True
+        self.grid.EnableEditing(1)
+
+        self.Layout()
 
     #-------------------------------------------------------------------------------
-    def onButtonAddToList(self,evt):
-        print("onButtonAddToList")
+    def onButtonNew(self,evt):
+        print("onButtonNew")
         self.grid.AppendRows(1)
         self.Layout()
 
 #        s = self.dateInput.GetLineText(0)
 #        print(s)
 #        self.grid.SetCellValue(self.grid_index,0,s)
-        self.grid_index += 1
 
     #-------------------------------------------------------------------------------
     def onButtonDone(self,evt):
@@ -251,11 +302,19 @@ class MainApp(wx.Frame):
         for i in range(0,self.grid.GetNumberRows()):
             row = []
             for j in range(0,self.grid.GetNumberCols()):
+                print(type(self.grid.GetCellValue(i,j)))
                 row.append(self.grid.GetCellValue(i,j))
             table.append(row)
 
         self.Obs.write(table)
-        self.Destroy()
+
+        self.button_new.Hide()
+        self.button_done.Hide()
+        #self.button_debug.Hide()
+        self.button_edit.Show()
+
+        self.grid.EnableEditing(0)
+        self.edit = 0
 
     #-------------------------------------------------------------------------------
     def onButtonDebug(self,evt):
@@ -319,9 +378,24 @@ class MainApp(wx.Frame):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-app = wx.App(redirect=False)
-MainApp()
-app.MainLoop()
+class ObsFrame(wx.Frame):
 
+    #-------------------------------------------------------------------------------
+    def __init__(self):
 
-self.Show()
+        #filename = 'observations.csv'
+        filename = '/home/git/wxflore-meta/obs/Acanthus.mollis.csv'
+
+        wx.Frame.__init__(self, None, title="Observations", size=(950, 550))
+        self.SetBackgroundColour("#101010")
+        ObsPanel(self, {}, filename, None)
+        self.Show()
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+if __name__ == '__main__':
+
+    app = wx.App(redirect=False)
+    ObsFrame()
+    app.MainLoop()

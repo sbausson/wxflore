@@ -13,21 +13,20 @@ import wx.lib.newevent
 # AUI
 import wx.lib.agw.aui as aui
 import wx.aui
-
+from wx.lib.splitter import MultiSplitterWindow
 import wx.richtext
 
 import wxgrid
 import classification
+import observations
 import fldb
 import wxeditor
 import bota
+from common import *
 
-from wx.lib.splitter import MultiSplitterWindow
 
 ID_HELP_ABOUT = 300
 ID_HELP_CREDITS = 301
-
-(NoteUpdateEvent, EVT_NOTE_UPDATE_ID) = wx.lib.newevent.NewEvent()
 
 
 class colors:
@@ -638,10 +637,6 @@ class DescriptionPanel(wx.Panel):
             self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
-    def Button_OBS(self,event):
-        pass
-
-    #-------------------------------------------------------------------------------
     def Button_BASEVEG(self,event):
 
         def filter_basveg_by_cat_id(cat_id):
@@ -690,6 +685,19 @@ class DescriptionPanel(wx.Panel):
         print(len(self.apps.table.keys()))
 
     #-------------------------------------------------------------------------------
+    def Button_OBS(self,event):
+        print("Button_OBS")
+        name = "Oberservations"
+        PageIndex = IsNotebookPageAlreadyExist(self.notebook,name)
+        if PageIndex:
+            self.notebook.SetSelection(PageIndex - 1)
+        else:
+            panel = observations.ObsPanel(self,self.struct,self.obs_filename,self.button_obs)
+            self.notebook.AddPage(panel, name, True)
+            PageIndex = self.notebook.GetSelection()
+            self.notebook.SetPageTextColour(PageIndex,'#669900')
+
+    #-------------------------------------------------------------------------------
     def Button_NOTES(self,event):
         print("Button_NOTES")
         name = "Notes"
@@ -702,6 +710,15 @@ class DescriptionPanel(wx.Panel):
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
 
+    #-------------------------------------------------------------------------------
+    def OnObsUpdate(self,event):
+        print("OnObspdate")
+        if os.path.exists(self.obs_filename):
+            self.button_obs.SetForegroundColour(self.colors.button.obs[0]) #"#101010")
+            self.button_obs.SetBackgroundColour(self.colors.button.obs[1]) #"#33CCCC")
+        else:
+            self.button_obs.SetForegroundColour(self.colors.button.default[0]) #"#101010")
+            self.button_obs.SetBackgroundColour(self.colors.button.default[1]) #"#D0D0D0")
 
     #-------------------------------------------------------------------------------
     def OnNoteUpdate(self,event):
@@ -914,31 +931,9 @@ class DescriptionPanel(wx.Panel):
         self.tagFlag = 0
 
         self.protSizer =  wx.BoxSizer(wx.HORIZONTAL)
-        self.scrolledProtPanel = wx.lib.scrolledpanel.ScrolledPanel(self,size=(-1,34))
+        self.scrolledProtPanel = wx.lib.scrolledpanel.ScrolledPanel(self,size=(-1,28))
         self.scrolledProtPanel.SetBackgroundColour(colors.normal[1])
         self.protFlag = 0
-
-        # ID Catminat
-        #--------------
-        if 0 and 'ID.cat' in self.struct['baseflor'] and self.struct['baseflor']['ID.cat'] != '':
-
-            self.tagsSizer.Add((5,-1))
-            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
-            self.button_baseveg = wx.Button(self.toolbar,
-                                            id,
-                                            u" Cat: {} ".format(self.struct['baseflor']['ID.cat']),
-                                            wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
-            #button.SetForegroundColour("#600060")
-            self.button_baseveg.SetForegroundColour("#000000")
-            #button.SetBackgroundColour("#6699ff")
-            self.button_baseveg.SetBackgroundColour("#ffffff")
-            #self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
-            self.toolbar.AddControl(self.button_baseveg)
-            #self.tagFlag = 1
-
-            print(dir(self.button_baseveg))
-            wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
-            id+=1
 
 
         # Tags
@@ -946,12 +941,6 @@ class DescriptionPanel(wx.Panel):
         if "tags" in struct.keys():
             for tag in struct["tags"]:
 
-                # statictext = wx.StaticText(self.scrolledTagPanel, -1, "Tags:")
-                # #font = statictext.GetFont()
-                # #font.SetWeight(wx.BOLD)
-                # #statictext.SetFont(font)
-                # self.tagsSizer.Add((5,-1))
-                # self.tagsSizer.Add(statictext, 0, wx.ALIGN_LEFT|wx.EXPAND, border=0)
                 self.tagsSizer.Add((5,-1))
 
                 button = wx.Button(self.scrolledTagPanel, wx.ID_ANY, u" {} ".format(tag),
@@ -960,7 +949,6 @@ class DescriptionPanel(wx.Panel):
                 button.SetBackgroundColour("#6699ff")
                 self.tagsSizer.Add(button,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
                 self.tagFlag = 1
-
 
         self.protSizer.Add((5,-1))
 
@@ -1599,33 +1587,46 @@ class DescriptionPanel(wx.Panel):
         # wx.TB_FLAT | wx.TB_NODIVIDER)
 
         self.descTB_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.descTB = wx.Panel(self,size=(-1,32))
+        self.descTB = wx.Panel(self,size=(-1,35))
 
         self.descTB.SetBackgroundColour(self.colors.normal[1])
         self.descTB.SetForegroundColour(self.colors.normal[0])
 
         id = wx.NewId()
-        button = wx.Button(self.descTB, id, "Synonymes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
+        button = wx.Button(self.descTB, id, "Synonymes", wx.DefaultPosition, (-1,-1)) #, wx.BU_EXACTFIT )
         button.SetForegroundColour(self.colors.button.default[0])
         button.SetBackgroundColour(self.colors.button.default[1])
         # self.descTB.AddControl(button)
-        self.descTB_sizer.Add(button,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2) #wx.ALL)
+        self.descTB_sizer.Add(button,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
         wx.EVT_BUTTON( self, id, self.Button_SYN)
         id+=1
 
-        button = wx.Button(self.descTB, id, "Observations", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
-        # self.descTB.AddControl(button)
-        self.descTB_sizer.Add(button,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2) #wx.ALL)
-        wx.EVT_BUTTON( self, id, self.Button_OBS)
-        id+=1
+        # Button OSERVATIONS
+        #-------------------------------------------------------------------------------
+        self.button_obs = wx.Button(self.descTB, id, "Observations", wx.DefaultPosition, (-1,-1))
+        self.button_obs.SetForegroundColour(self.colors.button.default[0])
+        self.button_obs.SetBackgroundColour(self.colors.button.default[1])
+        self.descTB_sizer.Add(self.button_obs,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
 
-        self.Bind(EVT_NOTE_UPDATE_ID, self.OnNoteUpdate)
+        self.obs_filename = ""
+        if options.paths.meta != "":
+            self.obs_filename = os.path.join(options.paths.meta,"obs",struct["N."]+".csv")
+            print(self.obs_filename)
+            if os.path.exists(self.obs_filename):
+                self.button_obs.SetForegroundColour(self.colors.button.obs[0])
+                self.button_obs.SetBackgroundColour(self.colors.button.obs[1])
 
-        self.button_note = wx.Button(self.descTB, id, "Notes", wx.DefaultPosition, (-1,-1), wx.BU_EXACTFIT )
+            wx.EVT_BUTTON( self, id, self.Button_OBS)
+            self.Bind(EVT_OBS_UPDATE_ID, self.OnObsUpdate)
+            id+=1
+
+
+        # Button NOTES
+        #-------------------------------------------------------------------------------
+        self.button_note = wx.Button(self.descTB, id, "Notes", wx.DefaultPosition, (-1,-1))
         self.button_note.SetForegroundColour(self.colors.button.default[0])
         self.button_note.SetBackgroundColour(self.colors.button.default[1])
-        #self.descTB.AddControl(self.button_note)
-        self.descTB_sizer.Add(self.button_note,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2) #wx.ALL)
+        self.descTB_sizer.Add(self.button_note,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
 
         self.note_fn = ""
         if options.paths.meta != "":
@@ -1633,9 +1634,10 @@ class DescriptionPanel(wx.Panel):
             print(self.note_fn)
             if os.path.exists(self.note_fn):
                 self.button_note.SetForegroundColour(self.colors.button.note[0])
-                self.button_note.SetBackgroundColour(self.colors.button.note[1]) #"#33CCCC")
+                self.button_note.SetBackgroundColour(self.colors.button.note[1])
 
             wx.EVT_BUTTON( self, id, self.Button_NOTES)
+            self.Bind(EVT_NOTE_UPDATE_ID, self.OnNoteUpdate)
             id+=1
 
         # ID Catminat
@@ -1644,19 +1646,15 @@ class DescriptionPanel(wx.Panel):
 
             self.tagsSizer.Add((5,-1))
             #self.button_baseveg = wx.Button(self.scrolledTagPanel,
-            self.button_baseveg = wx.Button(self.descTB,
-                                            id,
+            self.button_baseveg = wx.Button(self.descTB, id,
                                             u" Cat: {} ".format(self.struct['baseflor']['ID.cat']),
-                                            wx.DefaultPosition, (-1,-1), style=wx.BU_EXACTFIT)
-            #button.SetForegroundColour("#600060")
+                                            wx.DefaultPosition, (-1,-1)) #, style=wx.BU_EXACTFIT)
             self.button_baseveg.SetForegroundColour("#000000")
             #self.button_note.SetForegroundColour(self.colors.button.note[0])
-
             #button.SetBackgroundColour("#6699ff")
             self.button_baseveg.SetBackgroundColour("#ffffff")
-            #self.tagsSizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.EXPAND)
-            #self.descTB.AddControl(self.button_baseveg)
             self.descTB_sizer.Add(self.button_baseveg,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
+
             wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
             id+=1
 
@@ -2217,20 +2215,17 @@ class MainApp(wx.Frame):
         statictext = wx.StaticText(self.statusbar, -1, "Familles: {}".format(len(self.stats.fam_list)))
         self.statusbar_sizer.Add(statictext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
         self.statusbar_sizer.Add((20,-1))
-        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
         #self.statusbar_sizer.AddControl(statictext)
 
         statictext = wx.StaticText(self.statusbar, -1, "Genres: {}".format(len(self.stats.gen_list)))
         self.statusbar_sizer.Add(statictext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
         self.statusbar_sizer.Add((20,-1))
         #self.statusbar.AddControl(statictext)
-        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
 
         statictext = wx.StaticText(self.statusbar, -1, "Especes: {}".format(len(self.stats.spe_list)))
         self.statusbar_sizer.Add(statictext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
         self.statusbar_sizer.Add((20,-1))
         #self.statusbar.AddControl(statictext)
-        #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
 
         button = wx.Button(self.statusbar, id, "m1", wx.DefaultPosition, (35,-1))
         button.selection = 0
@@ -2261,9 +2256,6 @@ class MainApp(wx.Frame):
         #self.statusbar.AddControl(wx.StaticText(self.statusbar, -1, sep))
         statictext = wx.StaticText(self.statusbar, label=" Search")
         self.statusbar_sizer.Add(statictext ,0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, border=0)
-        # statusbar_sizer.Add((10,-1))
-        #self.statusbar.AddControl(wx.StaticText(self.statusbar, label=" Search"))
-        #self.statusbar.AddControl((10,-1))
 
         self.filter_cb = wx.ComboBox(self.statusbar,  wx.CB_DROPDOWN,
                                      style=wx.TE_PROCESS_ENTER, pos=(25,25), size=(400,28))
@@ -2288,10 +2280,8 @@ class MainApp(wx.Frame):
         button.SetForegroundColour("#D1DEFA")
         button.SetBackgroundColour("#53566E")
         self.statusbar_sizer.Add(button, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL)
-        #self.statusbar.AddControl(button,) #,0,wx.ALIGN_LEFT|wx.EXPAND) #wx.ALL)
         wx.EVT_BUTTON( self, id, self.onAdvancedSearch)
         id+=1
-
 
         self.div_data = [[x[0]] for x in classification.divisions]
         self.div_data += [["Other"]]
