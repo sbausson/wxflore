@@ -2596,11 +2596,17 @@ class MainApp(wx.Frame):
         flags = {}
 
         re_notes = re.compile('(^| )\$notes',re.U)
+        re_obs = re.compile('(^| )\$obs',re.U)
         re_dept = re.compile('^| \(\$dept=([0-9,]*)\)',re.U)
 
         if re_notes.search(s):
             s = re_notes.sub('',s,re.U)
             flags['notes'] = 1
+
+        if re_obs.search(s):
+            s = re_obs.sub('',s,re.U)
+            flags['obs'] = 1
+
 
         if re_dept.search(s):
             dept = re_dept.findall(s)[-1]
@@ -2648,6 +2654,12 @@ class MainApp(wx.Frame):
                         if 'notes' in flags:
                             note_filename = os.path.join(options.paths.meta,"notes",struct["N."]+".txt")
                             if os.path.exists(note_filename):
+                                filtered_struct_list.append(struct)
+                            handled = 1
+
+                        if 'obs' in flags:
+                            obs_filename = os.path.join(options.paths.meta,"obs",struct["N."]+".csv")
+                            if os.path.exists(obs_filename):
                                 filtered_struct_list.append(struct)
                             handled = 1
 

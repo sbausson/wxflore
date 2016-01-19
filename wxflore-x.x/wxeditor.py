@@ -1,6 +1,7 @@
 import wx
 import os
 import codecs
+import re
 
 ID_ABOUT=101
 ID_OPEN=102
@@ -17,7 +18,7 @@ class MainWindow(wx.Dialog):
     def __init__(self,parent,title,filename,colors):
 
         self.filename=filename
-        
+
         wx.Dialog.__init__(self, None, title=title)
 
         #wx.Frame.__init__(self,parent,wx.ID_ANY, title)
@@ -50,10 +51,23 @@ class MainWindow(wx.Dialog):
 
     def onCloseWindow(self,event):
         print("onCloseWindow")
-#        f = codecs.open(self.filename, "w", "utf-8")
-#        self.TC.WriteText("".join(f.readlines()))
-        
-        self.TC.SaveFile(self.filename)
+        #        f = codecs.open(self.filename, "w", "utf-8")
+        #        self.TC.WriteText("".join(f.readlines()))
+        text = self.TC.GetValue()
+
+        text_is_empty = 1
+        for line in text:
+            if not re.match("\s*$",line):
+                text_is_empty = 0
+
+
+        if text_is_empty:
+            if os.path.exists(self.filename):
+                print("## WARNING ## : Removing 'empty Note' file = {}".format(self.filename))
+                os.remove(self.filename)
+        else:
+            self.TC.SaveFile(self.filename)
+
         event.Skip()
 
 #-------------------------------------------------------------------------------
