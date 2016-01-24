@@ -6,7 +6,7 @@ divisions=[
     ["Bryophytes",["Marchantiaceae",
                    "Polytrichaceae",
                ]],
-    
+
     ["Pteridophyte",["Aspleniaceae",
                      "Azollaceae",
                      "Blechnaceae",
@@ -21,7 +21,7 @@ divisions=[
                      "Osmundaceae",
                      "Polypodiaceae",
                      "Pteridaceae",
-                     "Salviniaceae",                
+                     "Salviniaceae",
                      "Thelypteridaceae",
                      "Woodsiaceae",
                      ]],
@@ -72,7 +72,7 @@ divisions=[
     ["Dicots",[
         # A
         "Acanthaceae",
-        "Achariaceae",                           
+        "Achariaceae",
         "Adoxaceae",
         "Aizoaceae",
         "Amaranthaceae",
@@ -82,12 +82,13 @@ divisions=[
         "Apocynaceae",
         "Aquifoliaceae",
         "Araliaceae",
-        "Araucariaceae",        
+        "Araucariaceae",
         "Aristolochiaceae",
         "Asteraceae",
 
         # B
         "Balsaminaceae",
+        "Basellaceae",
         "Begoniaceae",
 
         "Berberidaceae",
@@ -114,7 +115,7 @@ divisions=[
         "Crassulaceae",
         "Cucurbitaceae",
         "Cytinaceae",
-        
+
         # D
         "Droseraceae",
 
@@ -179,7 +180,7 @@ divisions=[
         "Platanaceae",
         "Plumbaginaceae",
         "Polemoniaceae",
-        "Polygalaceae",                          
+        "Polygalaceae",
         "Polygonaceae",
         "Portulacaceae",
         "Primulaceae",
@@ -195,14 +196,14 @@ divisions=[
         # S
         "Salicaceae",
         "Santalaceae",
-        "Sapindaceae",          
+        "Sapindaceae",
         "Saxifragaceae",
         "Scrophulariaceae",
         "Simaroubaceae",
         "Solanaceae",
         "Staphyleaceae",
         "Styracaceae",
-        
+
         # #
         "Tamaricaceae",
         "Thymelaeaceae",

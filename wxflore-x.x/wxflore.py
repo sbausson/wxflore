@@ -2778,11 +2778,6 @@ if __name__ == '__main__':
 
     parse_argv(options)
 
-    if options.noconfig:
-        default_config = 1
-    else:
-        default_config = 0
-
     try:
         import config
         root = config.flore_root
@@ -2790,10 +2785,10 @@ if __name__ == '__main__':
         if hasattr(config,"meta_path"):
             options.paths.meta = config.meta_path
     except ImportError:
-        default_config = 1
+        options.noconfig = 1
         options.paths.meta = ""
 
-    if default_config:
+    if options.notconfig:
         script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding)))
         root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
         img_path = os.path.join(root,"img")
