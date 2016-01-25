@@ -2784,11 +2784,12 @@ if __name__ == '__main__':
         img_path = config.flore_img_path
         if hasattr(config,"meta_path"):
             options.paths.meta = config.meta_path
+
     except ImportError:
         options.noconfig = 1
         options.paths.meta = ""
 
-    if options.notconfig:
+    if options.noconfig:
         script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding)))
         root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
         img_path = os.path.join(root,"img")
