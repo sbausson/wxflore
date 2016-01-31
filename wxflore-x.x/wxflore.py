@@ -8,7 +8,7 @@ import re
 import functools
 import codecs
 import wx.lib.newevent
-
+import importlib
 
 # AUI
 import wx.lib.agw.aui as aui
@@ -17,7 +17,6 @@ from wx.lib.splitter import MultiSplitterWindow
 import wx.richtext
 
 import wxgrid
-import classification
 import observations
 import fldb
 import wxeditor
@@ -1834,7 +1833,10 @@ class MainPanel(wx.Panel):
 
         self.pos=pos()
 #        self.colors = colors
-        self.pos.div =  [key[0] for key in self.div_data].index("Dicots")
+
+        import classification
+
+        self.pos.div =  [key[0] for key in self.div_data].index(classification.default_division)
 
         self.UpdateFam(0)
         self.UpdateGen(0)
@@ -2073,6 +2075,8 @@ class MainApp(wx.Frame):
     def __init__(self, options):
 
 
+        import classification
+
         xMaxDisplaySize, yMaxDisplaySize = wx.GetDisplaySize()
 
         self.size = {}
@@ -2145,7 +2149,13 @@ class MainApp(wx.Frame):
         #self.options = aplog.OPTIONS()
         #self.options.history_file = "wxap.conf"
         #self.options.color_file = "wxap.colors"
-        self.SetTitle("wxFlore")
+        title = "wxFlore"
+        try:
+            title+=" ({})".format(classification.title)
+        except:
+            pass
+
+        self.SetTitle(title)
         self.title = "Famille"
         self.options = options
         self.colors = colors
@@ -2283,6 +2293,16 @@ class MainApp(wx.Frame):
         wx.EVT_BUTTON( self, id, self.onAdvancedSearch)
         id+=1
 
+
+        # Refresh
+        #-----------------
+        button = wx.Button(self.statusbar, id, u" Refresh ", wx.DefaultPosition, (-1,-1))
+        button.SetForegroundColour("#003366")
+        button.SetBackgroundColour("#999966")
+        self.statusbar_sizer.Add(button, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL)
+        wx.EVT_BUTTON( self, id, self.onRefresh)
+        id+=1
+
         self.div_data = [[x[0]] for x in classification.divisions]
         self.div_data += [["Other"]]
         self.div_data += [["All"]]
@@ -2328,10 +2348,12 @@ class MainApp(wx.Frame):
         self.div_data.append(["LIGNEUX"])
         self.tree["LIGNEUX"] = {}
 
-        for tl in classification.type_ligneux:
-            self.div_data.append([tl])
-            self.tree[tl] = {}
-            count[tl] = 0
+        type_ligneux_flag = hasattr(classification,"type_ligneux")
+        if type_ligneux_flag:
+            for tl in classification.type_ligneux:
+                self.div_data.append([tl])
+                self.tree[tl] = {}
+                count[tl] = 0
 
         for fam in self.table.keys():
             for gen in self.table[fam].keys():
@@ -2340,7 +2362,7 @@ class MainApp(wx.Frame):
                     if "baseflor" in struct.keys():
                         if "TL" in struct["baseflor"].keys() and struct["baseflor"]["TL"] != "":
                             tl = struct["baseflor"]["TL"]
-                            if tl not in classification.type_ligneux:
+                            if type_ligneux_flag and tl not in classification.type_ligneux:
                                 tl = "other"
 
                             for cat in ["LIGNEUX",tl]:
@@ -2354,8 +2376,9 @@ class MainApp(wx.Frame):
                                 count[cat]+=1
 
         self.div_data_s.append("{} ({})".format("LIGNEUX",count["LIGNEUX"]))
-        for tl in classification.type_ligneux:
-            self.div_data_s.append("    {} ({})".format(tl,count[tl]))
+        if type_ligneux_flag:
+            for tl in classification.type_ligneux:
+                self.div_data_s.append("    {} ({})".format(tl,count[tl]))
 
         self.notebook = aui.AuiNotebook(self) #,aui.AUI_NB_CLOSE_ON_ALL_TABS)
 
@@ -2710,7 +2733,7 @@ class MainApp(wx.Frame):
             self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
-    def onAdvancedSearch(self,even):
+    def onAdvancedSearch(self,event):
 
         name = "Advanced Search"
         PageIndex = IsNotebookPageAlreadyExist(self.notebook,name)
@@ -2723,6 +2746,12 @@ class MainApp(wx.Frame):
             self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
+    def onRefresh(self,event):
+        print("onRefresh")
+        import mkthumb
+        mkthumb.mkthumb(options,options.paths.img)
+
+    #-------------------------------------------------------------------------------
     def Update(self,struct):
         print("MainApp.Update")
         self.content[struct["NL"]] = struct
@@ -2732,6 +2761,8 @@ class MainApp(wx.Frame):
 #
 #-------------------------------------------------------------------------------
 def parse_argv(options):
+
+    options.config = ""
 
     i = 1
     while i < len(sys.argv):
@@ -2746,6 +2777,10 @@ def parse_argv(options):
 
         elif re.match("-noconfig",sys.argv[i]):
             options.noconfig = 1
+
+        elif re.match("-config",sys.argv[i]):
+            i+=1
+            options.config = sys.argv[i]
 
         elif re.match("-wxga",sys.argv[i]):
             options.wxga = 1
@@ -2778,22 +2813,41 @@ if __name__ == '__main__':
 
     parse_argv(options)
 
-    try:
+
+    # Custom config
+    if options.config != "":
+        sys.path.insert(0, os.path.split(options.config)[0])
+
+    # Default config in $HOME/.wxflore/config.py
+    elif os.path.exists(os.path.join(options.wxflore,"config.py")):
+        options.config = os.path.join(options.wxflore,"config.py")
+
+    else:
+        error()
+
+
+    # Config file exist
+    if options.config != "":
         import config
+        print("Loading config file \{}\" ...".format(options.config))
+        #sys.path.insert(0, os.path.split(options.config)[0])
+        #mod = os.path.split(options.config)[1].split(".")[0]
+        #config = importlib.import_module(mod)
         root = config.flore_root
+
         img_path = config.flore_img_path
         if hasattr(config,"meta_path"):
             options.paths.meta = config.meta_path
 
-    except ImportError:
+    # No config
+    else:
         options.noconfig = 1
         options.paths.meta = ""
-
-    if options.noconfig:
         script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding)))
         root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
         img_path = os.path.join(root,"img")
         print(root,img_path)
+
 
     if options.paths.db == "":
         db_base_dir = os.path.join(root,"db")

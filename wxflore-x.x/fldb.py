@@ -609,25 +609,28 @@ def python_table(base_flore_path,options=OPTIONS()):
     fam_list = []
     gen_list = []
 
-#    options = OPTIONS()
-
-#    options.coste_dir = os.path.join(base_flore_path[0],"flore.coste")
-#    options.db_base_dir = base_flore_path[0]
-#    filenames = [os.path.join(base_flore_path[0],"flore.main")]
-    filenames = [options.paths.db] #[os.path.join(base_flore_path[0],"flore.main")]
-
+    filenames = [options.paths.db]
 
     path = os.path.join(options.paths.db,"python")
+    print(sys.path)
+
     try:
         import bdtfx
         options.bdtfx = bdtfx
         print('Loading "bdtfx.py" ...')
     except:
+        options.bdtfx = {}
         print("## WARNING ## : Can not load 'bdtfx' ...")
 
     try:
+        import taxref
+        options.taxref = taxref
+        print('Loading "taxref.py" ...')
+    except:
+        print("## WARNING ## : Can not load 'taxref' ...")
+
+    try:
         import baseflor
-        #options.baseflor_table = baseflor.table
         options.baseflor = baseflor
         print('Loading "baseflor.py" ...')
     except:
@@ -638,11 +641,11 @@ def python_table(base_flore_path,options=OPTIONS()):
         options.chorodep = chorodep
         print('Loading "chorodep.py" ...')
     except:
+        options.chorodep = {}
         print('## WARNING ## : Can not load "chorodep.py !')
 
     try:
         import baseveg
-        #options.baseveg_table = baseveg.table
         options.baseveg = baseveg
         print('Loading "baseveg.py" ...')
     except:
@@ -719,7 +722,7 @@ def python_table(base_flore_path,options=OPTIONS()):
         #print(key,struct.keys())
         name_reduced = bota.ReduceName(struct["NL"])
         photos_path_list.append(name_reduced)
-        if struct['ID.tela'] in options.chorodep.table:
+        if struct['ID.tela'] != "" and struct['ID.tela'] in options.chorodep.table:
             chorodep_counter += 1
 
     if os.path.exists(os.path.join(options.paths.img,"photos")):
@@ -729,6 +732,7 @@ def python_table(base_flore_path,options=OPTIONS()):
 
     print("="*50)
     print("chorodep count={}".format(chorodep_counter))
+
     return struct_table
 
 #-------------------------------------------------------------------------------
@@ -1056,7 +1060,7 @@ def parse_file(filename,name,options):
                 i+=1
             #parse_struct(line,struct,options)
 
-    if "ID.tela" in struct.keys():
+    if "ID.tela" in struct.keys() and struct["ID.tela"] != "":
         if struct["ID.tela"] in options.bdtfx.table.keys():
             #print(options.bdtfx[struct["ID.tela"]])
             #print(type(struct["NL"]),type(options.bdtfx[struct["ID.tela"]]["NL"]))
@@ -1154,7 +1158,7 @@ def parse_file(filename,name,options):
         struct["chorodep"] = options.chorodep.table[struct["ID.tela"]]
         #options.debug.chorodep+=1
     except:
-        pass
+        struct["chorodep"] = {}
 
     # Catminat / RedList
     #---------------------

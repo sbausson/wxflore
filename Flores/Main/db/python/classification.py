@@ -5,7 +5,7 @@ divisions=[
 
     ["Bryophytes",["Marchantiaceae",
                    "Polytrichaceae",
-               ]],
+    ]],
 
     ["Pteridophyte",["Aspleniaceae",
                      "Azollaceae",
@@ -29,7 +29,7 @@ divisions=[
     ["Lycopods",["Isoetaceae",
                  "Lycopodiaceae",
                  "Selaginellaceae",
-                 ]],
+    ]],
 
     ["Monocots",["Acoraceae",
                  "Alismataceae",
@@ -56,7 +56,6 @@ divisions=[
                  "Poaceae",
                  "Posidoniaceae",
                  "Potamogetonaceae",
-                 #"Ruscaceae",
                  "Restionaceae",
                  "Ruppiaceae",
                  "Scheuchzeriaceae",
@@ -67,7 +66,7 @@ divisions=[
                  "Xanthorrhoeaceae",
                  "Zingiberaceae",
                  "Zosteraceae",
-             ]],
+    ]],
 
     ["Dicots",[
         # A
@@ -219,17 +218,19 @@ divisions=[
 
         #Z
         "Zygophyllaceae",
-           ]],
-
-#    ["Magnoliids",[,
-#               ]],
+    ]],
 
     ["Gymnospermes",["Cupressaceae",
                      "Ephedraceae",
                      "Pinaceae",
                      "Taxaceae",
-                     ]],
+    ]],
 ]
+
+
+title = "Flore Française"
+
+default_division = "Dicots"
 
 type_ligneux = ["sous-arbrisseau","arbuste","arbrisseau","petit arbre","arbre","grand arbre","liane","other"]
 
