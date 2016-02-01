@@ -2869,12 +2869,6 @@ if __name__ == '__main__':
         options.paths.python = os.path.join(db_base_dir,"python")
         options.paths.cat = os.path.join(db_base_dir,"cat")
         sys.path.append(options.paths.python)
-        #sys.path.append(os.path.join(options.paths.python,"prot"))
-    else:
-        options.paths.meta = ""
-
-    if options.paths.img == "":
-        options.paths.img = img_path
 
     # Create "meta/notes" if needed ...
     if options.paths.meta != "":
