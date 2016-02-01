@@ -4,11 +4,11 @@ import os
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def mkthumb(options,img_path):
+def mkthumb(options):
 
-    for directory in os.listdir(os.path.join(img_path,"photos")):
-        photo_directory = os.path.join(img_path,"photos",directory)
-        thumb_directory = os.path.join(img_path,"photos.thumb",directory)
+    for directory in os.listdir(os.path.join(options.paths.img,"photos")):
+        photo_directory = os.path.join(options.paths.img,"photos",directory)
+        thumb_directory = os.path.join(options.paths.img,"photos.thumb",directory)
         if not os.path.exists(thumb_directory):
             print("Creating {} ...".format(thumb_directory))
             os.mkdir(thumb_directory)

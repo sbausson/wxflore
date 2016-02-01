@@ -6,6 +6,10 @@ import subprocess
 
 class OPTIONS:
     local = 0
+    config = ""
+    noconfig = 0
+    class paths:
+        pass
 
 #-------------------------------------------------------------------------------
 #
@@ -33,21 +37,33 @@ if __name__ == '__main__':
     options = OPTIONS()
     parse_argv(options)
 
-    if options.local:
-        flore_img_path = os.getcwd()
+    if os.getenv("HOME") == None:
+        options.home  = os.getenv("HOMEPATH")#.decode(sys.stdout.encoding)
     else:
-        if os.getenv("HOME") == None:
-            home  = os.getenv("HOMEPATH")
-        else:
-            home = os.getenv("HOME")
+        options.home = os.getenv("HOME")#.decode(sys.stdout.encoding)
 
-        sys.path.append(os.path.join(home,".wxflore"))
+    options.wxflore = os.path.join(options.home,".wxflore")
 
-        try:
-            import config
-            flore_img_path = config.flore_img_path
-        except:
-            print("Can not load flore_img_path ...")
-            sys.exit()
+    if options.local:
+        options.img = os.getcwd()
+    else:
+        import config
+        config.read(options)
 
-    mkthumb.mkthumb(options,flore_img_path)
+
+
+#        if os.getenv("HOME") == None:
+#            home  = os.getenv("HOMEPATH")
+#        else:
+#            home = os.getenv("HOME")
+#
+#        sys.path.append(os.path.join(home,".wxflore"))
+#
+#        try:
+#            import config
+#            flore_img_path = config.flore_img_path
+#        except:
+#            print("Can not load flore_img_path ...")
+#            sys.exit()
+
+    mkthumb.mkthumb(options)
