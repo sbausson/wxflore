@@ -1610,6 +1610,9 @@ class DescriptionPanel(wx.Panel):
 
         self.obs_filename = ""
         if options.paths.meta != "":
+            if not os.path.exists(os.path.join(options.paths.meta,"obs")):
+                os.makedirs(os.path.join(options.paths.meta,"obs"))
+
             self.obs_filename = os.path.join(options.paths.meta,"obs",struct["N."]+".csv")
             print(self.obs_filename)
             if os.path.exists(self.obs_filename):
