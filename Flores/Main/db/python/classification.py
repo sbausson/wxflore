@@ -183,6 +183,7 @@ divisions=[
         "Polygonaceae",
         "Portulacaceae",
         "Primulaceae",
+        "Proteaceae",
 
         # R
         "Ranunculaceae",

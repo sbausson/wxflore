@@ -2787,6 +2787,48 @@ def parse_argv(options):
 
         i+=1
 
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+def read_config(options):
+
+
+    options.paths.meta = ""
+    options.paths.img = ""
+    options.paths.snd = ""
+    options.lang = []
+
+    # Standard config
+    if options.config == "" and os.path.exists(os.path.join(options.wxflore,"config")):
+        options.config = os.path.join(options.wxflore,"config")
+
+    if not options.noconfig and options.config != "":
+        print("Loading config file \"{}\" ...".format(options.config))
+        with open(options.config,"r") as f:
+            for line in f.readlines():
+                line = line.split("#")[0].strip()
+                if line != "":
+                    name,value= [x.strip() for x in line.split("=")]
+                    if name in ["path.root","path.img","path.snd","path.meta"]:
+                        name = name.split(".")[1]
+                        exec("options.paths.{}=value".format(name,value))
+                    elif name == "options.lang":
+                        options.lang = value.split(',')
+
+    # No config file
+    else:
+        script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding)))
+        options.paths.root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
+        options.paths.img = os.path.join(options.paths.root,"img")
+        options.paths.snd = os.path.join(options.paths.root,"snd")
+
+    print(options.paths.root)
+    print(options.paths.img)
+    print(options.paths.snd)
+    print(options.paths.meta)
+    print(options.lang)
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -2809,48 +2851,13 @@ if __name__ == '__main__':
     if not os.path.exists(options.wxflore):
         os.makedirs(options.wxflore)
 
-    sys.path.append(options.wxflore)
+    #sys.path.append(options.wxflore)
 
     parse_argv(options)
-
-
-    # Custom config
-    if options.config != "":
-        sys.path.insert(0, os.path.split(options.config)[0])
-
-    # Default config in $HOME/.wxflore/config.py
-    elif os.path.exists(os.path.join(options.wxflore,"config.py")):
-        options.config = os.path.join(options.wxflore,"config.py")
-
-    else:
-        error()
-
-
-    # Config file exist
-    if options.config != "":
-        import config
-        print("Loading config file \{}\" ...".format(options.config))
-        #sys.path.insert(0, os.path.split(options.config)[0])
-        #mod = os.path.split(options.config)[1].split(".")[0]
-        #config = importlib.import_module(mod)
-        root = config.flore_root
-
-        img_path = config.flore_img_path
-        if hasattr(config,"meta_path"):
-            options.paths.meta = config.meta_path
-
-    # No config
-    else:
-        options.noconfig = 1
-        options.paths.meta = ""
-        script_path = os.path.abspath(os.path.dirname(__file__.decode(sys.stdout.encoding)))
-        root = os.path.join(os.path.split(script_path)[0],"Flores","Main")
-        img_path = os.path.join(root,"img")
-        print(root,img_path)
-
+    read_config(options)
 
     if options.paths.db == "":
-        db_base_dir = os.path.join(root,"db")
+        db_base_dir = os.path.join(options.paths.root,"db")
 
         if options.paths.meta == "":
             options.paths.meta = os.path.join(options.wxflore,'meta')
