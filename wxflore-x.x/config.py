@@ -5,11 +5,11 @@ import os
 #-------------------------------------------------------------------------------
 def read(options):
 
-
     options.paths.meta = ""
     options.paths.img = ""
     options.paths.snd = ""
-    options.lang = []
+    options.lang.show = []
+    options.lang.hide = []
 
     # Standard config
     if options.config == "" and os.path.exists(os.path.join(options.wxflore,"config")):
@@ -25,8 +25,12 @@ def read(options):
                     if name in ["path.root","path.img","path.snd","path.meta"]:
                         name = name.split(".")[1]
                         exec("options.paths.{}=value".format(name,value))
-                    elif name == "options.lang":
-                        options.lang = value.split(',')
+
+                    elif name == "options.lang.show":
+                        options.lang.show = value.split(',')
+
+                    elif name == "options.lang.hide":
+                        options.lang.hide = value.split(',')
 
     # No config file
     else:
@@ -39,7 +43,8 @@ def read(options):
     print(options.paths.img)
     print(options.paths.snd)
     print(options.paths.meta)
-    print(options.lang)
+    print(options.lang.show)
+    print(options.lang.hide)
 
 #-------------------------------------------------------------------------------
 #

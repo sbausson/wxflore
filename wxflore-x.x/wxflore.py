@@ -828,12 +828,20 @@ class DescriptionPanel(wx.Panel):
         self.headerRTC.EndTextColour()
         self.headerRTC.EndFontSize()
 
-        if "N.UK" in struct.keys() and struct["N.UK"] != "":
+        if "N.UK" in struct.keys() and struct["N.UK"] != "" and "UK" not in options.lang.hide:
             self.headerRTC.BeginFontSize(12)
             self.headerRTC.BeginTextColour("#cc6600")
             self.headerRTC.WriteText(struct["N.UK"].replace(";",", "))
             self.headerRTC.EndTextColour()
             self.headerRTC.EndFontSize()
+
+        if "N.NL" in struct.keys() and struct["N.NL"] != "" and "NL" in options.lang.show:
+            self.headerRTC.BeginFontSize(12)
+            self.headerRTC.BeginTextColour("#6666ff")
+            self.headerRTC.WriteText(struct["N.NL"].replace(";",", "))
+            self.headerRTC.EndTextColour()
+            self.headerRTC.EndFontSize()
+
 
         self.headerRTC.EndAlignment()
         ###self.headerRTC.EndLeftIndent()
