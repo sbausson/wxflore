@@ -38,8 +38,6 @@ class OPTIONS:
     more_directories = []
     warning = 0
     paths = PATHS()
-    class lang:
-        pass
 
     class debug:
         not_updated = 0

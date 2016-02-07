@@ -5,11 +5,14 @@ import os
 #-------------------------------------------------------------------------------
 def read(options):
 
+    class lang:
+        show = []
+        hide = []
+
     options.paths.meta = ""
     options.paths.img = ""
     options.paths.snd = ""
-    options.lang.show = []
-    options.lang.hide = []
+    options.lang = lang()
 
     # Standard config
     if options.config == "" and os.path.exists(os.path.join(options.wxflore,"config")):
