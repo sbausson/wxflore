@@ -11,7 +11,7 @@ def mkthumb(options):
         thumb_directory = os.path.join(options.paths.img,"photos.thumb",directory)
         if not os.path.exists(thumb_directory):
             print("Creating {} ...".format(thumb_directory))
-            os.mkdirs(thumb_directory)
+            os.makedirs(thumb_directory)
 
         for filename in os.listdir(photo_directory):
             photo_filename = os.path.join(photo_directory,filename)
