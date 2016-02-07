@@ -47,16 +47,17 @@ def setdefault(options,subdir,filename):
 
     name_00 = "{}.00.jpg".format(subdir)
 
-    if os.path.exists(os.path.join(dir,name_00)):
-        name_tmp = "{}.tmp".format(filename)
-        os.rename(os.path.join(dir,name_00),os.path.join(dir,name_tmp))
-        os.rename(os.path.join(dir,filename),os.path.join(dir,name_00))
-        os.rename(os.path.join(dir,name_tmp),os.path.join(dir,filename))
+    if name_00 != filename:
+        if os.path.exists(os.path.join(dir,name_00)):
+            name_tmp = "{}.tmp".format(filename)
+            os.rename(os.path.join(dir,name_00),os.path.join(dir,name_tmp))
+            os.rename(os.path.join(dir,filename),os.path.join(dir,name_00))
+            os.rename(os.path.join(dir,name_tmp),os.path.join(dir,filename))
 
-        os.remove(os.path.join(thumb_dir,name_00))
-        os.remove(os.path.join(thumb_dir,filename))
-    else:
-        os.rename(os.path.join(dir,filename),os.path.join(dir,name_00))
+            os.remove(os.path.join(thumb_dir,name_00))
+            os.remove(os.path.join(thumb_dir,filename))
+        else:
+            os.rename(os.path.join(dir,filename),os.path.join(dir,name_00))
 
 #-------------------------------------------------------------------------------
 #
