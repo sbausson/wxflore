@@ -1220,6 +1220,7 @@ class DescriptionPanel(wx.Panel):
 
         menu = wx.Menu()
 
+        self.popupID_COPY = wx.NewId()
         self.popupID_COPY_NL_FA_NV_UK = wx.NewId()
         self.popupID_COPY_DIASPORA_names = wx.NewId()
         self.popupID_COPY_DIASPORA_desc = wx.NewId()
@@ -1240,6 +1241,8 @@ class DescriptionPanel(wx.Panel):
 
         self.popupID_EXPORT = wx.NewId()
 
+        menu.Append(self.popupID_COPY, "Copy (selected text)")
+        menu.AppendSeparator()
         menu.Append(self.popupID_COPY_NL_FA_NV_UK, "Copy NL (FA) + NV + N.UK")
         menu.Append(self.popupID_COPY_NL_FA_NV, "Copy NL (FA) + NV")
         menu.Append(self.popupID_COPY_NL_FA, "Copy NL (FA)")
@@ -1295,6 +1298,9 @@ class DescriptionPanel(wx.Panel):
                                      self.struct["FN.coste"],
                                      colors)
             ed.ShowModal()
+
+        elif event.GetId() == self.popupID_COPY:
+            self.headerRTC.Copy()
 
         elif event.GetId() == self.popupID_COPY_NL_FA_NV_UK:
             nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
@@ -2761,7 +2767,7 @@ class MainApp(wx.Frame):
     def onRefresh(self,event):
         print("onRefresh")
         import mkthumb
-        mkthumb.mkthumb(options,options.paths.img)
+        mkthumb.mkthumb(options)
 
     #-------------------------------------------------------------------------------
     def Update(self,struct):
