@@ -104,7 +104,7 @@ class Observations():
 class ObsPanel(wx.Panel):
 
     #-------------------------------------------------------------------------------
-    def __init__(self,parent,struct, filename, obs_button):
+    def __init__(self, parent, struct, filename, obs_button):
 
         wx.Panel.__init__(self, parent) #size=(950, 550))
 

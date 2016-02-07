@@ -7,12 +7,201 @@ import wx
 import wx.aui
 import wx.lib.agw.aui as aui
 
-
 import bota
 import wxeditor
+import observations
 from common import *
 
 
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class Panel_NOTES(wx.Panel):
+
+    def __init__(self, parent, struct, filename, button):
+
+        print("Panel_NOTES")
+        self.parent = parent
+        self.struct = struct
+        self.button = button
+        self.fn = filename
+        wx.Panel.__init__(self, parent, -1)
+        self.SetAutoLayout(1)
+
+        self.RTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.TE_MULTILINE)
+        #self.RTC = wx.TextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
+        self.RTC.SetBackgroundColour(self.parent.colors.normal[1])
+        self.RTC.SetForegroundColour(self.parent.colors.normal[0])
+        #self.RTC.SelectNone()
+        self.RTC.SetEditable(False)
+        self.RTC.Bind(wx.EVT_RIGHT_DOWN, self.RightClick)
+
+        self.RTC.BeginTextColour(parent.colors.normal[0])
+
+        self.ReadNotes()
+
+        self.RTC.GetCaret().Hide()
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
+        self.SetSizer(sizer)
+        self.Show()
+
+    #-------------------------------------------------------------------------------
+    def RightClick(self,event):
+
+        menu = wx.Menu()
+        self.popupID_EDIT = wx.NewId()
+        menu.Append(self.popupID_EDIT, "Edit this Note")
+        self.Bind(wx.EVT_MENU, self.RightClickMenu)
+        self.PopupMenu(menu)
+        menu.Destroy()
+
+    #-------------------------------------------------------------------------------
+    def RightClickMenu(self,event):
+
+        print("RightClickMenu")
+
+        if event.GetId() == self.popupID_EDIT:
+            ed = wxeditor.MainWindow(self,
+                                     u"Note : {}".format(self.struct["nl"]),
+                                     self.fn,
+                                     self.parent.colors)
+            ed.ShowModal()
+            self.ReadNotes()
+            nevent = NoteUpdateEvent()
+            wx.PostEvent(self.parent,nevent)
+
+
+    #-------------------------------------------------------------------------------
+    def ReadNotes(self):
+
+        print("ReadNotes",self.fn)
+
+        try:
+            f = codecs.open(self.fn, "r", "utf-8")
+            text = ''.join(f.readlines())
+            f.close()
+        except:
+            text = ""
+
+        self.RTC.SetValue(text)
+        print(text)
+        #self.Refresh()
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class PanelSYN(wx.Panel):
+
+    def __init__(self, parent, struct):
+        print("PanelSYN")
+        self.parent = parent
+        wx.Panel.__init__(self, parent, -1)
+        self.SetAutoLayout(1)
+
+        self.RTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER)
+        self.RTC.SetBackgroundColour(self.parent.colors.normal[1])
+        self.RTC.SetForegroundColour(self.parent.colors.normal[0])
+        self.RTC.SelectNone()
+        self.RTC.SetEditable(False)
+
+        s = ""
+        self.RTC.BeginTextColour(parent.colors.normal[0])
+
+        for syn in struct["SY"]:
+            syn = syn.replace("["," ").replace("]","")
+            s+=u"- {}\n".format(syn)
+
+        print(s)
+        self.RTC.WriteText(s)
+        self.RTC.GetCaret().Hide()
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
+        self.SetSizer(sizer)
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+def build_baseveg_string(struct,options,markdown=False):
+
+    s=''
+    if 'ID.cat' in struct['baseflor'] and struct['baseflor']['ID.cat'] != '':
+        st = options.baseveg.table[struct['baseflor']['ID.cat']]
+        if markdown:
+            fmt = u' - **{}**  :  {}\n'
+        else:
+            fmt = u' {:35s}  :  {}\n'
+
+        if markdown:
+            s+=u'**Baseveg:**\n'
+            s+=u'*Index phytosociologique synonymique de la végétation de la France Version [{}]\n'.format(options.baseveg.version)
+            s+=u'P. Julve, 1998 ff. Programme Catminat. http://perso.wanadoo.fr/philippe.julve/catminat.htm*\n\n'
+
+        s+=fmt.format(u'Syntaxon',st['SYNTAXON'].decode('utf-8'))
+        s+=fmt.format(u'Dénomination écologique',st['ECO.name'].decode('utf-8'))
+        s+=fmt.format(u'Chorologie mondiale',st['choro.world'].decode('utf-8'))
+        s+=fmt.format(u'Répartition connue en France',st['REP.fr'].decode('utf-8'))
+        s+=fmt.format(u'Physionmie',st['C.physio'].decode('utf-8'))
+        s+=fmt.format(u'Etages altitudinaux (altitude)',st['C.alti'].decode('utf-8'))
+        s+=fmt.format(u'Latitude',st['C.lat'].decode('utf-8'))
+        s+=fmt.format(u'Océanité',st['C.ocea'].decode('utf-8'))
+        s+=fmt.format(u'Température',st['C.temp'].decode('utf-8'))
+        s+=fmt.format(u'Lumière',st['C.lum'].decode('utf-8'))
+        s+=fmt.format(u'Exposition, pente',st['C.exp'].decode('utf-8'))
+        s+=fmt.format(u'Optimum de développement',st['C.opt'].decode('utf-8'))
+        s+=fmt.format(u'Humidité atmosphérique',st['C.humi.nat'].decode('utf-8'))
+        s+=fmt.format(u"Types de sol et d'humus",st['C.humus'].decode('utf-8'))
+        s+=fmt.format(u'Humidité édaphique',st['C.humi.ned'].decode('utf-8'))
+        s+=fmt.format(u'Texture du sol',st['C.tex'].decode('utf-8'))
+        s+=fmt.format(u'Niveau trophique',st['C.niv.troph'].decode('utf-8'))
+        s+=fmt.format(u'pH du sol',st['C.pH'].decode('utf-8'))
+        s+=fmt.format(u'Salinité',st['C.sal'].decode('utf-8'))
+        s+=fmt.format(u'Dynamique',st['C.dyn'].decode('utf-8'))
+        s+=fmt.format(u'Influences anthropozoogènes',st['C.infl'].decode('utf-8'))
+
+    return s
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class Panel_baseveg(wx.Panel):
+
+    def __init__(self, parent, struct, button, options):
+        print("Panel_baseveg")
+        self.parent = parent
+        self.struct = struct
+        self.button = button
+        self.options = options
+
+        wx.Panel.__init__(self, parent, -1)
+        self.SetAutoLayout(1)
+
+        self.RTC = wx.richtext.RichTextCtrl(self, style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.TE_MULTILINE)
+
+        #font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL) #MODERN
+        font = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, 'Monospace')
+
+        self.RTC.BeginFont(font)
+
+        self.RTC.SetBackgroundColour(self.parent.colors.normal[1])
+        self.RTC.SetForegroundColour(self.parent.colors.normal[0])
+        self.RTC.SetEditable(False)
+        #self.RTC.Bind(wx.EVT_RIGHT_DOWN, self.RightClick)
+
+        self.RTC.BeginTextColour(parent.colors.normal[0])
+
+        s = build_baseveg_string(struct,self.options)
+        if s!= '':
+            self.RTC.SetValue(s)
+
+
+        self.RTC.GetCaret().Hide()
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
+        self.SetSizer(sizer)
 
 #-------------------------------------------------------------------------------
 #
@@ -101,7 +290,7 @@ class Panel(wx.Panel):
         if PageIndex:
             self.notebook.SetSelection(PageIndex - 1)
         else:
-            panel = observations.ObsPanel(self,self.struct,self.obs_filename,self.button_obs)
+            panel = observations.ObsPanel(self, self.struct, self.obs_filename, self.button_obs)
             self.notebook.AddPage(panel, name, True)
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
@@ -114,7 +303,7 @@ class Panel(wx.Panel):
         if PageIndex:
             self.notebook.SetSelection(PageIndex - 1)
         else:
-            panel = Panel_NOTES(self,self.struct,self.note_fn,self.button_note)
+            panel = Panel_NOTES(self, self.struct,self.note_fn,self.button_note)
             self.notebook.AddPage(panel, name, True)
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
