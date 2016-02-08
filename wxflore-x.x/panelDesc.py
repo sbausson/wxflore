@@ -2,6 +2,7 @@
 
 import os
 import functools
+import codecs
 
 import wx
 import wx.aui
