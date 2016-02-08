@@ -9,6 +9,7 @@ import wx.aui
 import wx.lib.agw.aui as aui
 
 import bota
+import fldb
 import wxeditor
 import observations
 from common import *
