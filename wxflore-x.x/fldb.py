@@ -38,8 +38,9 @@ class OPTIONS:
     more_directories = []
     warning = 0
     paths = PATHS()
+    debug = 0
 
-    class debug:
+    class debug_infos:
         not_updated = 0
         chorodep = 0
 
@@ -1069,9 +1070,9 @@ def parse_file(filename,name,options):
             struct["NL"] = struct["NL"].replace(u"×","x")
 
             if struct["NL"] != options.bdtfx.table[struct["ID.tela"]]["NL"]:
-                options.debug.not_updated += 1
+                options.debug_infos.not_updated += 1
 
-                warning("\n## WARNING ## : ({}) {} does not seem uptodate ... {}\n{}\n{}".format(options.debug.not_updated,
+                warning("\n## WARNING ## : ({}) {} does not seem uptodate ... {}\n{}\n{}".format(options.debug_infos.not_updated,
                                                                                                  struct["ID.tela"],
                                                                                                  filename,
                                                                                                  struct["NL"].encode("utf-8"),

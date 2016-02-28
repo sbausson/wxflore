@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import functools
 import codecs
 
@@ -14,6 +15,9 @@ import wxeditor
 import observations
 from common import *
 
+format_url_tela = "http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n"
+format_url_inpn = "http://inpn.mnhn.fr/espece/cd_nom/{}\n"
+format_url_fcnb = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
 
 #-------------------------------------------------------------------------------
 #
@@ -122,6 +126,116 @@ class PanelSYN(wx.Panel):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.RTC,1, wx.ALL|wx.EXPAND, 0)
         self.SetSizer(sizer)
+
+        #-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+def build_text_to_export(struct,markdown=False):
+
+    #-------------------------------------------------------------------------------
+    def fill_string(format_string,struct,field_name,field):
+
+        s_res = ""
+
+        if field not in struct and field not in ['FCBN','COSTE']:
+            print("====",field)
+            return s_res
+
+        if field == 'NL':
+            nl1, nl2 = re.findall("(.*)\[(.*)\]",struct['NL'])[0]
+            nl1 = nl1.strip()
+            nl2 = nl2.strip()
+            if markdown:
+                s_res = u"***{}***  {}  /  **{}**\n\n".format(nl1,nl2,struct["FA"])
+            else:
+                s_res = u"{}  {}  /  {}".format(nl1,nl2,struct["FA"])
+
+        elif field in ["NV","N.UK","N.IT","N.DE","N.ES","N.NL","ZO","FL","HB","REF.wiki.fr"]:
+            s = struct[field].replace(";",",") #.encode("utf-8")
+            s_res+=format_string.format(field_name,s) #.encode("utf-8"))
+
+        elif field in ["SY","DS"]:
+            s_res+="\n**{}:**\n".format(field_name)
+            for item in struct[field]:
+                s_res+=format_string.format(item) #.encode("utf-8"))
+            s_res+='\n'
+
+        elif field in ["ID.tela","ID.inpn"]:
+            s = struct[field]
+            s_res+=format_string.format(field_name,s,s)
+
+        elif field in ["FCBN"]:
+            print "FCBN"
+            s = struct["ID.inpn"]
+            s_res+=format_string.format(field_name,s)
+
+        elif field == 'COSTE':
+            s=''
+            if "ID.coste" in struct.keys():
+                if struct["ID.coste"] != "":
+                    s +=u"N°{}".format(struct["ID.coste"])
+            if "N.coste" in struct.keys():
+                s +=u"  -  {}".format(struct["N.coste"])
+            s_res+=format_string.format(field_name,s)
+
+        else:
+            s = struct[field] #.encode("utf-8")
+            s_res+=format_string.format(field_name,s) #.encode("utf-8"))
+
+        return s_res
+
+    #-------------------------------------------------------------------------------
+    s = ""
+    if markdown:
+        format_string = u'**{}**  :  {}\n'
+        format_tela = u'**{}**  :  N°{}  http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n'
+        format_inpn = u'**{}**  :  N°{}  http://inpn.mnhn.fr/espece/cd_nom/{}\n'
+        format_fcbn = u'**{}**  :  http://siflore.fcbn.fr/?cd_ref={}&r=metro\n'
+    else:
+        format_string = u'{:25} : {}\n'
+        format_tela = u'{:25} : N°{}  http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n'
+        format_inpn = u'{:25} : N°{}  http://inpn.mnhn.fr/espece/cd_nom/{}\n'
+        format_fcbn = u'{:25} : http://siflore.fcbn.fr/?cd_ref={}&r=metro\n'
+
+    format_list = u'    - {}\n'
+
+    s+=fill_string(format_string,struct,u'Nom latin',"NL")
+    #s+=fill_string(format_string,struct,"Famille","FA")
+    s+=fill_string(format_string,struct,u'Nom(s) français(s)',"NV")
+    s+=fill_string(format_string,struct,u'English',"N.UK")
+    s+=fill_string(format_string,struct,u'Nederlands',"N.NL")
+    s+=fill_string(format_string,struct,u'Italiano',"N.IT")
+    s+=fill_string(format_string,struct,u'Español',"N.ES")
+    s+=fill_string(format_string,struct,u'Deutsch',"N.DE")
+    if not markdown:
+        s+=fill_string(format_list,struct,"Synonymes","SY")
+    s+=fill_string(format_list,struct,u'Description',"DS")
+    s+=fill_string(format_string,struct,u'Habitat',"HB")
+    s+=fill_string(format_string,struct,u'Zone Géographique',"ZO")
+    s+=fill_string(format_string,struct,u'Floraison',"FL")
+    s+=fill_string(format_string,struct,u'Ref. Coste',"COSTE")
+    s+=fill_string(format_string,struct,u'Usage',"US")
+    s+=fill_string(format_tela,struct,u'Ref. Tela',"ID.tela")
+    s+=fill_string(format_inpn,struct,u'Ref. INPN',"ID.inpn")
+    s+=fill_string(format_fcbn,struct,u'Répartition FCBN',"FCBN")
+    s+=fill_string(format_string,struct,u'Wiki.Fr',"REF.wiki.fr")
+
+    s+='\n'
+    s+='#botanique '
+    s+='#botany '
+    s+='#botanik '
+    s+='#fleur '
+    s+='#bloemen '
+    s+='#plantes '
+    s+='#plants '
+    s+='#planten '
+    s+='#nature '
+    s+='#wild '
+    s+='#{} '.format(struct['NL'].split()[0].lower())
+    s+='#{} '.format(struct['FA'].lower())
+    s+='\n'
+
+    return s
 
 #-------------------------------------------------------------------------------
 #

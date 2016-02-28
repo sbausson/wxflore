@@ -8,6 +8,8 @@ class OPTIONS:
     local = 0
     config = ""
     noconfig = 0
+    dumplicates = 0
+    remove = 0
     class paths:
         pass
 
@@ -21,6 +23,12 @@ def parse_argv(options):
 
         if sys.argv[i] == "-local":
             options.local = 1
+
+        elif sys.argv[i] == "-dup":
+            options.duplicates = 1
+
+        elif sys.argv[i] == "-remove":
+            options.remove = 1
 
         i+=1
 
@@ -50,20 +58,6 @@ if __name__ == '__main__':
         import config
         config.read(options)
 
-
-
-#        if os.getenv("HOME") == None:
-#            home  = os.getenv("HOMEPATH")
-#        else:
-#            home = os.getenv("HOME")
-#
-#        sys.path.append(os.path.join(home,".wxflore"))
-#
-#        try:
-#            import config
-#            flore_img_path = config.flore_img_path
-#        except:
-#            print("Can not load flore_img_path ...")
-#            sys.exit()
-
     mkthumb.mkthumb(options)
+    if options.duplicates:
+        mkthumb.check_all_duplicate(options)

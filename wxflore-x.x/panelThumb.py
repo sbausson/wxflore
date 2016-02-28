@@ -42,10 +42,12 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
     def RightClick(self,event):
 
         self.popupID_REFRESH = wx.NewId()
+        self.popupID_DUPLICATE = wx.NewId()
         self.popupID_DOWNLOAD = wx.NewId()
 
         menu = wx.Menu()
         menu.Append(self.popupID_REFRESH, "Remame and Refresh thumb gallery")
+        menu.Append(self.popupID_DUPLICATE, "Check Duplicate pictures")
         menu.Append(self.popupID_DOWNLOAD, "Download")
         menu.AppendSeparator()
 
@@ -63,6 +65,28 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
             mkthumb.number(self.options,self.name_reduced)
             mkthumb.mkthumb(self.options,self.name_reduced)
             self.Update()
+
+        elif event.GetId() == self.popupID_DUPLICATE:
+            print("CHECK_DUPLICATE")
+            duplicates = mkthumb.check_duplicate(self.options,self.name_reduced)
+
+            if duplicates != []:
+
+                msg = "Remove this duplicates pictures ?\n\n" + "\n".join(duplicates)
+                dlg = wx.MessageDialog(None, msg, "Duplicated Photos",wx.YES_NO | wx.ICON_QUESTION)
+                retCode = dlg.ShowModal()
+
+                if (retCode == wx.ID_YES):
+                    #print("Remove {}".format(filename))
+                    for photo in duplicates:
+                        print("Removing {} ...".format(photo))
+                        os.remove(photo)
+
+                    mkthumb.mkthumb(self.options,self.name_reduced)
+                    self.Update()
+
+            else:
+                pass
 
         elif event.GetId() == self.popupID_DOWNLOAD:
 
@@ -191,7 +215,7 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 
 
         elif event.GetId() == self.popupID_RENAME:
-            print("RENAME")
+            print("RENAME",filename)
 
             path,name = os.path.split(filename)
             dlg = wx.FileDialog(self, message="Rename as  ...",
@@ -201,6 +225,7 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
             if dlg.ShowModal() == wx.ID_OK:
                 newfilename = dlg.GetPath()
                 os.rename(filename,newfilename)
+                update = 1
 
             dlg.Destroy()
 
