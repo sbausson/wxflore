@@ -308,7 +308,11 @@ class Panel_baseveg(wx.Panel):
 
         self.RTC.BeginTextColour(parent.colors.normal[0])
 
-        s = build_baseveg_string(struct,self.options)
+        try:
+            s = build_baseveg_string(struct,self.options)
+        except:
+            s = "Catminat ID not found ..."
+
         if s!= '':
             self.RTC.SetValue(s)
 
@@ -930,9 +934,13 @@ class Panel(wx.Panel):
 
         self.popupID_COPY = wx.NewId()
         self.popupID_COPY_NL_FA_NV_UK = wx.NewId()
+
         self.popupID_COPY_DIASPORA_names = wx.NewId()
         self.popupID_COPY_DIASPORA_desc = wx.NewId()
         self.popupID_COPY_DIASPORA_baseveg = wx.NewId()
+
+        self.popupID_COPY_FORUM_names = wx.NewId()
+
         self.popupID_COPY_NL_FA_NV = wx.NewId()
         self.popupID_COPY_NL_FA = wx.NewId()
         self.popupID_COPY_ID_TELA = wx.NewId()
@@ -958,6 +966,8 @@ class Panel(wx.Panel):
         menu.Append(self.popupID_COPY_DIASPORA_names, 'Diaspora* : copy NL + (FA) + Names')
         menu.Append(self.popupID_COPY_DIASPORA_desc, 'Diaspora* : copy Description')
         menu.Append(self.popupID_COPY_DIASPORA_baseveg, 'Diaspora* : copy BaseVeg')
+        menu.AppendSeparator()
+        menu.Append(self.popupID_COPY_FORUM_names, 'Forum : copy NL + (FA) + Names')
         menu.AppendSeparator()
         menu.Append(self.popupID_COPY_ID_TELA, "Copy ID TELA")
         menu.Append(self.popupID_COPY_ID_INPN, "Copy ID INPN")
@@ -1084,6 +1094,43 @@ class Panel(wx.Panel):
         elif event.GetId() == self.popupID_COPY_DIASPORA_baseveg:
             s = build_baseveg_string(self.struct,self.options,True)
             print(s)
+
+        elif event.GetId() == self.popupID_COPY_FORUM_names:
+            #nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
+            nl1, nl2 = re.findall("(.*)\[(.*)\]",self.struct['NL'])[0]
+            nl1 = nl1.strip()
+            nl2 = nl2.strip()
+
+            s = u"[b][i]{}[/b][/i]  {}  /  [b]{}[/b]".format(nl1,nl2,self.struct["FA"])
+            try:
+                s+=u"\n[b]Nom(s) français:[/b] {}".format(self.struct["NV"].replace(";",",")) #.encode("utf-8"))
+            except:
+                pass
+
+            try:
+                s+=u"\n[b]English:[/b] {}".format(self.struct["N.UK"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\n[b]Nederlands:[/b] {}".format(self.struct["N.NL"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\n[b]Deutsch:[/b] {}".format(self.struct["N.DE"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\n[b]Italiano:[/b] {}".format(self.struct["N.IT"].replace(";",","))
+            except:
+                pass
+
+            try:
+                s+=u"\n[b]Español:[/b] {}".format(self.struct["N.ES"].replace(";",","))
+            except:
+                pass
 
         elif event.GetId() == self.popupID_COPY_NL_FA_NV:
             nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")

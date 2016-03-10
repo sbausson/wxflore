@@ -86,9 +86,10 @@ def warning(s,color,options):
         "white":98,
     }
 
-    print("\033[{}m{}\033[{}m".format(color_t[color],s,0))
+    print(u"\033[{}m{}\033[{}m".format(color_t[color],s,0))
 
-    with open(options.log_filename,"a") as f:
+    with codecs.open(options.log_filename,'a','utf-8') as f:
+    #with open(options.log_filename,"a") as f:
         f.write(s+"\n")
 
 #-------------------------------------------------------------------------------
@@ -726,6 +727,18 @@ def python_table(base_flore_path,options=OPTIONS()):
         if struct['ID.tela'] != "" and struct['ID.tela'] in options.chorodep.table:
             chorodep_counter += 1
 
+    # Check Catminat ID exists
+    #--------------------------
+    for key in struct_table.keys():
+        if "baseflor" in struct_table[key].keys():
+            if "ID.cat" in struct_table[key]["baseflor"]:
+                id_cat =  struct_table[key]["baseflor"]["ID.cat"]
+                if not id_cat in options.baseveg.table:
+                    warning(u"## WARNING ## Catminat ID '{}' not found for '{}' ...".format(id_cat,
+                                                                                            struct_table[key]["NL"]),"blue",options)
+
+    # Check orphan photos
+    #---------------------
     if os.path.exists(os.path.join(options.paths.img,"photos")):
         for filename in  os.listdir(os.path.join(options.paths.img,"photos")):
             if filename not in photos_path_list:
