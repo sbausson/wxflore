@@ -855,11 +855,9 @@ class Panel(wx.Panel):
                     print(" ======== if tagflag / ID.tela .{}.".format(seealso))
 
 
-
         # COSTE Illustration
         #--------------------
         coste_ill = os.path.join(self.options.paths.img,u"illustrations",u"Coste",u"{}.png".format(struct["ID.coste"]))
-        #print("COSTE",coste_ill)
         if os.path.exists(coste_ill):
             print(coste_ill)
             locale = wx.Locale(wx.LANGUAGE_DEFAULT)
@@ -868,10 +866,11 @@ class Panel(wx.Panel):
             image = image.Scale(self.apps.size["THUMB.XMAX"],
                                 self.apps.size["THUMB.YMAX"], wx.IMAGE_QUALITY_HIGH)
             imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
+
             imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
             self.headerSizer.Add(imageBitmap,0,wx.ALL)
 
-        elif 1:
+        else:
             name_reduced = bota.ReduceName(struct["NL"])
             thumb_dir = os.path.join(self.options.paths.img,"photos",name_reduced)
             thumb_file = os.path.join(thumb_dir,name_reduced+'.00.jpg')
@@ -891,8 +890,20 @@ class Panel(wx.Panel):
                 imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
                 imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
                 self.headerSizer.Add(imageBitmap,0,wx.ALL)
-        else:
-            self.headerSizer.Add((240,-1))
+            else:
+                self.headerSizer.Add((240,-1))
+
+        choro_map = os.path.join(self.options.paths.img,u"choro.map",u"{}.png".format(struct["ID.tela"]))
+        if 0 and os.path.exists(choro_map):
+            print(choro_map)
+            #locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+            image = wx.Image(choro_map, wx.BITMAP_TYPE_ANY)
+            #image = image.Scale(self.apps.size["THUMB.XMAX"],
+            #                    self.apps.size["THUMB.YMAX"], wx.IMAGE_QUALITY_HIGH)
+            imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
+            #imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
+            #self.headerSizer.Add(imageBitmap,1,wx.EXPAND)
+            self.headerSizer.Add(imageBitmap,0,wx.ALL)
 
 
         #self.headerSizer.Layout()
@@ -914,6 +925,22 @@ class Panel(wx.Panel):
             self.headerSizer1.Add(self.scrolledProtPanel,0,wx.ALIGN_LEFT|wx.EXPAND)
 
         self.headerSizer.Add(self.headerSizer1,1,wx.ALIGN_LEFT|wx.EXPAND)
+        #self.headerSizer.Add(self.headerSizer1,0,wx.ALL)
+
+
+        # Choro Map
+        #-----------
+        choro_map = os.path.join(self.options.paths.img,u"choro.map",u"{}.png".format(struct["ID.tela"]))
+        if os.path.exists(choro_map):
+            print(choro_map)
+            #locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+            image = wx.Image(choro_map, wx.BITMAP_TYPE_ANY)
+            #image = image.Scale(self.apps.size["THUMB.XMAX"],self.apps.size["THUMB.YMAX"], wx.IMAGE_QUALITY_HIGH)
+            imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
+            #imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
+            #self.headerSizer.Add(imageBitmap,1,wx.EXPAND)
+            self.headerSizer.Add(imageBitmap,0,wx.RIGHT,5)
+
 
         self.headerSizer.Layout()
 
