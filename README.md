@@ -18,10 +18,17 @@ git clone https://github.com/sbausson/wxflore.git
 ## Usage
 wxflore-x.x/wxflore.py
 
-Configuration file : $HOME/.wxflore/config.py
+Configuration file : $HOME/.wxflore/config
 ```
-flore_root = "/home/git/wxflore/Flores/Main"
-flore_img_path = "/Bota/Flores/Main/img"
+path.root = ...//Flores/Main
+path.img =  .../Flores/Main/img
+path.meta = .../wxflore-meta/Main
+
+(complete ... by absolute PATH)
+
+
+#options.lang.show = FR
+#options.lang.hide = UK
 ```
 
 ## Author(s)
