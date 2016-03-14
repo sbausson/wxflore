@@ -57,7 +57,10 @@ class Panel(wx.Panel):
         self.panel2 = wxgrid.Vpanel(self.grids_splitter, self, 2, self.gen_data, self.gen_data_s, self.pos.gen)
         self.panel3 = wxgrid.Vpanel(self.grids_splitter, self, 3, self.spe_data, self.spe_data, self.pos.spe)
         # iiiiiiii self.descPanel = DescriptionPanel(self.grids_splitter, self.apps, self.options, self.colors)
-        self.descPanel = panelDesc.Panel(self, self.apps, self.options, self.colors)
+        #self.descPanel = panelDesc.Panel(self, self.apps, self.options, self.colors)
+
+        # Important keep self.grids_splitter for Windows behave correctly
+        self.descPanel = panelDesc.Panel(self.grids_splitter, self, self.apps, self.options, self.colors)
 
 
         ##self.tb_desc.AppendText("{}\n".format(self.table[self.fam_data[self.pos.fam][0]][self.gen_data[self.pos.gen][0]]))

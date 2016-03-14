@@ -235,7 +235,10 @@ class FilteredPanel(wx.Panel):
 #        self.grid.Bind(wx.EVT_KILL_FOCUS, self.onKillFocus)
 
         # iiiiiiiii self.descPanel = DescriptionPanel(self.grids_splitter, self.apps, self.options, colors)
-        self.descPanel = panelDesc.Panel(self, self.apps, self.options, colors)
+        #self.descPanel = panelDesc.Panel(self, self.apps, self.options, colors)
+
+        # Important keep self.grids_splitter for Windows behave correctly
+        self.descPanel = panelDesc.Panel(self.grids_splitter, self, self.apps, self.options, colors)
 
         self.grids_splitter.AppendWindow(self.grid,500)
         self.grids_splitter.AppendWindow(self.descPanel,500)

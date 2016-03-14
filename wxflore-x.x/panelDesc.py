@@ -329,14 +329,15 @@ class Panel_baseveg(wx.Panel):
 class Panel(wx.Panel):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def __init__(self, parent, apps, options, colors):
+    def __init__(self, parent_win, parent_pan, apps, options, colors):
 
         self.options = options
         self.colors = colors
-        self.parent = parent
+        self.parent_win = parent_win
+        self.parent_pan = parent_pan
         self.apps = apps
 
-        wx.Panel.__init__(self,parent,size=(-1,-1))
+        wx.Panel.__init__(self,parent_win,size=(-1,-1))
         self.SetBackgroundColour(self.colors.normal[1])
 
         self.descSizer = wx.BoxSizer(wx.VERTICAL)
@@ -952,7 +953,7 @@ class Panel(wx.Panel):
     def onPhotoClick(self,coste_ill,evt):
         print "onPhotoClick",coste_ill
         import wxpict
-        viewer = wxpict.ViewerFrame(self.parent,[coste_ill],0)
+        viewer = wxpict.ViewerFrame(self.parent_win,[coste_ill],0)
 
     #-------------------------------------------------------------------------------
     def RightClick(self,event):
@@ -1036,7 +1037,7 @@ class Panel(wx.Panel):
 
             struct = fldb.parse_file(self.struct["FN"],self.struct["N."],self.options)
 
-            self.parent.Refresh(struct)
+            self.parent_pan.Refresh(struct)
             #self.appq.Update(struct)
             # iiiiiiiii
 
