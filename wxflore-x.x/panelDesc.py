@@ -13,6 +13,8 @@ import bota
 import fldb
 import wxeditor
 import observations
+import panelFiltered
+
 from common import *
 
 format_url_tela = "http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n"
@@ -374,7 +376,7 @@ class Panel(wx.Panel):
                 pass
             else:
                 name = cat_id
-                new_panel = FilteredPanel(self.apps,sorted_list)
+                new_panel = panelFiltered.Panel(self.apps,sorted_list)
                 self.apps.notebook.AddPage( new_panel, name, True )
                 PageIndex = self.apps.notebook.GetSelection()
                 self.apps.notebook.SetPageTextColour(PageIndex,'#669900')
