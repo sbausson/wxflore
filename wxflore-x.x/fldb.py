@@ -326,10 +326,8 @@ def display_struct(struct,compressed,i,options):
 
                 s+="\n"
 
-                try:
+                if "ID.tela" in struct and struct["ID.tela"] != "":
                     s+="%-25s : N°%s  http://www.tela-botanica.org/bdtfx-nn-%s-synthese\n" % ("Ref. Tela",struct["ID.tela"],struct["ID.tela"])
-                except:
-                    pass
 
                 try:
                     s+="%-25s : N°%s  http://inpn.mnhn.fr/espece/cd_nom/%s\n" % ("Ref. INPN",struct["ID.inpn"],struct["ID.inpn"])

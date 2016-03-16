@@ -1370,7 +1370,7 @@ class Panel(wx.Panel):
             self.descRTC.WriteText("http://inpn.mnhn.fr/espece/cd_nom/{}\n".format(struct["ID.inpn"]))
             self.descRTC.EndFontSize()
 
-        if "ID.tela" in struct.keys():
+        if "ID.tela" in struct and struct["ID.tela"] != "":
             self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Tela:")
