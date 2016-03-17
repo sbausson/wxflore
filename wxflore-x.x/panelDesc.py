@@ -4,6 +4,7 @@ import os
 import re
 import functools
 import codecs
+import webbrowser
 
 import wx
 import wx.aui
@@ -356,6 +357,21 @@ class Panel(wx.Panel):
             self.notebook.AddPage(panel, name, True)
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
+
+    #-------------------------------------------------------------------------------
+    def Button_INPN(self,event):
+        print("Button_INPN")
+        webbrowser.open(format_url_inpn.format(self.struct["ID.inpn"]))
+
+    #-------------------------------------------------------------------------------
+    def Button_TELA(self,event):
+        print("Button_TELA")
+        webbrowser.open(format_url_tela.format(self.struct["ID.tela"]))
+
+    #-------------------------------------------------------------------------------
+    def Button_FCNB(self,event):
+        print("Button_FCNB")
+        webbrowser.open(format_url_fcnb.format(self.struct["ID.inpn"]))
 
     #-------------------------------------------------------------------------------
     def Button_BASEVEG(self,event):
@@ -1463,6 +1479,57 @@ class Panel(wx.Panel):
             wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
             id+=1
 
+        # INPN Button
+        #-------------
+        if "ID.inpn" in self.struct:
+            self.tagsSizer.Add((5,-1))
+            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
+            self.button_inpn = wx.Button(self.descTB, id,
+                                         u" INPN ",
+                                         wx.DefaultPosition, (-1,-1))
+            self.button_inpn.SetForegroundColour("#000000")
+            #self.button_note.SetForegroundColour(self.colors.button.note[0])
+            #button.SetBackgroundColour("#6699ff")
+            self.button_inpn.SetBackgroundColour("#bfff80")
+            self.descTB_sizer.Add(self.button_inpn,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
+
+            wx.EVT_BUTTON( self, id, self.Button_INPN)
+            id+=1
+
+        # TELA Button
+        #-------------
+        if "ID.tela" in self.struct and self.struct["ID.tela"] != "":
+            self.tagsSizer.Add((5,-1))
+            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
+            self.button_tela = wx.Button(self.descTB, id,
+                                         u" Tela ",
+                                         wx.DefaultPosition, (-1,-1))
+            self.button_tela.SetForegroundColour("#000000")
+            #self.button_note.SetForegroundColour(self.colors.button.note[0])
+            #button.SetBackgroundColour("#6699ff")
+            self.button_tela.SetBackgroundColour("#85e085") #"#668cff")
+            self.descTB_sizer.Add(self.button_tela,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
+
+            wx.EVT_BUTTON( self, id, self.Button_TELA)
+            id+=1
+
+        # FCNB Button
+        #-------------
+        if "ID.inpn" in self.struct:
+            self.tagsSizer.Add((5,-1))
+            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
+            self.button_fcnb = wx.Button(self.descTB, id,
+                                         u" FCNB ",
+                                         wx.DefaultPosition, (-1,-1))
+            self.button_fcnb.SetForegroundColour("#000000")
+            #self.button_note.SetForegroundColour(self.colors.button.note[0])
+            #button.SetBackgroundColour("#6699ff")
+            self.button_fcnb.SetBackgroundColour("#99ddff") ##85e085") #"#668cff")#99ddff
+            self.descTB_sizer.Add(self.button_fcnb,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
+
+            wx.EVT_BUTTON( self, id, self.Button_FCNB)
+            id+=1
+
 
         self.descTB.SetSizer(self.descTB_sizer)
         self.descTB.Layout()
@@ -1477,6 +1544,12 @@ class Panel(wx.Panel):
         #self.notebook.SetAGWFlags(self.aui_mgr.GetAGWFlags()|wx.aui.AUI_MGR_ALLOW_ACTIVE_PANE )
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.onNotebookClose)
 
+        #self.descRTCsizer = wx.BoxSizer(wx.VERTICAL)
+        #self.descRTCsizer.Add(self.descRTC)
+        #
+        #button = wx.Button(self, 109, u"TOTO", wx.DefaultPosition, (-1,-1))
+        #self.descRTCsizer.Add(button,0,wx.ALL)
+
         self.notebook.AddPage(self.descRTC, "Description (COSTE)", True)
         PageIndex = self.notebook.GetSelection()
         self.notebook.SetPageTextColour(PageIndex,'#669900')
@@ -1488,6 +1561,9 @@ class Panel(wx.Panel):
         self.descSizer.Add(self.headerSizer,0,wx.ALIGN_LEFT|wx.EXPAND)
         self.descSizer.Add(self.descTB,0,wx.ALIGN_LEFT)
         self.descSizer.Add(self.notebook,1,wx.ALIGN_LEFT|wx.EXPAND)
+
+        #button = wx.Button(self, 109, u"TOTO", wx.DefaultPosition, (-1,-1))
+        #self.descSizer.Add(button,0,wx.ALL)
 
         self.SetSizer(self.descSizer)
         self.Layout()

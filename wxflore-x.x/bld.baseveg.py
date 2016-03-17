@@ -108,7 +108,8 @@ def build_python_module():
                     s+='{'
 
                     for item in conv_table:
-                        s+='"{}": "{}",'.format(item[1],row[indexes.index(item[0])].replace('\n',' '))
+
+                        s+='"{}": "{}",'.format(item[1],row[indexes.index(item[0])].replace('\n',' ').replace('"',"'"))
                     f.write(s)
 
                     s_=[]
@@ -117,7 +118,7 @@ def build_python_module():
                         if dep_match:
                             ndep = dep_match.group(1)
                             x = row[i].strip()
-                            if x in ["1"]: #,"1?"]:
+                            if x in ["1"]:
                                 s_.append(ndep)
                             elif x not in ["1?","-|-","-|-?","#","#?","?","<",""]:
                                 print(i)
@@ -126,6 +127,14 @@ def build_python_module():
                                 error()
                     f.write('"1": {}'.format(sorted(s_)))
                     f.write('},\n')
+
+                elif re.match("[0-9]{2}/$",id_cat):
+                    #print(row[indexes.index("SYNTAXON")])
+                    name = row[indexes.index("SYNTAXON")].split("(")[0].strip()
+                    s='"{}":{{"ECO.name":"{}"}}'.format(id_cat,name)
+                    f.write(s+",\n")
+                    #print(s)
+
             i+=1
 
 
