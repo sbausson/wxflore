@@ -34,6 +34,20 @@ path.meta = .../wxflore-meta/Main
 ## Author(s)
 Stéphane Bausson (sbausson [at] gmail.com)
 
+## Mailling-list
+
+  General Updates: wxflore (Low traffic)
+
+      Subscribe : mailto:wxflore-request@ml.free.fr?subject=subscribe
+      Subscribe : mailto:wxflore-request@ml.free.fr?subject=unsubscribe
+      Message on the list : wxflore@ml.free.fr
+
+  Active development and evolution of the tool (More traffic): wxflore.dev
+
+      Subscribe : mailto:wxflore.dev-request@ml.free.fr?subject=subscribe
+      Subscribe : mailto:wxflore.dev-request@ml.free.fr?subject=unsubscribe
+      Message on the list : wxflore.dev@ml.free.fr
+
 ## Screenshots
 
 ![ScreenShot](https://cloud.githubusercontent.com/assets/9042285/11195374/ef260e5c-8cb1-11e5-89e6-9337b1263fa6.png)
