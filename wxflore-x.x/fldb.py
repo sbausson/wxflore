@@ -600,7 +600,7 @@ def nyd(filename,struct_table,options):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def python_table(base_flore_path,options=OPTIONS()):
+def python_table( base_flore_path, log, options=OPTIONS()):
 
     res_table = {}
     res_table_content = {}
@@ -617,39 +617,39 @@ def python_table(base_flore_path,options=OPTIONS()):
     try:
         import bdtfx
         options.bdtfx = bdtfx
-        print('Loading "bdtfx.py" ...')
+        log.write('Loading "bdtfx.py" ...\n')
     except:
         options.bdtfx = {}
-        print("## WARNING ## : Can not load 'bdtfx' ...")
+        log.write("## WARNING ## : Can not load 'bdtfx' ...\n")
 
     try:
         import taxref
         options.taxref = taxref
-        print('Loading "taxref.py" ...')
+        log.write('Loading "taxref.py" ...\n')
     except:
-        print("## WARNING ## : Can not load 'taxref' ...")
+        log.write("## WARNING ## : Can not load 'taxref' ...\n")
 
     try:
         import baseflor
         options.baseflor = baseflor
-        print('Loading "baseflor.py" ...')
+        log.write('Loading "baseflor.py" ...\n')
     except:
-        print('## WARNING ## : Can not load "baseflor.py" !')
+        log.write('## WARNING ## : Can not load "baseflor.py" !\n')
 
     try:
         import chorodep
         options.chorodep = chorodep
-        print('Loading "chorodep.py" ...')
+        log.write('Loading "chorodep.py" ...\n')
     except:
         options.chorodep = {}
-        print('## WARNING ## : Can not load "chorodep.py !')
+        log.write('## WARNING ## : Can not load "chorodep.py !\n')
 
     try:
         import baseveg
         options.baseveg = baseveg
-        print('Loading "baseveg.py" ...')
+        log.write('Loading "baseveg.py" ...\n')
     except:
-        print('## WARNING ## : Can not load "baseveg.py !')
+        log.write('## WARNING ## : Can not load "baseveg.py !\n')
 
 
     # Import RED LIST
@@ -657,9 +657,9 @@ def python_table(base_flore_path,options=OPTIONS()):
     try:
         import redlist
         options.redlist_table = redlist.table
-        print('Loading "redlist.py" ...')
+        log.write('Loading "redlist.py" ...\n')
     except:
-        print('## WARNING ## : Can not load "redlist.py !')
+        log.write('## WARNING ## : Can not load "redlist.py !\n')
 
 
     options.prot = {}
@@ -670,7 +670,7 @@ def python_table(base_flore_path,options=OPTIONS()):
         dir_prot = os.path.join(options.paths.python,"prot",prot_type)
         sys.path.append(dir_prot)
         if os.path.exists(dir_prot):
-            print("Loading prot/reg ",end="")
+            log.write("Loading prot/reg ")
             for region in [fn.split(".")[0] for fn in os.listdir(dir_prot) if re.match(".*\.py$",fn)]:
                 try:
                     #print(region)
@@ -679,12 +679,12 @@ def python_table(base_flore_path,options=OPTIONS()):
                     mod = importlib.import_module(region)
                     #options.prot[mod.name] = mod.liste
                     options.prot[prot_type][region] = mod.liste
-                    print("'{}'".format(region),end=" ")
+                    log.write("'{}'".format(region))
 
                 except IOError:
                     print("error")
                     pass
-            print()
+            log.write("\n")
 
 
     # Read 'Cat' files ...
@@ -694,7 +694,7 @@ def python_table(base_flore_path,options=OPTIONS()):
         for fn in os.listdir(options.paths.cat):
             cat, ext = fn.split(".")
             if ext == "cat":
-                print("Loading category \"{}\" ...".format(fn))
+                log.write("Loading category \"{}\" ...".format(fn))
                 cat  = cat.decode("utf8")
                 options.cat[cat] = []
                 f = open(os.path.join(options.paths.cat,fn),"r")
@@ -702,7 +702,6 @@ def python_table(base_flore_path,options=OPTIONS()):
                     id = l.strip()
                     if id != "":
                         options.cat[cat].append(id)
-    #print(options.cat)
 
     # Read Taxon files
     #------------------
@@ -712,7 +711,7 @@ def python_table(base_flore_path,options=OPTIONS()):
             for name in files:
                 if re.match("[A-Z][a-z]+\.[a-z_]+(\-)?[a-z_]*$",name):
                     filename = os.path.join(root, name)
-                    struct_table[filename] = parse_file(filename,name,options)
+                    struct_table[filename] = parse_file(filename,name,log,options)
 
 
     chorodep_counter=0
@@ -732,7 +731,7 @@ def python_table(base_flore_path,options=OPTIONS()):
             if "ID.cat" in struct_table[key]["baseflor"]:
                 id_cat =  struct_table[key]["baseflor"]["ID.cat"]
                 if not id_cat in options.baseveg.table:
-                    warning(u"## WARNING ## Catminat ID '{}' not found for '{}' ...".format(id_cat,
+                    log.warning(u"## WARNING ## Catminat ID '{}' not found for '{}' ...".format(id_cat,
                                                                                             struct_table[key]["NL"]),"blue",options)
 
     # Check orphan photos
@@ -740,7 +739,7 @@ def python_table(base_flore_path,options=OPTIONS()):
     if os.path.exists(os.path.join(options.paths.img,"photos")):
         for filename in  os.listdir(os.path.join(options.paths.img,"photos")):
             if filename not in photos_path_list:
-                warning("## WARNING ## {} photo not linked to any taxon ...".format(filename),"magenta",options)
+                log.warning("## WARNING ## {} photo not linked to any taxon ...".format(filename),"magenta",options)
 
     print("="*50)
     print("chorodep count={}".format(chorodep_counter))
@@ -987,7 +986,7 @@ def update_file(filename,nl):
 #
 #-------------------------------------------------------------------------------
 #def parse_file(root,name,struct,options):
-def parse_file(filename,name,options):
+def parse_file(filename,name,log,options):
 
     #filename = os.path.join(root, name)
 
@@ -1096,9 +1095,9 @@ def parse_file(filename,name,options):
                         update_file(filename,struct["NL"])
 
             elif struct["FA"] != options.bdtfx.table[struct["ID.tela"]]["fam"]:
-                warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx.table[struct["ID.tela"]]["fam"]),
-                        "cyan",
-                        options)
+                log.warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx.table[struct["ID.tela"]]["fam"]),
+                            "cyan",
+                            options)
 
             #struct["NL"] = unicode(options.bdtfx[struct["ID.tela"]]["NL"])
             #print(struct["NL"],filename) #options.bdtfx[struct["ID.tela"]])

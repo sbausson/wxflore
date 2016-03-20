@@ -10,11 +10,14 @@ import codecs
 import wx.lib.newevent
 import importlib
 
+from threading import Thread
+
 # AUI
 import wx.lib.agw.aui as aui
 import wx.aui
 from wx.lib.splitter import MultiSplitterWindow
 import wx.richtext
+import wx.stc
 
 import wxgrid
 import fldb
@@ -237,13 +240,46 @@ class MyDialog ( wx.Dialog ):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-class MainApp(wx.Frame):
+class Log(wx.Panel):
 
-    def build_tables(self,base_flore_path):
+    def __init__(self, parent):
+
+        wx.Panel.__init__(self,parent)
+
+        self.text = wx.stc.StyledTextCtrl(self)
+        self.text.SetBackgroundColour(parent.colors.normal[1])
+        self.text.SetForegroundColour(parent.colors.normal[0])
+
+    def write(self,s):
+        self.text.AddText(s)
+
+    def warning(self,s,color,options):
+        self.text.AddText(s)
+
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class fldbThread(Thread):
+
+    #-------------------------------------------------------------------------------
+    def __init__(self, wxObject, log, options):
+
+        Thread.__init__(self)
+        self.log = log
+        self.options = options
+        self.wxObject = wxObject
+        self.start()
+
+    #-------------------------------------------------------------------------------
+    def run(self):
+        self.build_tables()
+
+    #-------------------------------------------------------------------------------
+    def build_tables(self):
 
         #print("base_flore_path",base_flore_path)
 
-        struct_table  = fldb.python_table(base_flore_path,self.options)
+        struct_table  = fldb.python_table(self.options.paths.db,self.log,self.options)
 
         res_table = {}
         res_table_content = {}
@@ -310,8 +346,13 @@ class MainApp(wx.Frame):
         self.table = res_table
         self.content = res_table_content
 
-    def __init__(self, options):
+#-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+class MainApp(wx.Frame):
 
+    #-------------------------------------------------------------------------------
+    def __init__(self, options):
 
         import classification
 
@@ -404,9 +445,6 @@ class MainApp(wx.Frame):
         self.marker_table = [[] for i in range(0,self.n_s_buttons)]
         self.selection_panels = [None]*self.n_s_buttons
 
-        self.LoadMarkers()
-        self.build_tables(options.paths.db)
-
         # Application Menu
         #------------------
         menubar = wx.MenuBar()
@@ -432,6 +470,15 @@ class MainApp(wx.Frame):
         menubar.Append(helpMenu, '&Help')
 
         self.SetMenuBar(menubar)
+
+        self.log = Log(self)
+        self.LoadMarkers()
+
+        self.Show()
+        fldbThread(self,self.log,self.options)
+
+         #self.build_tables(options.paths.db, self.log)
+        return
 
         # Toolbar
         #---------
@@ -677,11 +724,6 @@ class MainApp(wx.Frame):
         print(self.marker_table)
 
     #-------------------------------------------------------------------------------
-#    def OnMouse_LeftClick():
-#        print("="*50)
-#        print("MainApp.OnMouse_LeftClick")
-
-    #-------------------------------------------------------------------------------
     def SaveMarkers(self):
         fn = os.path.join(options.wxflore,u"markers-{}".format(self.options.suffix))
         print(u"Writting \"{}\" ...".format(fn))
@@ -698,7 +740,7 @@ class MainApp(wx.Frame):
     #-------------------------------------------------------------------------------
     def onQuit(self,evt):
 
-        self.SaveMarkers()
+        # toberemoved self.SaveMarkers()
         self.Destroy()
         sys.exit()
 
