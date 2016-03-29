@@ -710,7 +710,8 @@ def python_table(base_flore_path,options=OPTIONS()):
         print(filename)
         for root, dirs, files in os.walk(filename, topdown=False):
             for name in files:
-                if re.match("[A-Z][a-z]+\.[a-z_]+(\-)?[a-z_]*$",name):
+
+                if re.match('[A-Z]',os.path.split(root)[-1][0]) and re.match("[A-Z][a-z]+\.[a-z_]+(\-)?[a-z_]*$",name):
                     filename = os.path.join(root, name)
                     struct_table[filename] = parse_file(filename,name,options)
 

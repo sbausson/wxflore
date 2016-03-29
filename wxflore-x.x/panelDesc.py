@@ -20,7 +20,7 @@ from common import *
 
 format_url_tela = "http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n"
 format_url_inpn = "http://inpn.mnhn.fr/espece/cd_nom/{}\n"
-format_url_fcnb = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
+format_url_fcbn = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
 
 #-------------------------------------------------------------------------------
 #
@@ -369,9 +369,9 @@ class Panel(wx.Panel):
         webbrowser.open(format_url_tela.format(self.struct["ID.tela"]))
 
     #-------------------------------------------------------------------------------
-    def Button_FCNB(self,event):
-        print("Button_FCNB")
-        webbrowser.open(format_url_fcnb.format(self.struct["ID.inpn"]))
+    def Button_FCBN(self,event):
+        print("Button_FCBN")
+        webbrowser.open(format_url_fcbn.format(self.struct["ID.inpn"]))
 
     #-------------------------------------------------------------------------------
     def Button_BASEVEG(self,event):
@@ -996,7 +996,11 @@ class Panel(wx.Panel):
 
         self.popupID_COPY_URL_TELA = wx.NewId()
         self.popupID_COPY_URL_INPN = wx.NewId()
-        self.popupID_COPY_URL_FCNB = wx.NewId()
+        self.popupID_COPY_URL_FCBN = wx.NewId()
+
+        self.popupID_OPEN_URL_TELA = wx.NewId()
+        self.popupID_OPEN_URL_INPN = wx.NewId()
+        self.popupID_OPEN_URL_FCBN = wx.NewId()
 
         self.popupID_EDIT_MAIN = wx.NewId()
         self.popupID_EDIT_COSTE = wx.NewId()
@@ -1022,7 +1026,11 @@ class Panel(wx.Panel):
         menu.AppendSeparator()
         menu.Append(self.popupID_COPY_URL_TELA, "Copy URL for 'TELA'")
         menu.Append(self.popupID_COPY_URL_INPN, "Copy URL for 'INPN'")
-        menu.Append(self.popupID_COPY_URL_FCNB, "Copy URL for 'FCNB'")
+        menu.Append(self.popupID_COPY_URL_FCBN, "Copy URL for 'FCBN'")
+        menu.AppendSeparator()
+        menu.Append(self.popupID_OPEN_URL_TELA, "Open 'TELA' URL in Browser")
+        menu.Append(self.popupID_OPEN_URL_INPN, "Copy 'INPN' URL in Browser")
+        menu.Append(self.popupID_OPEN_URL_FCBN, "Copy 'FCBN' URL in Browser")
         menu.AppendSeparator()
 
         menu.Append(self.popupID_EDIT_MAIN, "Edit this sheet")
@@ -1088,7 +1096,8 @@ class Panel(wx.Panel):
             nl1 = nl1.strip()
             nl2 = nl2.strip()
 
-            s = u"***{}***  {}  /  **{}**".format(nl1,nl2,self.struct["FA"])
+            s = u"#### ***{}***  {}  /  **{}**".format(nl1,nl2,self.struct["FA"])
+            s+="\n"
             try:
                 s+=u"\n**Nom(s) français:** {}".format(self.struct["NV"].replace(";",",")) #.encode("utf-8"))
             except:
@@ -1224,15 +1233,24 @@ class Panel(wx.Panel):
 
             print(s)
 
-
         elif event.GetId() == self.popupID_COPY_URL_TELA:
             s = format_url_tela.format(self.struct["ID.tela"])
 
         elif event.GetId() == self.popupID_COPY_URL_INPN:
             s = format_url_inpn.format(self.struct["ID.inpn"])
 
-        elif event.GetId() == self.popupID_COPY_URL_FCNB:
-            s = format_url_fcnb.format(self.struct["ID.inpn"])
+        elif event.GetId() == self.popupID_COPY_URL_FCBN:
+            s = format_url_fcbn.format(self.struct["ID.inpn"])
+
+        elif event.GetId() == self.popupID_OPEN_URL_TELA:
+            webbrowser.open(format_url_tela.format(self.struct["ID.tela"]))
+
+        elif event.GetId() == self.popupID_OPEN_URL_INPN:
+            webbrowser.open(format_url_inpn.format(self.struct["ID.inpn"]))
+
+        elif event.GetId() == self.popupID_OPEN_URL_FCBN:
+            webbrowser.open(format_url_fcbn.format(self.struct["ID.inpn"]))
+
 
         if s != "":
             clipdata = wx.TextDataObject()
@@ -1479,9 +1497,12 @@ class Panel(wx.Panel):
             wx.EVT_BUTTON( self, id, self.Button_BASEVEG)
             id+=1
 
+
+        self.descTB_sizer.Add((5,-1))
+
         # INPN Button
         #-------------
-        if "ID.inpn" in self.struct:
+        if self.options.buttons.url and "ID.inpn" in self.struct:
             self.tagsSizer.Add((5,-1))
             #self.button_baseveg = wx.Button(self.scrolledTagPanel,
             self.button_inpn = wx.Button(self.descTB, id,
@@ -1498,7 +1519,7 @@ class Panel(wx.Panel):
 
         # TELA Button
         #-------------
-        if "ID.tela" in self.struct and self.struct["ID.tela"] != "":
+        if self.options.buttons.url and "ID.tela" in self.struct and self.struct["ID.tela"] != "":
             self.tagsSizer.Add((5,-1))
             #self.button_baseveg = wx.Button(self.scrolledTagPanel,
             self.button_tela = wx.Button(self.descTB, id,
@@ -1513,21 +1534,21 @@ class Panel(wx.Panel):
             wx.EVT_BUTTON( self, id, self.Button_TELA)
             id+=1
 
-        # FCNB Button
+        # FCBN Button
         #-------------
-        if "ID.inpn" in self.struct:
+        if self.options.buttons.url and "ID.inpn" in self.struct:
             self.tagsSizer.Add((5,-1))
             #self.button_baseveg = wx.Button(self.scrolledTagPanel,
-            self.button_fcnb = wx.Button(self.descTB, id,
-                                         u" FCNB ",
+            self.button_fcbn = wx.Button(self.descTB, id,
+                                         u" FCBN ",
                                          wx.DefaultPosition, (-1,-1))
-            self.button_fcnb.SetForegroundColour("#000000")
+            self.button_fcbn.SetForegroundColour("#000000")
             #self.button_note.SetForegroundColour(self.colors.button.note[0])
             #button.SetBackgroundColour("#6699ff")
-            self.button_fcnb.SetBackgroundColour("#99ddff") ##85e085") #"#668cff")#99ddff
-            self.descTB_sizer.Add(self.button_fcnb,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
+            self.button_fcbn.SetBackgroundColour("#99ddff") ##85e085") #"#668cff")#99ddff
+            self.descTB_sizer.Add(self.button_fcbn,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
 
-            wx.EVT_BUTTON( self, id, self.Button_FCNB)
+            wx.EVT_BUTTON( self, id, self.Button_FCBN)
             id+=1
 
 

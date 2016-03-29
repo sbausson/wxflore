@@ -65,9 +65,9 @@ class colors:
     }
 
 
-format_url_tela = "http://www.tela-botanica.org/bdtfx-nn-{}-synthese\n"
-format_url_inpn = "http://inpn.mnhn.fr/espece/cd_nom/{}\n"
-format_url_fcnb = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
+#format_url_tela = "http://www.tela-botaanica.org/bdtfx-nn-{}-synthese\n"
+#format_url_inpn = "http://inpn.mnhn.fr/espece/cd_nom/{}\n"
+#format_url_fcbn = "http://siflore.fcbn.fr/?cd_ref={}&r=metro\n"
 
 
 #-------------------------------------------------------------------------------
@@ -1031,11 +1031,18 @@ if __name__ == '__main__':
 
     print("wxPython version: {}".format(wx.__version__))
 
+    class SUB_OPTION:
+        pass
+
     options = fldb.init() #OPTIONS()
 
     options.noconfig = 0
     options.wxga = 0
     options.debug = 1
+
+    options.buttons = SUB_OPTION()
+    #options.buttons.url = 1
+    options.buttons.url = 0
 
     if os.getenv("HOME") == None:
         options.home  = os.getenv("HOMEPATH").decode(sys.stdout.encoding)
