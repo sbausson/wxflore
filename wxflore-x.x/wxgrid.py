@@ -2,6 +2,7 @@ import os
 import wx
 import wx.grid
 import bota
+from common import *
 
 #class colors:
 #    selected = ["#cc3399","#99ff33"]
@@ -424,6 +425,8 @@ class filteredGrid(wx.grid.Grid):
         self.popupID_EXPORT_NL_NV = wx.NewId()
         self.popupID_EXPORT_FA_NL_NV = wx.NewId()
         self.popupID_UNSELECT_ALL = wx.NewId()
+        self.popupID_PICT_GALLERY = wx.NewId()
+        self.popupID_PICT_LIST = wx.NewId()
 
         self.popupID_TEST = wx.NewId()
 
@@ -436,6 +439,9 @@ class filteredGrid(wx.grid.Grid):
         menu.Append(self.popupID_EXPORT_FA_NL_NV, "Export list of FA + NL + NV")
         menu.AppendSeparator()
         menu.Append(self.popupID_UNSELECT_ALL, "Unselect All")
+        menu.AppendSeparator()
+        menu.Append(self.popupID_PICT_GALLERY, "Display Gallery")
+        menu.Append(self.popupID_PICT_LIST, "Not Implemented ...")
         menu.AppendSeparator()
         menu.Append(self.popupID_TEST, "to be done")
 
@@ -474,6 +480,12 @@ class filteredGrid(wx.grid.Grid):
         elif event.GetId() == self.popupID_UNSELECT_ALL:
             self.panel.apps.marker_table[self.panel.apps.marker_index] = []
             self.Fill()
+
+        elif event.GetId() == self.popupID_PICT_GALLERY:
+            print("popupID_PICT_GALLERY")
+            nevent = PictGalleryEvent(struct_list = self.struct_list,
+                                      name = self.panel.name)
+            wx.PostEvent(self.panel.apps,nevent)
 
         if s != "":
             TextFrame(s,self.panel)

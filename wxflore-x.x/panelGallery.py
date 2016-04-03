@@ -4,16 +4,13 @@ import os
 import re
 import wx
 import functools
-
-#import bota
-#import mkthumb
-
+import math
 
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-#class Panel(wx.lib.scrolledpanel.ScrolledPanel):
-class Panel(wx.Panel):
+#class Panel(wx.Panel):
+class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 
     #-------------------------------------------------------------------------------
     def __init__(self,parent,pictList,options):
@@ -21,16 +18,22 @@ class Panel(wx.Panel):
         self.options = options
         self.parent = parent
 
-        wx.Panel.__init__(self,parent,size=(-1,-1))
+        ncol = 5.0
 
-        gridSizer =  wx.GridSizer(rows=4, cols=4, hgap=5, vgap=5)
+        #wx.Panel.__init__(self,parent,size=(-1,-1))
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self,parent,size=(-1,-1))
+        self.SetupScrolling(True,True)
+
+        gridSizer =  wx.GridSizer(rows=math.ceil(len(pictList) / ncol), cols=int(ncol), hgap=5, vgap=5)
         for i in range(0, len(pictList)):
-            img = wx.Image(pictList[i][0], wx.BITMAP_TYPE_ANY)
-            bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
-            text = wx.StaticText(self, -1, pictList[i][1])
-
             sizer = wx.BoxSizer(wx.VERTICAL)
-            sizer.Add(bmp,0,wx.CENTER,0)
+            if pictList[i][0] != "":
+                img = wx.Image(pictList[i][0], wx.BITMAP_TYPE_ANY)
+                bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
+
+                sizer.Add(bmp,0,wx.CENTER,0)
+
+            text = wx.StaticText(self, -1, pictList[i][1])
             sizer.Add(text,0,wx.CENTER,0)
 
             gridSizer.Add(sizer, 0, wx.ALIGN_CENTER, 8)

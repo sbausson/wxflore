@@ -27,6 +27,7 @@ import panelThumb
 import panelMain
 import panelDesc
 import panelFiltered
+import panelGallery
 
 from common import *
 
@@ -427,6 +428,7 @@ class MainApp(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onHelpCredits, id=ID_HELP_CREDITS)
         self.Bind(wx.EVT_MENU, self.onHelpAbout, id=ID_HELP_ABOUT)
         self.Bind(wx.EVT_CLOSE, self.onCloseWindows)
+        self.Bind(EVT_PICT_GALLERY_ID, self.onPictGallery)
 
         menubar.Append(fileMenu, '&File')
         menubar.Append(helpMenu, '&Help')
@@ -833,7 +835,9 @@ class MainApp(wx.Frame):
                         if os.path.exists(os.path.join(self.options.paths.img,"photos",name_reduced)):
                             attrib_list[i] = "#1F7A1F"
 
-                    self.selection_panels[selection] = panelFiltered.Panel(self,sorted_list,attrib_list)
+                    self.selection_panels[selection] = panelFiltered.Panel(self,
+                                                                           sorted_list,attrib_list,
+                                                                           name)
                     self.notebook.AddPage(self.selection_panels[selection], name, True)
                     PageIndex = self.notebook.GetSelection()
                     self.notebook.SetPageTextColour(PageIndex,'#669900')
@@ -946,7 +950,9 @@ class MainApp(wx.Frame):
             if 'dept' in flags:
                 name += ' ({})'.format(','.join(flags['dept']))
 
-            new_panel = panelFiltered.Panel(self,sorted_list)
+            new_panel = panelFiltered.Panel(self,
+                                            sorted_list,
+                                            name)
             self.notebook.AddPage( new_panel, name, True )
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
@@ -965,7 +971,9 @@ class MainApp(wx.Frame):
             print "else"
 
             name = "{}".format(name)
-            new_panel = panelFiltered.Panel(self,sorted_list) #parent, parent.notebook, name, grid, search_index_list, self, parent.options )
+            new_panel = panelFiltered.Panel(self,
+                                            sorted_list,
+                                            name)
             self.notebook.AddPage( new_panel, name, True )
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
@@ -982,6 +990,22 @@ class MainApp(wx.Frame):
             self.notebook.AddPage(panel, name, True)
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
+
+    #-------------------------------------------------------------------------------
+    def onPictGallery(self,event):
+        print("onPictGallery")
+
+        PictGallery_data = []
+        for struct in event.struct_list:
+            name_reduced = bota.ReduceName(struct["NL"])
+            thumb_dir = os.path.join(self.options.paths.img,"photos.thumb",name_reduced)
+            thumb_path = os.path.join(thumb_dir,"{}.00.jpg".format(name_reduced))
+            if not os.path.exists(thumb_path):
+                thumb_path = ""
+            PictGallery_data.append([thumb_path,bota.ShortName(struct["NL"])])
+
+        panel = panelGallery.Panel(self,PictGallery_data,self.options)
+        self.notebook.AddPage(panel,"Gallery [{}]".format(event.name), True)
 
     #-------------------------------------------------------------------------------
     def onRefresh(self,event):

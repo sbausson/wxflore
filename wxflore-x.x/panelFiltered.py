@@ -9,7 +9,7 @@ from wx.lib.splitter import MultiSplitterWindow
 #-------------------------------------------------------------------------------
 class Panel(wx.Panel):
 
-    def __init__(self, apps, filtered_struct_list, attrib_list = []):
+    def __init__(self, apps, filtered_struct_list, name, attrib_list = []):
 
         wx.Panel.__init__(self, apps, -1) # size=(1700, 1000))
         #self.mainPanel = wx.Panel(self, -1)
@@ -21,6 +21,7 @@ class Panel(wx.Panel):
         self.apps = apps
         self.tree = apps.tree
         self.content = apps.content
+        self.name = name
         self.options = apps.options
         self.colors = apps.colors
 
