@@ -1058,6 +1058,7 @@ if __name__ == '__main__':
     class SUB_OPTION:
         pass
 
+
     options = fldb.init() #OPTIONS()
 
     options.noconfig = 0
@@ -1077,7 +1078,8 @@ if __name__ == '__main__':
     if not os.path.exists(options.wxflore):
         os.makedirs(options.wxflore)
 
-    #sys.path.append(options.wxflore)
+    options.wxflore_root = os.path.split(os.path.realpath(__file__))[0]
+    options.wxflore_png_nodefault = os.path.join(options.wxflore_root,"png","nodefault.png")
 
     parse_argv(options)
     config.read(options)

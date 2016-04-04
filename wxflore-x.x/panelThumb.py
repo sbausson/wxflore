@@ -134,7 +134,15 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
             n=0
             self.pictPaths = []
             locale = wx.Locale(wx.LANGUAGE_DEFAULT)
-            for img_name in sorted(os.listdir(thumb_dir)):
+            sorted_thumb_paths = sorted(os.listdir(thumb_dir))
+            if len(sorted_thumb_paths) and not re.match(".*\.00.jpg",sorted_thumb_paths[0]):
+                image = wx.Image(self.options.wxflore_png_nodefault, wx.BITMAP_TYPE_PNG)
+                imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
+
+                #self.thumbSizer.Add(imageBitmap, 0, wx.ALIGN_LEFT|wx.ALL, 8)
+                self.thumbSizer.Add(imageBitmap, 0, wx.ALL|wx.EXPAND, 8)
+
+            for img_name in sorted_thumb_paths:
                 #print img_name
                 thumb_path = os.path.join(thumb_dir,img_name)
                 photo_path = os.path.join(photo_dir,img_name)
