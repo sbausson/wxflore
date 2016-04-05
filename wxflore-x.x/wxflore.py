@@ -1006,6 +1006,8 @@ class MainApp(wx.Frame):
 
         panel = panelGallery.Panel(self,PictGallery_data,self.options)
         self.notebook.AddPage(panel,"Gallery [{}]".format(event.name), True)
+        PageIndex = self.notebook.GetSelection()
+        self.notebook.SetPageTextColour(PageIndex,'#669900')
 
     #-------------------------------------------------------------------------------
     def onRefresh(self,event):

@@ -17,11 +17,13 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.options = options
         self.parent = parent
+        self.colors = parent.colors
 
-        ncol = 5.0
+        ncol = 6.0
 
         #wx.Panel.__init__(self,parent,size=(-1,-1))
         wx.lib.scrolledpanel.ScrolledPanel.__init__(self,parent,size=(-1,-1))
+        self.SetBackgroundColour(self.colors.normal[1])
         self.SetupScrolling(True,True)
 
         gridSizer =  wx.GridSizer(rows=math.ceil(len(pictList) / ncol), cols=int(ncol), hgap=5, vgap=5)
@@ -30,7 +32,10 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
             if pictList[i][0] != "":
                 img = wx.Image(pictList[i][0], wx.BITMAP_TYPE_ANY)
                 bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
-
+                sizer.Add(bmp,0,wx.CENTER,0)
+            else:
+                img = wx.Image(self.options.wxflore_png_nodefault, wx.BITMAP_TYPE_PNG)
+                bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
                 sizer.Add(bmp,0,wx.CENTER,0)
 
             text = wx.StaticText(self, -1, pictList[i][1])
