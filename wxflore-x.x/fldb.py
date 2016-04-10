@@ -732,7 +732,7 @@ def python_table(base_flore_path,options=OPTIONS()):
         if "baseflor" in struct_table[key].keys():
             if "ID.cat" in struct_table[key]["baseflor"]:
                 id_cat =  struct_table[key]["baseflor"]["ID.cat"]
-                if not id_cat in options.baseveg.table:
+                if not id_cat in options.baseveg.table and id_cat != "inconnu":
                     warning(u"## WARNING ## Catminat ID '{}' not found for '{}' ...".format(id_cat,
                                                                                             struct_table[key]["NL"]),"blue",options)
 
@@ -1096,7 +1096,8 @@ def parse_file(filename,name,options):
                     if resp == "y":
                         update_file(filename,struct["NL"])
 
-            elif struct["FA"] != options.bdtfx.table[struct["ID.tela"]]["fam"]:
+            elif ("" != options.bdtfx.table[struct["ID.tela"]]["fam"] and
+                  struct["FA"] != options.bdtfx.table[struct["ID.tela"]]["fam"]):
                 warning("\n## WARNING ## : Familly mismatch ...\n{} {} -> {}".format(filename,struct["FA"],options.bdtfx.table[struct["ID.tela"]]["fam"]),
                         "cyan",
                         options)
@@ -1113,7 +1114,7 @@ def parse_file(filename,name,options):
             #print(syn_t)
             struct["SY"] = options.bdtfx.table[struct["ID.tela"]]["syn"]
             struct["ID.inpn"] = options.bdtfx.table[struct["ID.tela"]]["ID.inpn"]
-
+            struct["bdtfx"] = options.bdtfx.table[struct["ID.tela"]]
         else:
             warning("{} not in bdtfx ... {}".format(struct["ID.tela"],filename),
                     "yellow",options)

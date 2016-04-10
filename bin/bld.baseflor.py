@@ -5,7 +5,7 @@ import os
 import sys
 import csv
 
-import bdtfx_CN
+#import bdtfx_CN
 
 #-------------------------------------------------------------------------------
 #
@@ -20,14 +20,14 @@ def bld_filename(nl):
     except:
         print(nl)
         error()
-        
+
     name = name.strip().replace(" x ",".").replace(" ",".")
     if len(name.split(".")) == 1:
         name = ""
         print("## WARNING ## Ignoring : {}".format(nl))
 
     return name
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ conv_table = [
 def build_chorodep_files():
 
 
-    with open(sys.argv[-1], "r") as csvfile: 
+    with open(sys.argv[-1], "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         i=0
         for row in reader:
@@ -101,13 +101,13 @@ def build_chorodep_files():
                 nl = row[indexes.index("NOM_SCIENTIFIQUE")]
                 if nl != "":
                     filename = bld_filename(nl)
-    
+
                     if filename != "":
                         f = open(os.path.join("baseflor",filename),"w")
                         for item in conv_table:
-                            f.write("{}: {}\n".format(item[1],row[indexes.index(item[0])]))                    
+                            f.write("{}: {}\n".format(item[1],row[indexes.index(item[0])]))
                         f.close()
-    
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -127,10 +127,10 @@ def build_python_module():
 
     f.write('# -*- coding: utf-8 -*-\n')
     f.write('\nID\'s="N°_Nomenclatural_BDNFF"')
-    
+
     f.write("version='{}'\n".format(version))
     f.write("table={\n")
-    with open(baseflor_filename, "r") as csvfile: 
+    with open(baseflor_filename, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         i=0
 
@@ -140,30 +140,31 @@ def build_python_module():
                 indexes=row
                 print(indexes)
             else:
+                #print(row)
                 nl = row[indexes.index("NOM_SCIENTIFIQUE")]
                 CN = row[indexes.index("N°_Taxinomique_BDNFF")]
-                #print(row)
+                id = row[indexes.index("N°_Nomenclatural_BDNFF")]
 
-                try:
-                    id = bdtfx_CN.table[CN]
-                except:
-                    id = row[indexes.index("N°_Nomenclatural_BDNFF")]
-                    print("## WARNING ## {}".format(id))
+                #try:
+                #    id = bdtfx_CN.table[CN]
+                #except:
+                #    id = row[indexes.index("N°_Nomenclatural_BDNFF")]
+                #    print("## WARNING ## {}".format(id))
 
                 if nl != "" and not id in["","nc"]:
 
                     s = ""
                     s_ = []
-                    
+
                     s+='"{}":'.format(id)
                     s+='{'
                     for item in conv_table:
                         s+='"{}": "{}",'.format(item[1],row[indexes.index(item[0])])
                     f.write(s)
-                    
+
                     #for i in range(0,len(indexes)):
                     #    dep_match=re.match(".*\((.*)\)",indexes[i])
-                    #    if dep_match:       
+                    #    if dep_match:
                     #        ndep = dep_match.group(1)
                     #        x = row[i].strip()
                     #        if x in ["1"]: #,"1?"]:
@@ -176,7 +177,7 @@ def build_python_module():
 
     f.write("}\n")
     f.close()
-                        
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------

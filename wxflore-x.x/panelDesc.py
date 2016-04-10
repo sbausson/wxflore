@@ -115,12 +115,15 @@ class PanelSYN(wx.Panel):
         self.RTC.SelectNone()
         self.RTC.SetEditable(False)
 
-        s = ""
+        s = "Synonymes:\n"
+        s+= "-"*50 + "\n"
         self.RTC.BeginTextColour(parent.colors.normal[0])
 
         for syn in struct["SY"]:
             syn = syn.replace("["," ").replace("]","")
             s+=u"- {}\n".format(syn)
+
+        s += "\n"
 
         print(s)
         self.RTC.WriteText(s)
@@ -1289,7 +1292,7 @@ class Panel(wx.Panel):
 
         self.descRTC.BeginFontSize(big_font)
         self.descRTC.BeginBold()
-        self.descRTC.WriteText("Description:")
+        self.descRTC.WriteText("Description (Coste):")
         self.descRTC.Newline()
         self.descRTC.EndFontSize()
         self.descRTC.EndBold()
@@ -1358,16 +1361,47 @@ class Panel(wx.Panel):
             self.descRTC.EndFontSize()
 
 
-        ref_coste = u""
-        if "ID.coste" in struct.keys():
-            if struct["ID.coste"] != "":
-                ref_coste +=u"N°{}".format(struct["ID.coste"])
-        if "N.coste" in struct.keys():
-            ref_coste +=u"  -  {}".format(struct["N.coste"])
+        #ref_coste = u""
+        #if "ID.coste" in struct.keys():
+        #    if struct["ID.coste"] != "":
+        #        ref_coste +=u"N°{}".format(struct["ID.coste"])
+        #if "N.coste" in struct.keys():
+        #    ref_coste +=u"  -  {}".format(struct["N.coste"])
+        #
+        #if ref_coste != "":
+        #    self.descRTC.WriteText("\n")
+        #
+        #    self.descRTC.BeginFontSize(big_font)
+        #    self.descRTC.BeginBold()
+        #    self.descRTC.WriteText("Ref. Coste:")
+        #    self.descRTC.EndBold()
+        #    self.descRTC.EndFontSize()
+        #
+        #    self.descRTC.BeginFontSize(small_font)
+        #    self.descRTC.WriteText("    ")
+        #    self.descRTC.WriteText(u"{}\n".format(ref_coste))
+        #    self.descRTC.EndFontSize()
+        #s += "References:\n"
+        #s+= "-"*50 + "\n"
 
-        if ref_coste != "":
-            self.descRTC.WriteText("\n")
+        self.descRTC.WriteText("\n")
 
+        # Flora Gallica
+        if "bdtfx" in struct and "FG_num" in struct["bdtfx"]:
+            #s+=u"Flora Galica Ref N° {} - {}\n".format(struct["bdtfx"]["FG_num"],struct["bdtfx"]["FG_name"])
+            self.descRTC.BeginFontSize(big_font)
+            self.descRTC.BeginBold()
+            self.descRTC.WriteText("Ref. Flora Gallica:")
+            self.descRTC.EndBold()
+            self.descRTC.EndFontSize()
+
+            self.descRTC.BeginFontSize(small_font)
+            self.descRTC.WriteText("    ")
+            self.descRTC.WriteText(u"N° {}  -  {}\n".format(struct["bdtfx"]["FG_num"],struct["bdtfx"]["FG_name"]))
+            self.descRTC.EndFontSize()
+
+        # Coste
+        if "bdtfx" in struct and "Coste_num" in struct["bdtfx"]:
             self.descRTC.BeginFontSize(big_font)
             self.descRTC.BeginBold()
             self.descRTC.WriteText("Ref. Coste:")
@@ -1376,8 +1410,72 @@ class Panel(wx.Panel):
 
             self.descRTC.BeginFontSize(small_font)
             self.descRTC.WriteText("    ")
-            self.descRTC.WriteText(u"{}\n".format(ref_coste))
+            self.descRTC.WriteText(u"N° {}  -  {}\n".format(struct["bdtfx"]["Coste_num"],struct["bdtfx"]["Coste_name"]))
             self.descRTC.EndFontSize()
+
+        # Flore Bleue
+        if "bdtfx" in struct and "FB_num" in struct["bdtfx"]:
+            #self.descRTC.WriteText("\n")
+            self.descRTC.BeginFontSize(big_font)
+            self.descRTC.BeginBold()
+            self.descRTC.WriteText("Ref. Flore Belge:")
+            self.descRTC.EndBold()
+            self.descRTC.EndFontSize()
+
+            self.descRTC.BeginFontSize(small_font)
+            self.descRTC.WriteText("    ")
+            self.descRTC.WriteText(u"page {}  -  {}\n".format(struct["bdtfx"]["FB_num"],struct["bdtfx"]["FB_name"]))
+            self.descRTC.EndFontSize()
+
+        # Fournier
+        if "bdtfx" in struct and "Fournier_num" in struct["bdtfx"]:
+            self.descRTC.BeginFontSize(big_font)
+            self.descRTC.BeginBold()
+            self.descRTC.WriteText("Ref. Fournier:")
+            self.descRTC.EndBold()
+            self.descRTC.EndFontSize()
+
+            self.descRTC.BeginFontSize(small_font)
+            self.descRTC.WriteText("    ")
+            self.descRTC.WriteText(u"N° {}  -  {}\n".format(struct["bdtfx"]["Fournier_num"],struct["bdtfx"]["Fournier_name"]))
+            self.descRTC.EndFontSize()
+
+        self.descRTC.WriteText("\n")
+
+#        # Flore Belge
+#        if "FB_num" in struct["bdtfx"]:
+#            s+="Page Flore Belge page {} - {}\n".format(struct["bdtfx"]["FB_num"].replace("R",""))
+#
+#        # Coste
+#        if "Coste_num" in struct["bdtfx"]:
+#            s+=u"Flore Coste N° {} - {}\n".format(struct["bdtfx"]["Coste_num"],struct["bdtfx"]["Coste_name"])
+##            if struct["bdtfx"]["Coste_rem"] != "":
+##                s+=" ({})".format(struct["bdtfx"]["Coste_rem"])
+##            s+="\n"
+
+#        # Fournier
+#        if "Fournier_num" in struct["bdtfx"] and struct["bdtfx"]["Fournier_num"] != "":
+#            s+=u"Flore Fournier N° {} - {}\n".format(struct["bdtfx"]["Fournier_num"],struct["bdtfx"]["Fournier_name"])
+
+#            if struct["bdtfx"]["Fournier_rem"] != "":
+#                s+=" ({})".format(struct["bdtfx"]["Fournier_rem"])
+#            s+="\n"
+
+#        if "FE_num" in struct["bdtfx"]:
+#            s+="Flora Europea: p{}".format(struct["bdtfx"]["FE_num"])
+#            if struct["bdtfx"]["FE_rem"] != "":
+#                s+=" ({})".format(struct["bdtfx"]["FE_rem"])
+#            s+="\n"
+#        if "CNRS_num" in struct["bdtfx"]:
+#            s+="Ref. Flore CNRS: {}".format(struct["bdtfx"]["CNRS_num"])
+#            if struct["bdtfx"]["CNRS_rem"] != "":
+#                s+=" ({})".format(struct["bdtfx"]["CNRS_rem"])
+#            s+="\n"
+#        if "Bonnier_num" in struct["bdtfx"]:
+#            s+="Flore Bonnier: p{}".format(struct["bdtfx"]["Bonnier_num"])
+#            if struct["bdtfx"]["Bonnier_rem"] != "":
+#                s+=" ({})".format(struct["bdtfx"]["Bonnier_rem"])
+#            s+="\n"
 
         if "REF.wiki.fr" in struct.keys():
             self.descRTC.WriteText("\n")
@@ -1571,7 +1669,7 @@ class Panel(wx.Panel):
         #button = wx.Button(self, 109, u"TOTO", wx.DefaultPosition, (-1,-1))
         #self.descRTCsizer.Add(button,0,wx.ALL)
 
-        self.notebook.AddPage(self.descRTC, "Description (COSTE)", True)
+        self.notebook.AddPage(self.descRTC, "Description", True)
         PageIndex = self.notebook.GetSelection()
         self.notebook.SetPageTextColour(PageIndex,'#669900')
 

@@ -58,16 +58,9 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 
     #-------------------------------------------------------------------------------
     def RightClickMenu(self,event):
-        print("ThumbPanel.RightClickMenu()")
-        s=""
 
-        if event.GetId() == self.popupID_REFRESH:
-            mkthumb.number(self.options,self.name_reduced)
-            mkthumb.mkthumb(self.options,self.name_reduced)
-            self.Update()
-
-        elif event.GetId() == self.popupID_DUPLICATE:
-            print("CHECK_DUPLICATE")
+        #-------------------------------------------------------------------------------
+        def duplicate():
             duplicates = mkthumb.check_duplicate(self.options,self.name_reduced)
 
             if duplicates != []:
@@ -83,10 +76,22 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
                         os.remove(photo)
 
                     mkthumb.mkthumb(self.options,self.name_reduced)
-                    self.Update()
+                    self.update = True
 
-            else:
-                pass
+        #-------------------------------------------------------------------------------
+        print("ThumbPanel.RightClickMenu()")
+        s=""
+
+        if event.GetId() == self.popupID_REFRESH:
+            mkthumb.number(self.options,self.name_reduced)
+            mkthumb.mkthumb(self.options,self.name_reduced)
+            self.Update()
+
+        elif event.GetId() == self.popupID_DUPLICATE:
+            print("CHECK_DUPLICATE")
+            duplicate()
+            if self.update:
+                self.Update()
 
         elif event.GetId() == self.popupID_DOWNLOAD:
 
@@ -102,7 +107,11 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
                         print("download done")
                         mkthumb.number(self.options,self.name_reduced)
                         mkthumb.mkthumb(self.options,self.name_reduced)
-                        self.Update()
+                        self.update = True
+
+            duplicate()
+            if self.update:
+                self.Update()
 
     #-------------------------------------------------------------------------------
     def onSize(self, evt):

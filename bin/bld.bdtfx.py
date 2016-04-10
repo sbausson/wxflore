@@ -87,6 +87,22 @@ with open(bdtfx_in_file, "r") as csvfile:
                 author = row[indexes.index("Auteur")]
                 author_date = row[indexes.index("Ann\xc3\xa9e publication")]
                 id_inpn = row[indexes.index("Num\xc3\xa9ro INPN")]
+
+                #Bonnier_num = row[indexes.index("Autres : flore_bonnier_num")]
+                #Bonnier_rem = row[indexes.index("Autres : flore_bonnier_rem")]
+                #CNRS_num = row[indexes.index("Autres : flore_cnrs_num")]
+                #CNRS_rem = row[indexes.index("Autres : flore_cnrs_rem")]
+                #FE_num = row[indexes.index("Autres : flore_fe_num")]
+                #FE_rem = row[indexes.index("Autres : flore_fe_rem")]
+
+                Coste_num = row[indexes.index("Autres : flore_coste_num")]
+                Fournier_num = row[indexes.index("Autres : flore_fournier_num")]
+                FB_num = row[indexes.index("Autres : flore_belge_ed5_page")]
+                FG_num = row[indexes.index("Autres : flore_fg_num")]
+                #if FB_num == "0644 R":
+                #    print(row)
+                    #error()
+                #print(FB_num)
             else:
                 num = row[indexes.index("num_nom")]
                 num_ref = row[indexes.index("num_nom_retenu")]
@@ -109,36 +125,145 @@ with open(bdtfx_in_file, "r") as csvfile:
             nl = s.decode("utf-8")
             nl_t[num] = nl
 
-            if name_sci == "toto":
-                print("num_ref",num_ref)
-                print("sup_ref",sup_ref)
-                print("rang",rang)
-                print("num",num)
-                error()
-
             if num_ref != "":
                 if num_ref not in table.keys():
-                    table[num_ref] = {"syn.id":[]}
+                    table[num_ref] = {}
+                    table[num_ref]["syn.id"] = []
+                    table[num_ref]["rang"] = rang
+
+                    table[num_ref]["Coste_num"] = ""
+                    table[num_ref]["Coste_name"] = ""
+                    table[num_ref]["Coste_syn"] = []
+
+                    table[num_ref]["Fournier_num"] = ""
+                    table[num_ref]["Fournier_name"] = ""
+                    table[num_ref]["Fournier_syn"] = []
+
+                    table[num_ref]["FG_num"] = ""
+                    table[num_ref]["FG_name"] = ""
+                    table[num_ref]["FG_syn"] = []
+
+                    table[num_ref]["FB_num"] = ""
+                    table[num_ref]["FB_name"] = ""
+                    table[num_ref]["FB_syn"] = []
+
+                    if Coste_num != "":
+                        if len(Coste_num.split(".")) > 1:
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["Coste_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["Coste_num"] = Coste_num
+                            table[num_ref]["Coste_name"] = name_sci
+
+                    if Fournier_num != "":
+                        if len(Fournier_num.split(".")) > 1:
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["Fournier_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["Fournier_num"] = Fournier_num.decode('utf-8')
+                            table[num_ref]["Fournier_name"] = name_sci
+
+                    if FG_num != "":
+                        if FG_num[-1] != "r":
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["FG_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["FG_num"] = FG_num[:-1]
+                            table[num_ref]["FG_name"] = name_sci
+
+                    if FB_num != "":
+                        if FB_num[-1] != "R":
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["FB_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["FB_num"] = FB_num[:-1].strip()
+                            table[num_ref]["FB_name"] = name_sci
+
 
                 if rang == 180:
-                    if name_sci == "Caryophyllaceae":
-                        print(name_sci,num_ref)
-                        print(row)
                     fam_t[num_ref] = name_sci
 
                 elif rang == 220 and sup_ref != "":
-                    if re.match("Dianthus",name_sci):
-                        print(name_sci,num_ref)
-                        print(row)
                     gen_t[name_sci] = sup_ref
 
                 elif num != num_ref:
                     table[num_ref]["syn.id"].append(num)
 
-                elif num_ref != "":
+                    if Fournier_num != "":
+                        if len(Fournier_num.split(".")) > 1:
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["Fournier_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["Fournier_num"] = Fournier_num.decode('utf-8')
+                            table[num_ref]["Fournier_name"] = name_sci
+
+                    if FG_num != "":
+                        if FG_num[-1] != "r":
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["FG_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["FG_num"] = FG_num[:-1]
+                            table[num_ref]["FG_name"] = name_sci
+
+                    if FB_num != "":
+                        if FB_num[-1] != "R":
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["FB_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["FB_num"] = FB_num[:-1].strip()
+                            table[num_ref]["FB_name"] = name_sci
+
+                # Remove
+                #   220 = genre
+                #
+                elif num_ref != "" and rang not in [220]:
                     table[num_ref]["NL"] = nl
                     table[num_ref]["ID.inpn"] = id_inpn
                     table[num_ref]["gen"] = genre
+                    table[num_ref]["rang"] = rang
+
+                    #table[num_ref]["CNRS_num"] = CNRS_num
+                    #table[num_ref]["CNRS_rem"] = CNRS_rem
+                    #table[num_ref]["FE_num"] = FE_num
+                    #table[num_ref]["FE_rem"] = FE_rem
+                    #table[num_ref]["Bonnier_num"] = Bonnier_num
+                    #table[num_ref]["Bonnier_rem"] = Bonnier_rem
+                    #table[num_ref]["Coste_num"] = Coste_num
+                    #table[num_ref]["Fournier_num"] = Fournier_num
+                    #table[num_ref]["FB_num"] = FB_num
+                    #table[num_ref]["FG_num"] = FG_num
+
+                    if Coste_num != "":
+                        if len(Coste_num.split(".")) > 1:
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["Coste_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["Coste_num"] = Coste_num
+                            table[num_ref]["Coste_name"] = name_sci
+
+                    if Fournier_num != "":
+                        if len(Fournier_num.split(".")) > 1:
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["Fournier_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["Fournier_num"] = Fournier_num.decode('utf-8')
+                            table[num_ref]["Fournier_name"] = name_sci
+
+                    if FG_num != "":
+                        if FG_num[-1] != "r":
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["FG_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["FG_num"] = FG_num[:-1]
+                            table[num_ref]["FG_name"] = name_sci
+
+                    if FB_num != "":
+                        if FB_num[-1] != "R":
+                            #table[num_ref]["Coste_num"] = Coste_num.split(".")[0]
+                            table[num_ref]["FB_syn"].append(name_sci)
+                        else:
+                            table[num_ref]["FB_num"] = FB_num[:-1].strip()
+                            table[num_ref]["FB_name"] = name_sci
 
 
 #f.write("'{}':{}\n".format(num_ref,table[num_ref]))
@@ -153,15 +278,20 @@ for key in table.keys():
             table[key]["syn"].append(nl_t[table[key]["syn.id"][i]])
 
         try:
-            print(table[key]["gen"])
-            print(gen_t[table[key]["gen"]])
+            #print(table[key]["gen"])
+            #print(gen_t[table[key]["gen"]])
             #print(fam_t[gen_t[table[key]["gen"]]])
             table[key]["fam"] = fam_t[gen_t[table[key]["gen"]]]
+            table[key]["fam"] = ""
         except:
             table[key]["fam"] = ""
 
         #print(table[key])
 
-        f.write("'{}':{},\n".format(key,table[key]))
+        if "NL" in table[key]:
+            f.write("'{}':{},\n".format(key,table[key]))
+        elif table[key]["rang"] not in [180,220]:
+            print("Skipping {}, {}".format(key,table[key]))
+
 f.write("}\n")
 f.close()
