@@ -5,6 +5,7 @@ import functools
 
 import bota
 import mkthumb
+from common import *
 
 #-------------------------------------------------------------------------------
 #
@@ -30,13 +31,66 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 #                                                        style = wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER, name="panel1")
         self.SetupScrolling(True, True)
         self.SetAutoLayout(1)
-
         self.thumbSizer = wx.BoxSizer(wx.HORIZONTAL)
+
         self.SetSizer(self.thumbSizer)
 
         #self.thumbSizer = wx.WrapSizer()
         self.Bind(wx.EVT_SIZE, self.onSize)
         self.Bind(wx.EVT_RIGHT_DOWN, self.RightClick)
+
+    #-------------------------------------------------------------------------------
+    def toto(self):
+        print("toto")
+
+    #-------------------------------------------------------------------------------
+    def duplicate(self,ask=1):
+        duplicates = mkthumb.check_duplicate(self.options,self.name_reduced)
+
+        if ask == 0:
+            clean_duplicate = 1
+        else:
+            clean_duplicate = 0
+
+        if ask and duplicates != []:
+
+            msg = "Remove this duplicates pictures ?\n\n" + "\n".join(duplicates)
+            dlg = wx.MessageDialog(None, msg, "Duplicated Photos",wx.YES_NO | wx.ICON_QUESTION)
+            retCode = dlg.ShowModal()
+
+            if (retCode == wx.ID_YES):
+                #print("Remove {}".format(filename))
+                clean_duplicate = 1
+
+        if clean_duplicate:
+            for photo in duplicates:
+                print("Removing {} ...".format(photo))
+                os.remove(photo)
+
+            mkthumb.mkthumb(self.options,self.name_reduced)
+            self.update = True
+
+    #-------------------------------------------------------------------------------
+    def onDownload(self,event):
+        print("onDownload")
+
+        if not wx.TheClipboard.IsOpened():  # may crash, otherwise
+            do = wx.TextDataObject()
+            wx.TheClipboard.Open()
+            success = wx.TheClipboard.GetData(do)
+            wx.TheClipboard.Close()
+            if success:
+                link = do.GetText()
+                if re.match("https?://",link):
+                    mkthumb.download(self.options,self.name_reduced,link)
+                    print("download done")
+                    mkthumb.number(self.options,self.name_reduced)
+                    mkthumb.mkthumb(self.options,self.name_reduced)
+                    self.update = True
+
+        self.duplicate(0)
+        if self.update:
+            self.Update()
 
     #-------------------------------------------------------------------------------
     def RightClick(self,event):
@@ -60,25 +114,6 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
     def RightClickMenu(self,event):
 
         #-------------------------------------------------------------------------------
-        def duplicate():
-            duplicates = mkthumb.check_duplicate(self.options,self.name_reduced)
-
-            if duplicates != []:
-
-                msg = "Remove this duplicates pictures ?\n\n" + "\n".join(duplicates)
-                dlg = wx.MessageDialog(None, msg, "Duplicated Photos",wx.YES_NO | wx.ICON_QUESTION)
-                retCode = dlg.ShowModal()
-
-                if (retCode == wx.ID_YES):
-                    #print("Remove {}".format(filename))
-                    for photo in duplicates:
-                        print("Removing {} ...".format(photo))
-                        os.remove(photo)
-
-                    mkthumb.mkthumb(self.options,self.name_reduced)
-                    self.update = True
-
-        #-------------------------------------------------------------------------------
         print("ThumbPanel.RightClickMenu()")
         s=""
 
@@ -89,29 +124,13 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 
         elif event.GetId() == self.popupID_DUPLICATE:
             print("CHECK_DUPLICATE")
-            duplicate()
+            self.duplicate()
             if self.update:
                 self.Update()
 
         elif event.GetId() == self.popupID_DOWNLOAD:
 
-            if not wx.TheClipboard.IsOpened():  # may crash, otherwise
-                do = wx.TextDataObject()
-                wx.TheClipboard.Open()
-                success = wx.TheClipboard.GetData(do)
-                wx.TheClipboard.Close()
-                if success:
-                    link = do.GetText()
-                    if re.match("https?://",link):
-                        mkthumb.download(self.options,self.name_reduced,link)
-                        print("download done")
-                        mkthumb.number(self.options,self.name_reduced)
-                        mkthumb.mkthumb(self.options,self.name_reduced)
-                        self.update = True
-
-            duplicate()
-            if self.update:
-                self.Update()
+            self.onDownload(event)
 
     #-------------------------------------------------------------------------------
     def onSize(self, evt):
@@ -136,6 +155,16 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.thumbSizer.DeleteWindows()
         #self.thumbSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+#        # Download Button
+#        #-----------------
+#        downloadButton = wx.Button(self, label='Download')
+#        self.Bind(wx.EVT_BUTTON,self.onDownload,downloadButton)
+#        downloadButton.SetBackgroundColour("#00ccff")
+#        downloadButton.SetForegroundColour("#000000")
+#        #toolbarSizer.Add(button,0,wx.ALIGN_RIGHT)
+#        self.thumbSizer.Add(downloadButton,0,wx.EXPAND)
+
 
         if os.path.exists(thumb_dir):
             print(self.name_reduced)

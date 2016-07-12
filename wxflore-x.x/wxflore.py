@@ -23,11 +23,11 @@ import bota
 import config
 import mkthumb
 
-import panelThumb
-import panelMain
-import panelDesc
-import panelFiltered
-import panelGallery
+#import panelThumb
+#import panelMain
+#import panelDesc
+#import panelFiltered
+#import panelGallery
 
 from common import *
 
@@ -523,6 +523,8 @@ class MainApp(wx.Frame):
         self.Bind(wx.EVT_TEXT, self.onTextEntered, self.filter_cb)
         self.filter_cb.Bind(wx.EVT_LEFT_DOWN, self.onCbSelect)
 
+        self.statusbar.Bind(wx.EVT_MIDDLE_DOWN,self.onMouseMiddleClick)
+
 
         # Advanced Search
         #-----------------
@@ -541,6 +543,15 @@ class MainApp(wx.Frame):
         button.SetBackgroundColour("#999966")
         self.statusbar_sizer.Add(button, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL)
         wx.EVT_BUTTON( self, id, self.onRefresh)
+        id+=1
+
+        # Download Button
+        #-----------------
+        downloadButton = wx.Button(self.statusbar, id, u'Download', wx.DefaultPosition, (-1,-1))
+        downloadButton.SetBackgroundColour("#00ccff")
+        downloadButton.SetForegroundColour("#000000")
+        self.Bind(wx.EVT_BUTTON, self.onDownload, downloadButton)
+        self.statusbar_sizer.Add(downloadButton, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL)
         id+=1
 
         self.div_data = [[x[0]] for x in classification.divisions]
@@ -664,6 +675,14 @@ class MainApp(wx.Frame):
         if not options.wxga:
             self.Maximize(True)
 
+    #-------------------------------------------------------------------------------
+    def onDownload(self,event):
+        print("onDownload")
+        PageIndex = self.notebook.GetSelection()
+        print(PageIndex)
+        print(self.notebook.GetPage(PageIndex).thumbPanel.onDownload(None))
+
+    #-------------------------------------------------------------------------------
     def LoadMarkers(self):
         fn = os.path.join(options.wxflore,u"markers-{}".format(self.options.suffix))
         try:
@@ -679,9 +698,10 @@ class MainApp(wx.Frame):
         print(self.marker_table)
 
     #-------------------------------------------------------------------------------
-#    def OnMouse_LeftClick():
-#        print("="*50)
-#        print("MainApp.OnMouse_LeftClick")
+    def onMouseMiddleClick(self,event):
+        print("onMouseMiddleClick")
+        nevent = DownloadEvent()
+        wx.PostEvent(self,nevent)
 
     #-------------------------------------------------------------------------------
     def SaveMarkers(self):
@@ -999,9 +1019,14 @@ class MainApp(wx.Frame):
         for struct in event.struct_list:
             name_reduced = bota.ReduceName(struct["NL"])
             thumb_dir = os.path.join(self.options.paths.img,"photos.thumb",name_reduced)
-            thumb_path = os.path.join(thumb_dir,"{}.00.jpg".format(name_reduced))
-            if not os.path.exists(thumb_path):
-                thumb_path = ""
+
+            if not os.path.exists(thumb_dir):
+                thumb_path = None
+            else:
+                thumb_path = os.path.join(thumb_dir,"{}.00.jpg".format(name_reduced))
+                if not os.path.exists(thumb_path):
+                    thumb_path = ""
+
             PictGallery_data.append([thumb_path,bota.ShortName(struct["NL"])])
 
         panel = panelGallery.Panel(self,PictGallery_data,self.options)
@@ -1081,7 +1106,15 @@ if __name__ == '__main__':
         os.makedirs(options.wxflore)
 
     options.wxflore_root = os.path.split(os.path.realpath(__file__))[0]
-    options.wxflore_png_nodefault = os.path.join(options.wxflore_root,"png","nodefault.png")
+    options.wxflore_png_nodefault = os.path.join(options.wxflore_root,"png","no_default.png")
+    options.wxflore_png_nophotos = os.path.join(options.wxflore_root,"png","no_photos.png")
+    sys.path.append(os.path.join(options.wxflore_root,"bk","FG"))
+
+    import panelThumb
+    import panelMain
+    import panelDesc
+    import panelFiltered
+    import panelGallery
 
     parse_argv(options)
     config.read(options)
@@ -1091,6 +1124,9 @@ if __name__ == '__main__':
 
         if options.paths.meta == "":
             options.paths.meta = os.path.join(options.wxflore,'meta')
+        if options.paths.bk == "":
+            options.paths.bk = os.path.join(db_base_dir,"BK")
+
         print(db_base_dir)
         options.paths.db = os.path.join(db_base_dir,"flore.main")
         options.paths.coste = os.path.join(db_base_dir,"flore.coste")

@@ -1,8 +1,9 @@
-import wx
+import wx.lib.newevent
 
 (NoteUpdateEvent, EVT_NOTE_UPDATE_ID) = wx.lib.newevent.NewEvent()
 (ObsUpdateEvent, EVT_OBS_UPDATE_ID) = wx.lib.newevent.NewEvent()
 (PictGalleryEvent, EVT_PICT_GALLERY_ID) = wx.lib.newevent.NewEvent()
+(DownloadEvent, EVT_DOWNLOAD_ID) = wx.lib.newevent.NewEvent()
 
 #-------------------------------------------------------------------------------
 #

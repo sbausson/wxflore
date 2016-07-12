@@ -15,6 +15,7 @@ import fldb
 import wxeditor
 import observations
 import panelFiltered
+import fg
 
 from common import *
 
@@ -449,6 +450,11 @@ class Panel(wx.Panel):
             self.notebook.AddPage(panel, name, True)
             PageIndex = self.notebook.GetSelection()
             self.notebook.SetPageTextColour(PageIndex,'#669900')
+
+    #-------------------------------------------------------------------------------
+    def Button_BK_FG(self,bk_filename,event):
+        print("Button_BK_FG",bk_filename)
+        fg.fgFrame(bk_filename)
 
     #-------------------------------------------------------------------------------
     def OnObsUpdate(self,event):
@@ -923,8 +929,6 @@ class Panel(wx.Panel):
             #image = image.Scale(self.apps.size["THUMB.XMAX"],
             #                    self.apps.size["THUMB.YMAX"], wx.IMAGE_QUALITY_HIGH)
             imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
-            #imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
-            #self.headerSizer.Add(imageBitmap,1,wx.EXPAND)
             self.headerSizer.Add(imageBitmap,0,wx.ALL)
 
 
@@ -959,8 +963,6 @@ class Panel(wx.Panel):
             image = wx.Image(choro_map, wx.BITMAP_TYPE_ANY)
             #image = image.Scale(self.apps.size["THUMB.XMAX"],self.apps.size["THUMB.YMAX"], wx.IMAGE_QUALITY_HIGH)
             imageBitmap = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(image))
-            #imageBitmap.Bind(wx.EVT_LEFT_DOWN, functools.partial(self.onPhotoClick,coste_ill))
-            #self.headerSizer.Add(imageBitmap,1,wx.EXPAND)
             self.headerSizer.Add(imageBitmap,0,wx.RIGHT,5)
 
 
@@ -988,6 +990,7 @@ class Panel(wx.Panel):
         self.popupID_COPY_DIASPORA_desc = wx.NewId()
         self.popupID_COPY_DIASPORA_baseveg = wx.NewId()
 
+        self.popupID_COPY_FORUM_NL = wx.NewId()
         self.popupID_COPY_FORUM_names = wx.NewId()
 
         self.popupID_COPY_NL_FA_NV = wx.NewId()
@@ -1020,6 +1023,7 @@ class Panel(wx.Panel):
         menu.Append(self.popupID_COPY_DIASPORA_desc, 'Diaspora* : copy Description')
         menu.Append(self.popupID_COPY_DIASPORA_baseveg, 'Diaspora* : copy BaseVeg')
         menu.AppendSeparator()
+        menu.Append(self.popupID_COPY_FORUM_NL, 'Forum : copy NL')
         menu.Append(self.popupID_COPY_FORUM_names, 'Forum : copy NL + (FA) + Names')
         menu.AppendSeparator()
         menu.Append(self.popupID_COPY_ID_TELA, "Copy ID TELA")
@@ -1152,6 +1156,14 @@ class Panel(wx.Panel):
         elif event.GetId() == self.popupID_COPY_DIASPORA_baseveg:
             s = build_baseveg_string(self.struct,self.options,True)
             print(s)
+
+        elif event.GetId() == self.popupID_COPY_FORUM_NL:
+            #nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
+            nl1, nl2 = re.findall("(.*)\[(.*)\]",self.struct['NL'])[0]
+            nl1 = nl1.strip()
+            nl2 = nl2.strip()
+
+            s = u"[b][i]{}[/b][/i]  {}".format(nl1,nl2)
 
         elif event.GetId() == self.popupID_COPY_FORUM_names:
             #nl = self.struct["NL"].replace("["," ").replace("]","") #.encode("utf-8")
@@ -1596,7 +1608,23 @@ class Panel(wx.Panel):
             id+=1
 
 
-        self.descTB_sizer.Add((5,-1))
+        # FG Keys
+        #---------
+        gender = self.struct["N."].split(".")[0]
+#        print("0"*50)
+#        print(os.path.join(self.options.paths.bk,"FG","{}.txt".format(gender)))
+        bk_filename = os.path.join(self.options.paths.bk,"FG",self.struct["FA"].upper(),"{}.txt".format(gender))
+        if os.path.exists(bk_filename):
+            self.descTB_sizer.Add((5,-1))
+            self.button_BK_FG = wx.Button(self.descTB, id,
+                                          u" FG {} sp.".format(gender),
+                                          wx.DefaultPosition, (-1,-1)) #, style=wx.BU_EXACTFIT)
+            self.button_BK_FG.SetForegroundColour("#000000")
+            self.button_BK_FG.SetBackgroundColour("#F08080")
+            self.descTB_sizer.Add(self.button_BK_FG,0,wx.ALIGN_LEFT|wx.LEFT|wx.TOP|wx.BOTTOM,border=2)
+
+            wx.EVT_BUTTON( self, id, functools.partial(self.Button_BK_FG,bk_filename))
+            id+=1
 
         # INPN Button
         #-------------
@@ -1619,7 +1647,6 @@ class Panel(wx.Panel):
         #-------------
         if self.options.buttons.url and "ID.tela" in self.struct and self.struct["ID.tela"] != "":
             self.tagsSizer.Add((5,-1))
-            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
             self.button_tela = wx.Button(self.descTB, id,
                                          u" Tela ",
                                          wx.DefaultPosition, (-1,-1))
@@ -1636,7 +1663,6 @@ class Panel(wx.Panel):
         #-------------
         if self.options.buttons.url and "ID.inpn" in self.struct:
             self.tagsSizer.Add((5,-1))
-            #self.button_baseveg = wx.Button(self.scrolledTagPanel,
             self.button_fcbn = wx.Button(self.descTB, id,
                                          u" FCBN ",
                                          wx.DefaultPosition, (-1,-1))

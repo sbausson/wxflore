@@ -108,8 +108,8 @@ def build_python_module():
                     s+='{'
 
                     for item in conv_table:
-
                         s+='"{}": "{}",'.format(item[1],row[indexes.index(item[0])].replace('\n',' ').replace('"',"'"))
+
                     f.write(s)
 
                     s_=[]

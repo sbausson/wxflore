@@ -4,6 +4,10 @@ import re
 import os
 import sys
 import csv
+import os
+import sys
+sys.path.append(os.getcwd())
+import bdtfx
 
 #import bdtfx_CN
 
@@ -114,9 +118,15 @@ def build_chorodep_files():
 def build_python_module():
 
 
+    syn_table = {}
+    for id in bdtfx.table:
+        for syn in bdtfx.table[id]["syn.id"]:
+            syn_table[syn] = id
+
     baseflor_filename = sys.argv[-1]
     try:
         version=re.findall("baseflor\-(.*).csv",baseflor_filename)[0]
+        print("Version detected  : {}".format(version))
     except:
         print("Version can not be detected ...  Exiting !")
         sys.exit()
@@ -126,7 +136,7 @@ def build_python_module():
 
 
     f.write('# -*- coding: utf-8 -*-\n')
-    f.write('\nID\'s="N°_Nomenclatural_BDNFF"')
+    #f.write('\nID\'s="N°_Nomenclatural_BDNFF"')
 
     f.write("version='{}'\n".format(version))
     f.write("table={\n")
@@ -144,6 +154,14 @@ def build_python_module():
                 nl = row[indexes.index("NOM_SCIENTIFIQUE")]
                 CN = row[indexes.index("N°_Taxinomique_BDNFF")]
                 id = row[indexes.index("N°_Nomenclatural_BDNFF")]
+
+                if id in bdtfx.table:
+                    pass
+                else:
+                    if id in syn_table:
+                        id = syn_table[id]
+                    else:
+                        print(nl)
 
                 #try:
                 #    id = bdtfx_CN.table[CN]

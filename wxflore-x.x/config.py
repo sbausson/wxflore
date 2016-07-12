@@ -26,7 +26,7 @@ def read(options):
                 line = line.split("#")[0].strip()
                 if line != "":
                     name,value= [x.strip() for x in line.split("=")]
-                    if name in ["path.root","path.img","path.snd","path.meta"]:
+                    if name in ["path.root","path.img","path.snd","path.meta","path.bk"]:
                         name = name.split(".")[1]
                         exec("options.paths.{}=value".format(name,value))
 

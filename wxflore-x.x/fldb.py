@@ -19,6 +19,7 @@ class PATHS:
     coste = ""
     #baseflor = ""
     catminat = ""
+    bk = ""
 
 class OPTIONS:
     desc = 0
@@ -52,7 +53,9 @@ key_list = ["NL","SY","NV",
             "CN","ID.coste","ID.tela","ID.inpn",
             "N.coste",
             "REF.wiki.fr",
+            "FL.col",
             "XX"
+
 ]
 
 line_parity = 0
@@ -86,6 +89,7 @@ def warning(s,color,options):
         "white":98,
     }
 
+    options.warning += 1
     print(u"\033[{}m{}\033[{}m".format(color_t[color],s,0))
 
     with codecs.open(options.log_filename,'a','utf-8') as f:
@@ -761,7 +765,6 @@ def parse_file_telacol(filename,struct,options):
         f.close()
         return
     except:
-        options.warning+=1
         sys.stderr.write("## WARNING {} ## \"{}\" Reading error ...\n".format(options.warning,filename))
         struct["telacol_ds"] = ""
         return
@@ -780,7 +783,6 @@ def parse_file_coste(coste_id,struct,options):
         struct["true_coste"] = 1
         f.close()
     except:
-        options.warning+=1
         sys.stderr.write("## WARNING {} ## \"{}\" Not found [ Tela {} ]...\n".format(options.warning,filename,struct["ID.tela"]))
         struct["true_coste"] = 0
         return
@@ -846,7 +848,6 @@ def parse_file_user(filename,struct,options):
         print("User {}".format(filename))
         print("="*50)
     except:
-        options.warning+=1
         sys.stderr.write("## WARNING {} ## \"{}\" Not found [ Tela {} ]...\n".format(options.warning,filename,struct["ID.tela"]))
         return
 
@@ -922,7 +923,7 @@ def parse_BOT(filename,struct,options):
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
-def parse_BASEFLOR(filename,struct,options):
+def __parse_BASEFLOR(filename,struct,options):
 
     #print(filename)
 
@@ -1163,8 +1164,15 @@ def parse_file(filename,name,options):
     #---------------------
     try:
         struct['baseflor'] = options.baseflor.table[struct["ID.tela"]]
+
     except:
         struct['baseflor'] = {}
+
+    if "FL.col" in struct["baseflor"] and struct['baseflor']["FL.col"] != "":
+        if "FL.col" in struct:
+            warning("## WARNING ## 'FL.col' field ignored for '{}' ...".format(struct["NL"]),"red",options)
+        else:
+            struct["FL.col"] = struct['baseflor']["FL.col"]
 
     # Catminat / chorodep
     #---------------------

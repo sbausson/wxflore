@@ -238,7 +238,10 @@ class filteredGrid(wx.grid.Grid):
 
             name_reduced = bota.ReduceName(struct["NL"])
             if os.path.exists(os.path.join(self.options.paths.img,"photos",name_reduced)):
-                photo_pres = ""
+                if os.path.exists(os.path.join(self.options.paths.img,"photos",name_reduced,"{}.00.jpg".format(name_reduced))):
+                    photo_pres = ""
+                else:
+                    photo_pres = "o"
             else:
                 photo_pres = "X"
 
@@ -304,7 +307,8 @@ class filteredGrid(wx.grid.Grid):
         for i in range(0,len(self.struct_list)):
             color = "none"
             try:
-                color = self.struct_list[i]["baseflor"]["FL.col"].split(",")[0].strip()
+                #color = self.struct_list[i]["baseflor"]["FL.col"].split(",")[0].strip()
+                color = self.struct_list[i]["FL.col"].split(",")[0].strip()
                 self.SetCellBackgroundColour(i,3,colors_t[color][0])
                 self.SetCellTextColour(i,3,colors_t[color][1])
 

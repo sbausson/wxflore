@@ -19,7 +19,7 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
         self.parent = parent
         self.colors = parent.colors
 
-        ncol = 6.0
+        ncol = 7.0
 
         #wx.Panel.__init__(self,parent,size=(-1,-1))
         wx.lib.scrolledpanel.ScrolledPanel.__init__(self,parent,size=(-1,-1))
@@ -29,12 +29,16 @@ class Panel(wx.lib.scrolledpanel.ScrolledPanel):
         gridSizer =  wx.GridSizer(rows=math.ceil(len(pictList) / ncol), cols=int(ncol), hgap=5, vgap=5)
         for i in range(0, len(pictList)):
             sizer = wx.BoxSizer(wx.VERTICAL)
-            if pictList[i][0] != "":
-                img = wx.Image(pictList[i][0], wx.BITMAP_TYPE_ANY)
+            if pictList[i][0] == None:
+                img = wx.Image(self.options.wxflore_png_nophotos, wx.BITMAP_TYPE_PNG)
+                bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
+                sizer.Add(bmp,0,wx.CENTER,0)
+            elif pictList[i][0] == "":
+                img = wx.Image(self.options.wxflore_png_nodefault, wx.BITMAP_TYPE_PNG)
                 bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
                 sizer.Add(bmp,0,wx.CENTER,0)
             else:
-                img = wx.Image(self.options.wxflore_png_nodefault, wx.BITMAP_TYPE_PNG)
+                img = wx.Image(pictList[i][0], wx.BITMAP_TYPE_ANY)
                 bmp = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(img))
                 sizer.Add(bmp,0,wx.CENTER,0)
 

@@ -81,6 +81,7 @@ class Panel(wx.Panel):
 
         #mainPanelSizer.Add(self.thumbPanel, 1, wx.ALL|wx.EXPAND)
         mainPanelSizer.Add(self.thumbPanel, 0, wx.EXPAND) #|wx.EXPAND)
+
         self.SetSizer(mainPanelSizer)
         print("## END ## MainPanel.__init__()")
 
