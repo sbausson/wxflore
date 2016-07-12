@@ -415,12 +415,12 @@ class bkGrid(wx.grid.Grid):
 class bkPanel(wx.Panel):
 
     #-------------------------------------------------------------------------------
-    def __init__(self, parent, panel, bkHeader, items, options):
+    def __init__(self, parent, panel, bk_t, options):
 
         self.colors = COLORS()
         self.title = "Title"
-        self.bkHeader = bkHeader
-        self.items = items
+        self.bk_t = bk_t
+        #self.items = items
 
         wx.Panel.__init__(self,parent=parent)
 
@@ -439,110 +439,146 @@ class bkPanel(wx.Panel):
 
         self.RTC.BeginTextColour(self.colors.normal[0])
 
-        # Botanical Key header
-        #----------------------
-        s=""
-        first = 1
-        for line in self.bkHeader:
-            if first:
-                self.RTC.BeginFontSize(14)
-                self.RTC.WriteText(line)
-                self.RTC.EndFontSize()
-                self.RTC.BeginFontSize(10)
-                first = 0
-            else:
+        for bk in self.bk_t:
 
-                self.RTC.WriteText(line)
+            # Botanical Key header
+            #----------------------
+            s=""
+            first = 1
+            for line in bk[0]:
+                if first:
+                    self.RTC.BeginFontSize(14)
+                    self.RTC.BeginTextColour("#ff9999") ##ff6666") ##ffff80")
 
-        self.RTC.WriteText("\n\n")
-
-        # Key items
-        #-----------
-        for item in self.items:
-
-            # key + caract
-            s=u""
-            s+=u"{} — {}\n".format(item["key"],item["caract"])
-            self.RTC.WriteText(s)
-
-            # action
-            s=u""
-            if re.match("[0-9]",item["action"]):
-                #self.color_t.append("")
-                #self.color_t.append("#ffff66")
-                self.RTC.BeginTextColour("#ff9900")
-                self.RTC.WriteText(u"Voir #{}".format(item["action"]))
-                self.RTC.EndTextColour()
-
-            else:
-                #print(item["action"])
-                re_names = re.match(u"(.*)(\[.*\])",item["action"])
-
-                if re_names:
-                    l = re_names.groups()
-
-                else:
-                    l = [item["action"]]
-
-                print(l[0])
-                if re.match(".* subsp\.? ",l[0]):
-                    ll = re.match("([A-Z][a-z\. ]+)([\(\)A-Z].*) subsp\.? ([a-z]+) (.*)",l[0]).groups()
-                    print(ll)
-                else:
-                    ll = re.match("([A-Z][a-z\. ]+)([\(\)A-Z].*)",l[0]).groups()
-
-                self.RTC.BeginTextColour("#33cc33")
-                self.RTC.BeginBold()
-                self.RTC.BeginItalic()
-                self.RTC.WriteText(u"= {}".format(ll[0]))
-                self.RTC.EndItalic()
-                self.RTC.EndBold()
-                if len(ll) == 2:
-                    self.RTC.WriteText(u"{}".format(ll[1]))
-
-#                elif len(ll) == 3:
-#                    self.RTC.WriteText(u"{} subsp. ".format(ll[1]))
-#                    self.RTC.BeginBold()
-#                    self.RTC.BeginItalic()
-#                    print(" {}".format(ll[2]))
-#                    self.RTC.EndItalic()
-#                    self.RTC.EndBold()
-
-                elif len(ll) == 4:
-                    print(ll)
-                    self.RTC.WriteText(u"{} subsp. ".format(ll[1]))
-                    self.RTC.BeginBold()
-                    self.RTC.BeginItalic()
-                    self.RTC.WriteText(" {}".format(ll[2]))
-                    self.RTC.EndItalic()
-                    self.RTC.EndBold()
-                    self.RTC.WriteText(" {}".format(ll[3]))
-
-                self.RTC.EndTextColour()
-
-                if len(l) > 1:
-                    self.RTC.BeginTextColour("white")
-                    self.RTC.WriteText(u"  {}".format(l[1]))
+                    self.RTC.WriteText(line)
                     self.RTC.EndTextColour()
 
-            self.RTC.WriteText("\n")
+                    self.RTC.EndFontSize()
+                    self.RTC.BeginFontSize(10)
+                    first = 0
+                else:
+                    self.RTC.WriteText(line)
 
-            # chorologie
-            #------------
-            if item["choro"] != "":
-                self.RTC.BeginTextColour("#999966")
-                self.RTC.WriteText(u"{}\n".format(item["choro"]))
-                self.RTC.EndTextColour()
-                #self.RTC.WriteText("\n")
+            self.RTC.WriteText("\n\n")
 
-            # note
-            #------
-            if item["note"] != "":
-                self.RTC.BeginTextColour("#99ccff")
-                self.RTC.WriteText(u"Note: {}\n".format(item["note"]))
-                self.RTC.EndTextColour()
+            # Key items
+            #-----------
+            for item in bk[1]:
 
-            self.RTC.WriteText("\n")
+                #print(item)
+                s=u""
+                s+=u"{} — {}\n".format(item["ref"],item["caract"])
+                self.RTC.WriteText(s)
+
+                # action
+                s=u""
+                if re.match("([0-9]+|[a-z])$",item["action"]):
+                    #self.color_t.append("")
+                    #self.color_t.append("#ffff66")
+                    self.RTC.BeginTextColour("#ff9900")
+                    self.RTC.WriteText(u"Voir #{}".format(item["action"]))
+                    self.RTC.EndTextColour()
+
+                elif re.match("groupe [A-Z]",item["action"]):
+                    #self.color_t.append("")
+                    #self.color_t.append("#ffff66")
+                    self.RTC.BeginTextColour("#DC143C")
+                    self.RTC.WriteText(u"Voir <{}>".format(item["action"]))
+                    self.RTC.EndTextColour()
+
+                else:
+                    #print(item["action"])
+                    re_names = re.match(u"(.*)(\[.*\])",item["action"])
+
+                    if re_names:
+                        l = re_names.groups()
+
+                    else:
+                        l = [item["action"]]
+
+                    print(l[0])
+                    if re.match("(subsp|var).? ",l[0]):
+                        ll = re.match("(subsp|var)\.? ([a-z]+)(.*)",l[0]).groups()
+                        self.RTC.BeginTextColour("#33cc33")
+                        self.RTC.WriteText(u"= {}.".format(ll[0]))
+                        self.RTC.BeginBold()
+                        self.RTC.BeginItalic()
+                        self.RTC.WriteText(u" {}".format(ll[1]))
+                        self.RTC.EndItalic()
+                        self.RTC.EndBold()
+                        if len(ll) > 2:
+                            self.RTC.WriteText(u" {}".format(ll[2]))
+
+
+                    elif 0 and re.match("var.? ",l[0]):
+                        ll = re.match("var\.? ([a-z]+)(.*)",l[0]).groups()
+                        self.RTC.BeginTextColour("#33cc33")
+                        self.RTC.BeginBold()
+                        self.RTC.BeginItalic()
+                        self.RTC.WriteText(u"= {}".format(ll[0]))
+                        self.RTC.EndItalic()
+                        self.RTC.EndBold()
+
+                    elif re.match(".* subsp\.? ",l[0]):
+                        #ll = re.match("([A-Z][a-z\. ]+)([\(\)A-Z].*) subsp\.? ([a-z]+) (.*)",l[0]).groups()
+                        ll = re.match("([A-Z][a-z\. ]+)([\(\)\.A-Z]*) subsp\.? ([a-z]+)(.*)",l[0]).groups()
+                        self.RTC.BeginTextColour("#33cc33")
+                        self.RTC.BeginBold()
+                        self.RTC.BeginItalic()
+                        self.RTC.WriteText(u"= {}".format(ll[0]))
+                        self.RTC.EndItalic()
+                        self.RTC.EndBold()
+                        self.RTC.WriteText(u"{}".format(ll[1]))
+
+                    else:
+                        ll = re.match("([A-Z][a-z\. ]+)([\(\)A-Z].*)",l[0]).groups()
+
+                        self.RTC.BeginTextColour("#33cc33")
+                        self.RTC.BeginBold()
+                        self.RTC.BeginItalic()
+                        self.RTC.WriteText(u"= {}".format(ll[0]))
+                        self.RTC.EndItalic()
+                        self.RTC.EndBold()
+                        self.RTC.WriteText(u"{}".format(ll[1]))
+
+#                    if len(ll) == 2:
+#                        self.RTC.WriteText(u"{}".format(ll[1]))
+#
+#                    elif len(ll) == 4:
+#                        print(ll)
+#                        self.RTC.WriteText(u"{} subsp. ".format(ll[1]))
+#                        self.RTC.BeginBold()
+#                        self.RTC.BeginItalic()
+#                        self.RTC.WriteText(" {}".format(ll[2]))
+#                        self.RTC.EndItalic()
+#                        self.RTC.EndBold()
+#                        self.RTC.WriteText(" {}".format(ll[3]))
+
+                    self.RTC.EndTextColour()
+
+                    if len(l) > 1:
+                        self.RTC.BeginTextColour("white")
+                        self.RTC.WriteText(u"  {}".format(l[1]))
+                        self.RTC.EndTextColour()
+
+                self.RTC.WriteText("\n")
+
+                # chorologie
+                #------------
+                if item["choro"] != "":
+                    self.RTC.BeginTextColour("#999966")
+                    self.RTC.WriteText(u"{}\n".format(item["choro"]))
+                    self.RTC.EndTextColour()
+                    #self.RTC.WriteText("\n")
+
+                # note
+                #------
+                if item["note"] != "":
+                    self.RTC.BeginTextColour("#99ccff")
+                    self.RTC.WriteText(u"Note: {}\n".format(item["note"]))
+                    self.RTC.EndTextColour()
+
+                self.RTC.WriteText("\n")
 
 
         self.RTC.EndTextColour()

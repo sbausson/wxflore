@@ -11,6 +11,18 @@ import fgPanel
 class OPTIONS:
     pass
 
+choro_ids = [u"Th",
+             u"G à drageons",
+             u"G à tubercules?",
+             u"G à rhizome",
+             u"Hydr Hc",
+             u"Hydr Th",
+             u"Hydr Hc",
+             u"Hydr Th / Hydr Hc",
+             u"Hc",
+             u"Th/Hc",
+             u"Hc/Ch"]
+
 #-------------------------------------------------------------------------------
 #
 #-------------------------------------------------------------------------------
@@ -55,34 +67,46 @@ class FGBotKeyItem():
         self.caract = ""
         self.choro = ""
         self.note = ""
+        self.group = "main"
 
     #-------------------------------------------------------------------------------
     def get(self):
         pass
 
     #-------------------------------------------------------------------------------
-    def handle(self,key_table):
+    def handle(self,ref,group_t):
 
         if self.caract != "":
             caract = self.caract.strip().replace("\n"," ")
-            print(caract)
-            splited_caract = re.findall(u"([0-9a-c]+’?) – (.*) \.+ (.*)",caract)[0]
+            #print(caract)
+
+            if re.match(u"([1-9][0-9]*’?) – (.*) \.+ (.*)",caract):
+                splited_caract = re.findall(u"([0-9]+’?) – (.*) \.+ (.*)",caract)[0]
+            elif re.match(u"([a-z]’?) – (.*) \.+ (.*)",caract):
+                splited_caract = re.findall(u"([a-z]’?) – (.*) \.+ (.*)",caract)[0]
+
             if len(splited_caract) != 3:
                 error()
             else:
                 print(splited_caract)
-                self.ref = splited_caract[0]
+                #self.ref = splited_caract[0]
 
             colprint(u"\t| {}".format(caract.strip().replace("\n"," ")),"green")
             colprint(u"\t| {}".format(self.choro.strip().replace("\n"," ")),"yellow")
             colprint(u"\t| {}".format(self.note.strip().replace("\n"," ")),"blue")
 
-            Bitem = {"caract":splited_caract[1],
+            Bitem = {"ref":splited_caract[0],
+                     "caract":splited_caract[1],
                      "action":splited_caract[2],
                      "choro":self.choro.replace("\n"," "),
                      "note":self.note}
 
-            key_table[self.ref] = Bitem
+            #print("o",ref,group_t[0])
+            if not ref in group_t[2]:
+                group_t[2][ref] = []
+
+            #print("#####",ref,Bitem["caract"],Bitem["action"])
+            group_t[2][ref].append(Bitem)
 
 #-------------------------------------------------------------------------------
 #
@@ -94,8 +118,12 @@ class FloraGallicaKey():
 
         section_type = ""
         header_flag = 1
-        self.header = []
-        self.key_table = {}
+        self.groups = [["main",[],{}]]
+        self.nref = ""
+        group_index = 0
+
+        #self.header = []
+        #self.key_table = {}
 
         item = FGBotKeyItem()
         with open(filename,"r") as f:
@@ -107,31 +135,46 @@ class FloraGallicaKey():
                 if re.match("^#",line):
                     pass
 
-                elif re.match(u"[1-9a-c][0-9]*’? – ",line):
+                elif re.match(u"[1-9][0-9]*’? – ",line):
                     header_flag = 0
-                    item.handle(self.key_table)
+                    item.handle(self.nref,self.groups[group_index])
+                    self.nref = re.findall(u"([0-9]+’?) –",line)[0]
+                    section_type = "caract"
+                    item = FGBotKeyItem()
+                    item.caract = line
+
+                elif re.match(u"[a-z]’? – ",line):
+                    header_flag = 0
+                    item.handle(self.nref,self.groups[group_index])
                     section_type = "caract"
                     item = FGBotKeyItem()
                     item.caract = line
 
                 elif header_flag:
-                    print("toto")
-                    self.header.append(line)
+                    self.groups[group_index][1].append(line)
 
-                elif re.match("[0-9]+\. ",line):
+                elif re.match("[1-9][0-9]*\. ",line):
                     section_type = "note"
                     item.note = line.strip()
 
                 elif re.match("^[0-9]+$",line.strip()):
                     pass
 
-                elif re.match(u"Th — |G à drageons — |G à tubercules? — |G à rhizome — |Hydr Th / Hydr Hc —|Hc — |Th/Hc — |Hc/Ch — ",line):
+                #elif re.match(u"Th — |G à drageons — |G à tubercules? — |G à rhizome — |Hydr Hc — |Hydr Th / Hydr Hc —|Hc — |Th/Hc — |Hc/Ch — ",line):
+                elif re.match("|".join([x + u" — " for x in choro_ids]),line,re.U):
                     section_type = "choro"
                     item.choro = line
 
                 elif re.match(u"Note – ",line):
                     section_type = "note"
                     item.note = line.split(u" – ",1)[1].strip()
+
+                elif re.match(u"Groupe [A-Z]",line):
+                    item.handle(self.nref,self.groups[group_index])
+                    item.group = re.findall(u"(Groupe [A-Z])",line)[0]
+                    header_flag = 1
+                    group_index+=1
+                    self.groups.append([item.group,[line],{}])
 
                 else:
                     if section_type == "caract":
@@ -146,44 +189,39 @@ class FloraGallicaKey():
                     else:
                         print("??????",line)
 
-            item.handle(self.key_table)
+            #item.handle(self.key_table)
+            item.handle(self.nref,self.groups[group_index])
 
         print()
 
 
     #-------------------------------------------------------------------------------
-    def walk(self,root,level):
+    def walk(self,root,group,level):
 
         table = []
+
         for key in [root, root+u'’']:
-            item = self.key_table[key]
-            #print(level)
+            #print(group,key,root)
+            #print(group)
+            #print(key,group[2].keys())
+            for item in group[2][key]:
 
-            item["key"] = key
-            table.append(item)
-            if re.match("[1-9]",item["action"]):
-                print(indent(level,u"[{}] - {}".format(key,item["caract"])))
+                item["key"] = key
+                table.append(item)
+                if re.match("([1-9][0-9]*|[a-z]’?)$",item["action"]):
+                    print(indent(level,u"[{}] - {}".format(item["ref"],item["caract"])))
 
-                subtable = self.walk(item["action"],level+1)
-                table += subtable
-            else:
-                print(indent(level,u"[{}] - {}".format(key,item["caract"])))
+                    subtable = self.walk(item["action"],group,level+1)
+                    table += subtable
+                else:
+                    print(indent(level,u"[{}] - {}".format(item["ref"],item["caract"])))
 
-                #first = 1
-                #for subcaract in item["caract"].split(";"):
-                #    #print(indent(level,"{} - {}".format(key,subcaract)))
-                #    if first :
-                #        print(indent(level,u"[{}]".format(key)))
-                #        first = 0
-                #    print(indent(level,u"  - {}".format(subcaract.strip())))
+                    colprint(indent(level,u"= {}".format(item["action"])),"yellow")
+                    print(indent(level,u"{}".format(item["choro"])))
 
-                colprint(indent(level,u"= {}".format(item["action"])),"yellow")
-                print(indent(level,u"{}".format(item["choro"])))
-
-                if item["note"] != "":
-                    print(indent(level,u"Note: {}".format(item["note"])))
-                print("")
-
+                    if item["note"] != "":
+                        print(indent(level,u"Note: {}".format(item["note"])))
+                    print("")
 
         return table
 
@@ -210,11 +248,16 @@ class fgFrame(wx.Frame):
         options = OPTIONS()
         options.filename=filename
         FGK = FloraGallicaKey(options.filename)
-        bk = FGK.walk("1",0)
-        bkh = FGK.header
+
+        bk_t = []
+        for G in FGK.groups:
+            bk = FGK.walk("1",G,0)
+            #bkh = FGK.header
+            bk_t.append([G[1],bk])
+
 
         #wxgrid.bkPanel(self,self,bkh,bk,options)
-        fgPanel.bkPanel(self,self,bkh,bk,options)
+        fgPanel.bkPanel(self,self,bk_t,options)
         self.Show()
 
 #-------------------------------------------------------------------------------
